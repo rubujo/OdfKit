@@ -78,8 +78,6 @@
 | `Test-OdfExternalSourceContracts.ps1` | 檢查 OASIS inventory／採用 manifest 與 OPF 固定版本／例外的對應。 |
 | `Build-OdfConformanceMatrix.py` | 從已取得的固定 OASIS 出版物建立 1.0～1.4 條款索引；`--verify` 檢查重建一致性，PDF 部分需 pypdf。 |
 | `Test-OdfConformanceMatrix.ps1` | 離線檢查逐條合規矩陣的來源／schema hash、條款 ID 與人工 audit／測試證據對應；見 [合規矩陣](../docs/odf-conformance-matrix.md)。 |
-| `Build-OdfObligationInventory.py` | 建立逐句來源定位與精確人工裁決對應，包含核准勘誤；`--check-contracts` 離線驗證，`--require-complete` 拒絕未完成的裁決。見 [條款對測試追蹤](../docs/odf-conformance-tracking.md)。 |
-| `Build-OdfObligationClassification.py` | 依官方來源結構分派主題佇列與跨版本候選工作群組；`--verify` 核對來源重建，`--check-contracts` 離線確認完整分派、hash、群組成員及既有裁決。分組不等於語意相同、SDK 範圍或合規裁決，見 [分類統計](../docs/odf-obligation-classification.md)。 |
 | `Test-OdfAttributeFixture.py` | 以 Jing 獨立重驗 `OdfKit.Tests/TestData/OdfAttributeCases.jsonl.gz`：正例須被官方 RELAX NG schema 接受、反例須被拒絕，並核對固定資料與清單雜湊相符。不使用 OdfKit，需要 Java 與 `eng/Install-Jing.ps1` 安裝的 Jing（`--jing` 指定路徑）。 |
 | `Test-OdfElementFixture.py` | 以 Jing 獨立重驗 `OdfKit.Tests/TestData/OdfElementCases.jsonl.gz` 記錄的每個元素實例判定（父元素、屬性、子元素、字元資料與變異反例），並核對固定資料與清單雜湊相符。不使用 OdfKit，需要 Java 與 Jing。 |
 | `Test-OfficeGuiSmoke.ps1` | 執行 Microsoft Office GUI／COM 的 ODT／ODS／ODP 讀取煙霧驗收（僅 Windows，手動）。 |

@@ -16,14 +16,6 @@ on:
       - 'eng/Test-OdfExternalSourceContracts.ps1'
       - 'eng/Test-OdfConformanceMatrix.ps1'
       - 'eng/Build-OdfConformanceMatrix.py'
-      - 'eng/Build-OdfObligationInventory.py'
-      - 'eng/Build-OdfObligationClassification.py'
-      - 'eng/testdata/Test-OdfObligationClassification.py'
-      - 'eng/testdata/Test-OdfObligationInventory.py'
-      - 'docs/odf-obligation-decisions.json'
-      - 'docs/odf-obligation-inventory/**'
-      - 'docs/odf-obligation-classification/**'
-      - 'docs/odf-obligation-classification.md'
       - 'docs/odf-conformance-audits.json'
       - 'docs/odf-conformance-matrix/**'
       - 'OdfKit.Tests/OdfConformanceGapTests.cs'
@@ -59,14 +51,6 @@ on:
       - 'eng/Test-OdfExternalSourceContracts.ps1'
       - 'eng/Test-OdfConformanceMatrix.ps1'
       - 'eng/Build-OdfConformanceMatrix.py'
-      - 'eng/Build-OdfObligationInventory.py'
-      - 'eng/Build-OdfObligationClassification.py'
-      - 'eng/testdata/Test-OdfObligationClassification.py'
-      - 'eng/testdata/Test-OdfObligationInventory.py'
-      - 'docs/odf-obligation-decisions.json'
-      - 'docs/odf-obligation-inventory/**'
-      - 'docs/odf-obligation-classification/**'
-      - 'docs/odf-obligation-classification.md'
       - 'docs/odf-conformance-audits.json'
       - 'docs/odf-conformance-matrix/**'
       - 'OdfKit.Tests/OdfConformanceGapTests.cs'
@@ -167,14 +151,6 @@ jobs:
           ./eng/Test-OdfConformanceMatrix.ps1
           python eng/testdata/Test-OdfConformanceMatrix.py
           if ($LASTEXITCODE -ne 0) { throw 'Conformance source extraction regressions failed.' }
-          python eng/testdata/Test-OdfObligationInventory.py
-          if ($LASTEXITCODE -ne 0) { throw 'Obligation inventory extraction regressions failed.' }
-          python eng/Build-OdfObligationInventory.py --check-contracts
-          if ($LASTEXITCODE -ne 0) { throw 'Obligation inventory contracts failed.' }
-          python eng/testdata/Test-OdfObligationClassification.py
-          if ($LASTEXITCODE -ne 0) { throw 'Obligation classification regressions failed.' }
-          python eng/Build-OdfObligationClassification.py --check-contracts
-          if ($LASTEXITCODE -ne 0) { throw 'Obligation classification contracts failed.' }
           $tool = (Get-Content eng/external-tools.json -Raw | ConvertFrom-Json).opfOdfValidator
           $corpus = Get-Content docs/examples/oasis-odf-tc-corpus/manifest.json -Raw | ConvertFrom-Json
           $corpusHash = (Get-FileHash docs/examples/oasis-odf-tc-corpus/manifest.json -Algorithm SHA256).Hash.ToLowerInvariant()
