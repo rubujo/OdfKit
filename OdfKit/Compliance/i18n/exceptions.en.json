@@ -1,4 +1,4 @@
-﻿{
+{
   "Err_ObjectDataReader_NoReadableProperties": "Type {0} has no readable public properties to map to data reader columns.",
   "Err_ObjectDataReader_Disposed": "Cannot access a disposed ObjectDataReader.",
   "Err_OdfSpreadsheetTable_ColumnNotFound": "Spreadsheet table column '{0}' was not found.",
@@ -126,7 +126,7 @@
   "Err_LibreOfficeRenderer_LibreofficeExitedCode": "LibreOffice exited with code {0}.",
   "Err_LocalProcessBackend_NativeLibreofficeConversionSuccessfully": "Native LibreOffice conversion does not successfully produce expected results.",
   "Err_XlsxToOdfConverter_XlsxInputSizeLimitExceeded": "The XLSX input stream exceeds the size limit ({0} > {1} bytes).",
-  "Err_OdfAngle_AngleCannotBeEmpty": "The angle value cannot be blank and cannot contain control characters.",
+  "Err_OdfAngle_AngleCannotBeEmpty": "The value must be a valid ODF angle.",
   "Err_OdfBorderWidths_BorderLineWidthThree": "The border line width must be three positive length values ​​separated by whitespace.",
   "Err_OdfBorderWidths_BorderLineWidthsOnly": "Border line widths can only use cm, mm, in, pt, pc, or px lengths greater than 0.",
   "Err_OdfBouncyCastleOpenPgpProvider_EcdhKdfRequiresNamed": "ECDH KDF requires named curves and does not support anonymous curve parameters.",
@@ -157,7 +157,7 @@
   "Err_OdfCellRangeAddressList_CellRangeAddressList": "The cell range address list must conform to the ODF cellRangeAddressList format.",
   "Err_OdfCellRangeAddressList_ListCannotBeEmpty": "The list of cell range addresses cannot be empty.",
   "Err_OdfCellRangeAddress_CellRangeAddressesConform": "Cell range addresses must conform to the ODF cellRangeAddress format.",
-  "Err_OdfCharacter_CharacterValueSingleText": "The character value must be a single text element and cannot contain control characters.",
+  "Err_OdfCharacter_CharacterValueSingleText": "The value must be a single valid XML character.",
   "Err_OdfChartDocument_AxisCannotBeEmpty": "Axis dimensions cannot be empty.",
   "Err_OdfChartDocument_CategoryCannotBeEmpty": "The category label range address cannot be empty.",
   "Err_OdfChartDocument_DataCannotBeEmpty": "The data range address cannot be empty.",
@@ -646,5 +646,10 @@
   "Err_OdfXmlReader_DtdProhibited": "DTD and XML markup declarations are prohibited.",
   "Err_OdfDocumentMerge_CannotMergeIntoItself": "A document cannot be appended to or merged into itself.",
   "Err_LibreOfficeRenderer_InvalidTargetFormat": "The conversion format '{0}' is invalid: the extension part must not be empty and must not contain '..' or line breaks.",
-  "Err_OdfRdfGraphBridge_ServiceClauseNotAllowed": "SPARQL federated queries (the SERVICE clause) are not allowed: they would make the library send network requests to endpoints named in the query."
+  "Err_OdfRdfGraphBridge_ServiceClauseNotAllowed": "SPARQL federated queries (the SERVICE clause) are not allowed: they would make the library send network requests to endpoints named in the query.",
+  "Err_OdfEncryption_PlaintextSizeMismatch": "Decrypted entry size does not match manifest:size ({0} declared, {1} actual bytes).",
+  "Err_OdfDatabaseFormDesigner_UnsupportedDocumentKind": "Form design requires a text document or a database document.",
+  "Err_OdfDatabaseFormDesigner_TimeOutsideDay": "The time must be between 00:00:00 and 24:00:00, inclusive.",
+  "Err_TextDocumentNotesEngine_SecondaryIndexKeyRequiresPrimary": "A secondary index key requires a primary index key.",
+  "Err_OdfDocumentSettingsEngine_ValueDoesNotFitType": "The setting value cannot be represented by its declared datatype."
 }

@@ -144,7 +144,7 @@ public static partial class OdfLocalizer
             ["Err_LibreOfficeRenderer_LibreofficeExitedCode"] = "LibreOffice가 코드 {0}으로 종료되었습니다.",
             ["Err_LocalProcessBackend_NativeLibreofficeConversionSuccessfully"] = "기본 LibreOffice 변환이 예상한 결과를 성공적으로 생성하지 못합니다.",
             ["Err_XlsxToOdfConverter_XlsxInputSizeLimitExceeded"] = "XLSX 입력 스트림이 크기 제한을 초과했습니다({0} > {1}바이트).",
-            ["Err_OdfAngle_AngleCannotBeEmpty"] = "각도 값은 비워 둘 수 없으며 제어 문자를 포함할 수 없습니다.",
+            ["Err_OdfAngle_AngleCannotBeEmpty"] = "값은 유효한 ODF 각도여야 합니다.",
             ["Err_OdfBorderWidths_BorderLineWidthThree"] = "테두리 선 너비는 공백으로 구분된 세 개의 양수 길이 값이어야 합니다.",
             ["Err_OdfBorderWidths_BorderLineWidthsOnly"] = "테두리 선 너비에는 0보다 큰 cm, mm, in, pt, pc 또는 px 길이만 사용할 수 있습니다.",
             ["Err_OdfBouncyCastleOpenPgpProvider_EcdhKdfRequiresNamed"] = "ECDH KDF에는 명명된 곡선이 필요하며 익명 곡선 매개변수는 지원하지 않습니다.",
@@ -175,7 +175,7 @@ public static partial class OdfLocalizer
             ["Err_OdfCellRangeAddressList_CellRangeAddressList"] = "셀 범위 주소 목록은 ODF cellRangeAddressList 형식을 따라야 합니다.",
             ["Err_OdfCellRangeAddressList_ListCannotBeEmpty"] = "셀 범위 주소 목록은 비워둘 수 없습니다.",
             ["Err_OdfCellRangeAddress_CellRangeAddressesConform"] = "셀 범위 주소는 ODF cellRangeAddress 형식을 준수해야 합니다.",
-            ["Err_OdfCharacter_CharacterValueSingleText"] = "문자 값은 단일 텍스트 요소여야 하며 제어 문자를 포함할 수 없습니다.",
+            ["Err_OdfCharacter_CharacterValueSingleText"] = "문자 값은 유효한 XML 문자 하나여야 합니다.",
             ["Err_OdfChartDocument_AxisCannotBeEmpty"] = "축 차원은 비워둘 수 없습니다.",
             ["Err_OdfChartDocument_CategoryCannotBeEmpty"] = "카테고리 라벨 범위 주소는 비워둘 수 없습니다.",
             ["Err_OdfChartDocument_DataCannotBeEmpty"] = "데이터 범위 주소는 비워둘 수 없습니다.",
@@ -665,6 +665,11 @@ public static partial class OdfLocalizer
             ["Err_OdfDocumentMerge_CannotMergeIntoItself"] = "문서를 자기 자신에 추가하거나 병합할 수 없습니다.",
             ["Err_LibreOfficeRenderer_InvalidTargetFormat"] = "변환 형식 '{0}'이(가) 잘못되었습니다. 확장명 부분은 비어 있을 수 없으며 '..' 또는 줄 바꿈을 포함할 수 없습니다.",
             ["Err_OdfRdfGraphBridge_ServiceClauseNotAllowed"] = "SPARQL 페더레이션 쿼리(SERVICE 절)는 허용되지 않습니다. 쿼리에 지정된 엔드포인트로 라이브러리가 네트워크 요청을 보내게 되기 때문입니다.",
+            ["Err_OdfEncryption_PlaintextSizeMismatch"] = "복호화된 항목 크기가 manifest:size와 일치하지 않습니다(선언: {0}, 실제: {1}바이트).",
+            ["Err_OdfDatabaseFormDesigner_UnsupportedDocumentKind"] = "양식 디자인에는 텍스트 문서 또는 데이터베이스 문서가 필요합니다.",
+            ["Err_OdfDatabaseFormDesigner_TimeOutsideDay"] = "시간은 00:00:00 이상 24:00:00 이하여야 합니다.",
+            ["Err_TextDocumentNotesEngine_SecondaryIndexKeyRequiresPrimary"] = "보조 색인 키에는 기본 색인 키가 필요합니다.",
+            ["Err_OdfDocumentSettingsEngine_ValueDoesNotFitType"] = "설정 값을 선언된 데이터 형식으로 표현할 수 없습니다.",
         };
     }
 }

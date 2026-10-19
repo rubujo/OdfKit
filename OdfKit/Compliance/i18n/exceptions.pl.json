@@ -1,4 +1,4 @@
-﻿{
+{
   "Err_ObjectDataReader_NoReadableProperties": "Typ {0} nie ma żadnych odczytywalnych właściwości publicznych, które można zmapować na kolumny czytnika danych.",
   "Err_ObjectDataReader_Disposed": "Nie można uzyskać dostępu do zwolnionego obiektu ObjectDataReader.",
   "Err_OdfSpreadsheetTable_ColumnNotFound": "Nie znaleziono kolumny '{0}' tabeli arkusza kalkulacyjnego.",
@@ -126,7 +126,7 @@
   "Err_LibreOfficeRenderer_LibreofficeExitedCode": "Program LibreOffice zakończył działanie z kodem {0}.",
   "Err_LocalProcessBackend_NativeLibreofficeConversionSuccessfully": "Natywna konwersja LibreOffice nie generuje prawidłowo oczekiwanych wyników.",
   "Err_XlsxToOdfConverter_XlsxInputSizeLimitExceeded": "Strumień wejściowy XLSX przekracza limit rozmiaru ({0} > {1} bajtów).",
-  "Err_OdfAngle_AngleCannotBeEmpty": "Wartość kąta nie może być pusta ani zawierać znaków sterujących.",
+  "Err_OdfAngle_AngleCannotBeEmpty": "Wartość musi być prawidłowym kątem ODF.",
   "Err_OdfBorderWidths_BorderLineWidthThree": "Szerokość linii obramowania musi składać się z trzech dodatnich wartości długości oddzielonych białymi znakami.",
   "Err_OdfBorderWidths_BorderLineWidthsOnly": "Szerokości linii obramowania mogą używać tylko długości cm, mm, in, pt, pc lub px większych niż 0.",
   "Err_OdfBouncyCastleOpenPgpProvider_EcdhKdfRequiresNamed": "Funkcja KDF ECDH wymaga nazwanych krzywych i nie obsługuje anonimowych parametrów krzywej.",
@@ -157,7 +157,7 @@
   "Err_OdfCellRangeAddressList_CellRangeAddressList": "Lista adresów zakresów komórek musi być zgodna z formatem ODF cellRangeAddressList.",
   "Err_OdfCellRangeAddressList_ListCannotBeEmpty": "Lista adresów zakresów komórek nie może być pusta.",
   "Err_OdfCellRangeAddress_CellRangeAddressesConform": "Adresy zakresów komórek muszą być zgodne z formatem ODF cellRangeAddress.",
-  "Err_OdfCharacter_CharacterValueSingleText": "Wartość znaku musi być pojedynczym elementem tekstowym i nie może zawierać znaków sterujących.",
+  "Err_OdfCharacter_CharacterValueSingleText": "Wartość znaku musi być pojedynczym prawidłowym znakiem XML.",
   "Err_OdfChartDocument_AxisCannotBeEmpty": "Wymiary osi nie mogą być puste.",
   "Err_OdfChartDocument_CategoryCannotBeEmpty": "Adres zakresu etykiet kategorii nie może być pusty.",
   "Err_OdfChartDocument_DataCannotBeEmpty": "Adres zakresu danych nie może być pusty.",
@@ -646,5 +646,10 @@
   "Err_OdfXmlReader_DtdProhibited": "Deklaracje DTD i znaczniki XML są zabronione.",
   "Err_OdfDocumentMerge_CannotMergeIntoItself": "Dokumentu nie można dołączyć ani scalić z samym sobą.",
   "Err_LibreOfficeRenderer_InvalidTargetFormat": "Format konwersji '{0}' jest nieprawidłowy: część rozszerzenia nie może być pusta ani zawierać '..' ani podziałów wierszy.",
-  "Err_OdfRdfGraphBridge_ServiceClauseNotAllowed": "Zapytania federacyjne SPARQL (klauzula SERVICE) są niedozwolone: powodowałyby wysyłanie przez bibliotekę żądań sieciowych do punktów końcowych wskazanych w zapytaniu."
+  "Err_OdfRdfGraphBridge_ServiceClauseNotAllowed": "Zapytania federacyjne SPARQL (klauzula SERVICE) są niedozwolone: powodowałyby wysyłanie przez bibliotekę żądań sieciowych do punktów końcowych wskazanych w zapytaniu.",
+  "Err_OdfEncryption_PlaintextSizeMismatch": "Rozmiar odszyfrowanego wpisu nie zgadza się z manifest:size (zadeklarowano {0}, rzeczywiście {1} bajtów).",
+  "Err_OdfDatabaseFormDesigner_UnsupportedDocumentKind": "Projektowanie formularzy wymaga dokumentu tekstowego lub dokumentu bazy danych.",
+  "Err_OdfDatabaseFormDesigner_TimeOutsideDay": "Czas musi mieścić się w zakresie od 00:00:00 do 24:00:00, włącznie z wartościami granicznymi.",
+  "Err_TextDocumentNotesEngine_SecondaryIndexKeyRequiresPrimary": "Dodatkowy klucz indeksu wymaga głównego klucza indeksu.",
+  "Err_OdfDocumentSettingsEngine_ValueDoesNotFitType": "Wartości ustawienia nie można przedstawić za pomocą zadeklarowanego typu danych."
 }

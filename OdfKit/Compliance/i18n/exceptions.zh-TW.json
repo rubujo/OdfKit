@@ -1,4 +1,4 @@
-﻿{
+{
   "Err_ObjectDataReader_NoReadableProperties": "型別 {0} 沒有可對應至資料讀取器欄位的可讀公開屬性。",
   "Err_ObjectDataReader_Disposed": "無法存取已釋放的 ObjectDataReader。",
   "Err_OdfSpreadsheetTable_ColumnNotFound": "找不到試算表表格欄位「{0}」。",
@@ -126,7 +126,7 @@
   "Err_LibreOfficeRenderer_LibreofficeExitedCode": "LibreOffice 已退出，代碼為 {0}。",
   "Err_LocalProcessBackend_NativeLibreofficeConversionSuccessfully": "本機 LibreOffice 轉檔未成功產生預期結果。",
   "Err_XlsxToOdfConverter_XlsxInputSizeLimitExceeded": "XLSX 輸入串流超過大小限制（{0} > {1} 位元組）。",
-  "Err_OdfAngle_AngleCannotBeEmpty": "角度值不可為空白，且不可包含控制字元。",
+  "Err_OdfAngle_AngleCannotBeEmpty": "值必須是合法的 ODF 角度。",
   "Err_OdfBorderWidths_BorderLineWidthThree": "邊框線寬必須是三個以空白分隔的正長度值。",
   "Err_OdfBorderWidths_BorderLineWidthsOnly": "邊框線寬只能使用大於 0 的 cm、mm、in、pt、pc 或 px 長度。",
   "Err_OdfBouncyCastleOpenPgpProvider_EcdhKdfRequiresNamed": "ECDH KDF 需要具名曲線，不支援匿名曲線參數。",
@@ -157,7 +157,7 @@
   "Err_OdfCellRangeAddressList_CellRangeAddressList": "儲存格範圍位址清單必須符合 ODF cellRangeAddressList 格式。",
   "Err_OdfCellRangeAddressList_ListCannotBeEmpty": "儲存格範圍位址清單不可為空。",
   "Err_OdfCellRangeAddress_CellRangeAddressesConform": "儲存格範圍位址必須符合 ODF cellRangeAddress 格式。",
-  "Err_OdfCharacter_CharacterValueSingleText": "字元值必須是單一文字元素，且不可包含控制字元。",
+  "Err_OdfCharacter_CharacterValueSingleText": "字元值必須是單一合法的 XML 字元。",
   "Err_OdfChartDocument_AxisCannotBeEmpty": "座標軸維度不能為空。",
   "Err_OdfChartDocument_CategoryCannotBeEmpty": "分類標籤範圍位址不能為空。",
   "Err_OdfChartDocument_DataCannotBeEmpty": "資料範圍位址不能為空。",
@@ -646,5 +646,10 @@
   "Err_OdfXmlReader_DtdProhibited": "禁止使用 DTD 與 XML 標記宣告。",
   "Err_OdfDocumentMerge_CannotMergeIntoItself": "文件不可附加或合併至自身。",
   "Err_LibreOfficeRenderer_InvalidTargetFormat": "轉換格式「{0}」無效：副檔名部分不得為空，且不得包含「..」或換行。",
-  "Err_OdfRdfGraphBridge_ServiceClauseNotAllowed": "不允許 SPARQL 聯邦查詢（SERVICE 子句）：它會讓程式庫對查詢中指定的端點發出網路要求。"
+  "Err_OdfRdfGraphBridge_ServiceClauseNotAllowed": "不允許 SPARQL 聯邦查詢（SERVICE 子句）：它會讓程式庫對查詢中指定的端點發出網路要求。",
+  "Err_OdfEncryption_PlaintextSizeMismatch": "解密後的項目大小與 manifest:size 不符（宣告 {0}，實際 {1} 位元組）。",
+  "Err_OdfDatabaseFormDesigner_UnsupportedDocumentKind": "表單設計需要文字文件或資料庫文件。",
+  "Err_OdfDatabaseFormDesigner_TimeOutsideDay": "時間必須介於包含端點的 00:00:00 與 24:00:00 之間。",
+  "Err_TextDocumentNotesEngine_SecondaryIndexKeyRequiresPrimary": "提供次要索引鍵時，也必須提供主要索引鍵。",
+  "Err_OdfDocumentSettingsEngine_ValueDoesNotFitType": "設定值無法以宣告的型別表示。"
 }

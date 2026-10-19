@@ -144,7 +144,7 @@ public static partial class OdfLocalizer
             ["Err_LibreOfficeRenderer_LibreofficeExitedCode"] = "LibreOffice skončil s kódem {0}.",
             ["Err_LocalProcessBackend_NativeLibreofficeConversionSuccessfully"] = "Nativní převod LibreOffice nevytváří očekávané výsledky úspěšně.",
             ["Err_XlsxToOdfConverter_XlsxInputSizeLimitExceeded"] = "Vstupní datový proud XLSX překračuje limit velikosti ({0} > {1} bajtů).",
-            ["Err_OdfAngle_AngleCannotBeEmpty"] = "Hodnota úhlu nesmí být prázdná ani obsahovat řídicí znaky.",
+            ["Err_OdfAngle_AngleCannotBeEmpty"] = "Hodnota musí být platný úhel ODF.",
             ["Err_OdfBorderWidths_BorderLineWidthThree"] = "Šířka čáry okraje musí obsahovat tři kladné hodnoty délky oddělené mezerami.",
             ["Err_OdfBorderWidths_BorderLineWidthsOnly"] = "Šířky čar okraje mohou používat pouze délky cm, mm, in, pt, pc nebo px větší než 0.",
             ["Err_OdfBouncyCastleOpenPgpProvider_EcdhKdfRequiresNamed"] = "KDF ECDH vyžaduje pojmenované křivky a nepodporuje anonymní parametry křivky.",
@@ -175,7 +175,7 @@ public static partial class OdfLocalizer
             ["Err_OdfCellRangeAddressList_CellRangeAddressList"] = "Seznam adres rozsahů buněk musí odpovídat formátu ODF cellRangeAddressList.",
             ["Err_OdfCellRangeAddressList_ListCannotBeEmpty"] = "Seznam adres rozsahů buněk nesmí být prázdný.",
             ["Err_OdfCellRangeAddress_CellRangeAddressesConform"] = "Adresy rozsahů buněk musí odpovídat formátu ODF cellRangeAddress.",
-            ["Err_OdfCharacter_CharacterValueSingleText"] = "Hodnota znaku musí být jediný textový prvek a nesmí obsahovat řídicí znaky.",
+            ["Err_OdfCharacter_CharacterValueSingleText"] = "Hodnota znaku musí být jediný platný znak XML.",
             ["Err_OdfChartDocument_AxisCannotBeEmpty"] = "Rozměry osy nesmí být prázdné.",
             ["Err_OdfChartDocument_CategoryCannotBeEmpty"] = "Adresa rozsahu popisků kategorií nesmí být prázdná.",
             ["Err_OdfChartDocument_DataCannotBeEmpty"] = "Adresa rozsahu dat nesmí být prázdná.",
@@ -665,6 +665,11 @@ public static partial class OdfLocalizer
             ["Err_OdfDocumentMerge_CannotMergeIntoItself"] = "Dokument nelze připojit ani sloučit sám do sebe.",
             ["Err_LibreOfficeRenderer_InvalidTargetFormat"] = "Formát převodu '{0}' je neplatný: část přípony nesmí být prázdná ani obsahovat '..' nebo zalomení řádků.",
             ["Err_OdfRdfGraphBridge_ServiceClauseNotAllowed"] = "Federované dotazy SPARQL (klauzule SERVICE) nejsou povoleny: způsobily by, že knihovna odesílá síťové požadavky na koncové body uvedené v dotazu.",
+            ["Err_OdfEncryption_PlaintextSizeMismatch"] = "Velikost dešifrované položky neodpovídá manifest:size (deklarováno {0}, skutečně {1} bajtů).",
+            ["Err_OdfDatabaseFormDesigner_UnsupportedDocumentKind"] = "Návrh formuláře vyžaduje textový dokument nebo databázový dokument.",
+            ["Err_OdfDatabaseFormDesigner_TimeOutsideDay"] = "Čas musí být mezi 00:00:00 a 24:00:00 včetně krajních hodnot.",
+            ["Err_TextDocumentNotesEngine_SecondaryIndexKeyRequiresPrimary"] = "Sekundární klíč rejstříku vyžaduje primární klíč rejstříku.",
+            ["Err_OdfDocumentSettingsEngine_ValueDoesNotFitType"] = "Hodnotu nastavení nelze vyjádřit deklarovaným datovým typem.",
         };
     }
 }

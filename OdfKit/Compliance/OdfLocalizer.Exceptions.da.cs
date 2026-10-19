@@ -144,7 +144,7 @@ public static partial class OdfLocalizer
             ["Err_LibreOfficeRenderer_LibreofficeExitedCode"] = "LibreOffice afsluttede med koden {0}.",
             ["Err_LocalProcessBackend_NativeLibreofficeConversionSuccessfully"] = "Native LibreOffice-konvertering giver ikke de forventede resultater.",
             ["Err_XlsxToOdfConverter_XlsxInputSizeLimitExceeded"] = "XLSX-inputstrømmen overskrider størrelsesgrænsen ({0} > {1} byte).",
-            ["Err_OdfAngle_AngleCannotBeEmpty"] = "Vinkelværdien må ikke være tom og må ikke indeholde kontroltegn.",
+            ["Err_OdfAngle_AngleCannotBeEmpty"] = "Værdien skal være en gyldig ODF-vinkel.",
             ["Err_OdfBorderWidths_BorderLineWidthThree"] = "Grænselinjens bredde skal være tre positive længdeværdier adskilt af mellemrum.",
             ["Err_OdfBorderWidths_BorderLineWidthsOnly"] = "Kantlinjebredder kan kun bruge cm, mm, in, pt, pc eller px længder større end 0.",
             ["Err_OdfBouncyCastleOpenPgpProvider_EcdhKdfRequiresNamed"] = "ECDH KDF kræver navngivne kurver og understøtter ikke anonyme kurveparametre.",
@@ -175,7 +175,7 @@ public static partial class OdfLocalizer
             ["Err_OdfCellRangeAddressList_CellRangeAddressList"] = "Celleområdets adresseliste skal være i overensstemmelse med ODF cellRangeAddressList-formatet.",
             ["Err_OdfCellRangeAddressList_ListCannotBeEmpty"] = "Listen over adresser til celleområde må ikke være tom.",
             ["Err_OdfCellRangeAddress_CellRangeAddressesConform"] = "Celleområdeadresser skal være i overensstemmelse med ODF cellRangeAddress-formatet.",
-            ["Err_OdfCharacter_CharacterValueSingleText"] = "Tegnværdien skal være et enkelt tekstelement og må ikke indeholde kontroltegn.",
+            ["Err_OdfCharacter_CharacterValueSingleText"] = "Tegnværdien skal være ét gyldigt XML-tegn.",
             ["Err_OdfChartDocument_AxisCannotBeEmpty"] = "Aksedimensioner må ikke være tomme.",
             ["Err_OdfChartDocument_CategoryCannotBeEmpty"] = "Kategorieetikettens områdeadresse må ikke være tom.",
             ["Err_OdfChartDocument_DataCannotBeEmpty"] = "Dataområdets adresse må ikke være tom.",
@@ -665,6 +665,11 @@ public static partial class OdfLocalizer
             ["Err_OdfDocumentMerge_CannotMergeIntoItself"] = "Et dokument kan ikke tilføjes til eller flettes med sig selv.",
             ["Err_LibreOfficeRenderer_InvalidTargetFormat"] = "Konverteringsformatet '{0}' er ugyldigt: filtypenavnsdelen må ikke være tom og må ikke indeholde '..' eller linjeskift.",
             ["Err_OdfRdfGraphBridge_ServiceClauseNotAllowed"] = "Fødererede SPARQL-forespørgsler (SERVICE-klausulen) er ikke tilladt: de ville få biblioteket til at sende netværksanmodninger til de slutpunkter, der er angivet i forespørgslen.",
+            ["Err_OdfEncryption_PlaintextSizeMismatch"] = "Størrelsen på den dekrypterede post svarer ikke til manifest:size ({0} angivet, {1} faktiske byte).",
+            ["Err_OdfDatabaseFormDesigner_UnsupportedDocumentKind"] = "Formulardesign kræver et tekstdokument eller et databasedokument.",
+            ["Err_OdfDatabaseFormDesigner_TimeOutsideDay"] = "Tiden skal være mellem 00:00:00 og 24:00:00, inklusive grænserne.",
+            ["Err_TextDocumentNotesEngine_SecondaryIndexKeyRequiresPrimary"] = "En sekundær indeksnøgle kræver en primær indeksnøgle.",
+            ["Err_OdfDocumentSettingsEngine_ValueDoesNotFitType"] = "Indstillingsværdien kan ikke repræsenteres med den erklærede datatype.",
         };
     }
 }

@@ -1,4 +1,4 @@
-﻿{
+{
   "Err_ObjectDataReader_NoReadableProperties": "型 {0} には、データリーダーの列にマップできる読み取り可能なパブリックプロパティがありません。",
   "Err_ObjectDataReader_Disposed": "破棄された ObjectDataReader にはアクセスできません。",
   "Err_OdfSpreadsheetTable_ColumnNotFound": "スプレッドシートのテーブル列 '{0}' が見つかりません。",
@@ -126,7 +126,7 @@
   "Err_LibreOfficeRenderer_LibreofficeExitedCode": "LibreOffice はコード {0} で終了しました。",
   "Err_LocalProcessBackend_NativeLibreofficeConversionSuccessfully": "ネイティブの LibreOffice 変換で期待される結果を正常に生成できません。",
   "Err_XlsxToOdfConverter_XlsxInputSizeLimitExceeded": "XLSX 入力ストリームがサイズ制限を超えています ({0} > {1} バイト)。",
-  "Err_OdfAngle_AngleCannotBeEmpty": "角度の値を空にしたり、制御文字を含めたりすることはできません。",
+  "Err_OdfAngle_AngleCannotBeEmpty": "値は有効な ODF 角度である必要があります。",
   "Err_OdfBorderWidths_BorderLineWidthThree": "境界線の幅には、空白で区切られた 3 つの正の長さ値を指定する必要があります。",
   "Err_OdfBorderWidths_BorderLineWidthsOnly": "境界線の幅には、0 より大きい cm、mm、in、pt、pc、または px の長さのみを使用できます。",
   "Err_OdfBouncyCastleOpenPgpProvider_EcdhKdfRequiresNamed": "ECDH KDF には名前付き曲線が必要であり、匿名の曲線パラメーターはサポートされません。",
@@ -157,7 +157,7 @@
   "Err_OdfCellRangeAddressList_CellRangeAddressList": "セル範囲アドレスの一覧は ODF cellRangeAddressList 形式に準拠している必要があります。",
   "Err_OdfCellRangeAddressList_ListCannotBeEmpty": "セル範囲アドレスの一覧を空にすることはできません。",
   "Err_OdfCellRangeAddress_CellRangeAddressesConform": "セル範囲アドレスは ODF cellRangeAddress 形式に準拠している必要があります。",
-  "Err_OdfCharacter_CharacterValueSingleText": "文字値は単一のテキスト要素である必要があり、制御文字を含めることはできません。",
+  "Err_OdfCharacter_CharacterValueSingleText": "文字値は有効な単一の XML 文字である必要があります。",
   "Err_OdfChartDocument_AxisCannotBeEmpty": "軸の次元を空にすることはできません。",
   "Err_OdfChartDocument_CategoryCannotBeEmpty": "カテゴリラベルの範囲アドレスを空にすることはできません。",
   "Err_OdfChartDocument_DataCannotBeEmpty": "データ範囲のアドレスを空にすることはできません。",
@@ -646,5 +646,10 @@
   "Err_OdfXmlReader_DtdProhibited": "DTD および XML マークアップ宣言は禁止されています。",
   "Err_OdfDocumentMerge_CannotMergeIntoItself": "ドキュメントを自分自身に追加またはマージすることはできません。",
   "Err_LibreOfficeRenderer_InvalidTargetFormat": "変換形式 '{0}' は無効です。拡張子部分は空にできず、'..' や改行を含めることはできません。",
-  "Err_OdfRdfGraphBridge_ServiceClauseNotAllowed": "SPARQL のフェデレーテッドクエリ（SERVICE 句）は使用できません。クエリで指定されたエンドポイントへネットワーク要求が送信されるためです。"
+  "Err_OdfRdfGraphBridge_ServiceClauseNotAllowed": "SPARQL のフェデレーテッドクエリ（SERVICE 句）は使用できません。クエリで指定されたエンドポイントへネットワーク要求が送信されるためです。",
+  "Err_OdfEncryption_PlaintextSizeMismatch": "復号後の項目サイズが manifest:size と一致しません（宣言値 {0}、実際 {1} バイト）。",
+  "Err_OdfDatabaseFormDesigner_UnsupportedDocumentKind": "フォームの設計にはテキスト文書またはデータベース文書が必要です。",
+  "Err_OdfDatabaseFormDesigner_TimeOutsideDay": "時刻は 00:00:00 以上 24:00:00 以下である必要があります。",
+  "Err_TextDocumentNotesEngine_SecondaryIndexKeyRequiresPrimary": "副索引キーには主索引キーが必要です。",
+  "Err_OdfDocumentSettingsEngine_ValueDoesNotFitType": "設定値を宣言されたデータ型で表現できません。"
 }

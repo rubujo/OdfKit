@@ -144,7 +144,7 @@ public static partial class OdfLocalizer
             ["Err_LibreOfficeRenderer_LibreofficeExitedCode"] = "LibreOffice keluar dengan kod {0}.",
             ["Err_LocalProcessBackend_NativeLibreofficeConversionSuccessfully"] = "Penukaran LibreOffice asli tidak berjaya menghasilkan hasil yang diharapkan.",
             ["Err_XlsxToOdfConverter_XlsxInputSizeLimitExceeded"] = "Strim input XLSX melebihi had saiz ({0} > {1} bait).",
-            ["Err_OdfAngle_AngleCannotBeEmpty"] = "Nilai sudut tidak boleh kosong dan tidak boleh mengandungi aksara kawalan.",
+            ["Err_OdfAngle_AngleCannotBeEmpty"] = "Nilai mestilah sudut ODF yang sah.",
             ["Err_OdfBorderWidths_BorderLineWidthThree"] = "Lebar garis sempadan mestilah tiga nilai panjang positif yang dipisahkan oleh ruang putih.",
             ["Err_OdfBorderWidths_BorderLineWidthsOnly"] = "Lebar garis sempadan hanya boleh menggunakan panjang cm, mm, in, pt, pc atau px yang lebih besar daripada 0.",
             ["Err_OdfBouncyCastleOpenPgpProvider_EcdhKdfRequiresNamed"] = "ECDH KDF memerlukan lengkung bernama dan tidak menyokong parameter lengkung tanpa nama.",
@@ -175,7 +175,7 @@ public static partial class OdfLocalizer
             ["Err_OdfCellRangeAddressList_CellRangeAddressList"] = "Senarai alamat julat sel mesti mematuhi format ODF cellRangeAddressList.",
             ["Err_OdfCellRangeAddressList_ListCannotBeEmpty"] = "Senarai alamat julat sel tidak boleh kosong.",
             ["Err_OdfCellRangeAddress_CellRangeAddressesConform"] = "Alamat julat sel mesti mematuhi format ODF cellRangeAddress.",
-            ["Err_OdfCharacter_CharacterValueSingleText"] = "Nilai aksara mestilah satu elemen teks dan tidak boleh mengandungi aksara kawalan.",
+            ["Err_OdfCharacter_CharacterValueSingleText"] = "Nilai aksara mestilah satu aksara XML yang sah.",
             ["Err_OdfChartDocument_AxisCannotBeEmpty"] = "Dimensi paksi tidak boleh kosong.",
             ["Err_OdfChartDocument_CategoryCannotBeEmpty"] = "Alamat julat label kategori tidak boleh kosong.",
             ["Err_OdfChartDocument_DataCannotBeEmpty"] = "Alamat julat data tidak boleh kosong.",
@@ -665,6 +665,11 @@ public static partial class OdfLocalizer
             ["Err_OdfDocumentMerge_CannotMergeIntoItself"] = "Dokumen tidak boleh ditambah atau digabungkan dengan dirinya sendiri.",
             ["Err_LibreOfficeRenderer_InvalidTargetFormat"] = "Format penukaran '{0}' tidak sah: bahagian sambungan tidak boleh kosong dan tidak boleh mengandungi '..' atau pemisah baris.",
             ["Err_OdfRdfGraphBridge_ServiceClauseNotAllowed"] = "Pertanyaan bersekutu SPARQL (klausa SERVICE) tidak dibenarkan: ia akan menyebabkan pustaka menghantar permintaan rangkaian ke titik akhir yang dinamakan dalam pertanyaan.",
+            ["Err_OdfEncryption_PlaintextSizeMismatch"] = "Saiz entri yang dinyahsulit tidak sepadan dengan manifest:size ({0} diisytiharkan, {1} bait sebenar).",
+            ["Err_OdfDatabaseFormDesigner_UnsupportedDocumentKind"] = "Reka bentuk borang memerlukan dokumen teks atau dokumen pangkalan data.",
+            ["Err_OdfDatabaseFormDesigner_TimeOutsideDay"] = "Masa mestilah antara 00:00:00 dan 24:00:00, termasuk kedua-dua had.",
+            ["Err_TextDocumentNotesEngine_SecondaryIndexKeyRequiresPrimary"] = "Kunci indeks sekunder memerlukan kunci indeks utama.",
+            ["Err_OdfDocumentSettingsEngine_ValueDoesNotFitType"] = "Nilai tetapan tidak dapat diwakili oleh jenis data yang diisytiharkan.",
         };
     }
 }

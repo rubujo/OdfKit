@@ -144,7 +144,7 @@ public static partial class OdfLocalizer
             ["Err_LibreOfficeRenderer_LibreofficeExitedCode"] = "LibreOffice finalizó con el código {0}.",
             ["Err_LocalProcessBackend_NativeLibreofficeConversionSuccessfully"] = "La conversión nativa de LibreOffice no produce correctamente los resultados esperados.",
             ["Err_XlsxToOdfConverter_XlsxInputSizeLimitExceeded"] = "El flujo de entrada XLSX supera el límite de tamaño ({0} > {1} bytes).",
-            ["Err_OdfAngle_AngleCannotBeEmpty"] = "El valor del ángulo no puede estar en blanco ni contener caracteres de control.",
+            ["Err_OdfAngle_AngleCannotBeEmpty"] = "El valor debe ser un ángulo ODF válido.",
             ["Err_OdfBorderWidths_BorderLineWidthThree"] = "La anchura de la línea del borde debe constar de tres valores de longitud positivos separados por espacios en blanco.",
             ["Err_OdfBorderWidths_BorderLineWidthsOnly"] = "Las anchuras de las líneas del borde solo pueden usar longitudes cm, mm, in, pt, pc o px mayores que 0.",
             ["Err_OdfBouncyCastleOpenPgpProvider_EcdhKdfRequiresNamed"] = "La KDF de ECDH requiere curvas con nombre y no admite parámetros de curva anónimos.",
@@ -175,7 +175,7 @@ public static partial class OdfLocalizer
             ["Err_OdfCellRangeAddressList_CellRangeAddressList"] = "La lista de direcciones de intervalos de celdas debe cumplir el formato ODF cellRangeAddressList.",
             ["Err_OdfCellRangeAddressList_ListCannotBeEmpty"] = "La lista de direcciones de intervalos de celdas no puede estar vacía.",
             ["Err_OdfCellRangeAddress_CellRangeAddressesConform"] = "Las direcciones de intervalos de celdas deben cumplir el formato ODF cellRangeAddress.",
-            ["Err_OdfCharacter_CharacterValueSingleText"] = "El valor del carácter debe ser un único elemento de texto y no puede contener caracteres de control.",
+            ["Err_OdfCharacter_CharacterValueSingleText"] = "El valor debe ser un único carácter XML válido.",
             ["Err_OdfChartDocument_AxisCannotBeEmpty"] = "Las dimensiones del eje no pueden estar vacías.",
             ["Err_OdfChartDocument_CategoryCannotBeEmpty"] = "La dirección del intervalo de etiquetas de categoría no puede estar vacía.",
             ["Err_OdfChartDocument_DataCannotBeEmpty"] = "La dirección del intervalo de datos no puede estar vacía.",
@@ -665,6 +665,11 @@ public static partial class OdfLocalizer
             ["Err_OdfDocumentMerge_CannotMergeIntoItself"] = "Un documento no puede anexarse ni combinarse consigo mismo.",
             ["Err_LibreOfficeRenderer_InvalidTargetFormat"] = "El formato de conversión '{0}' no es válido: la parte de la extensión no puede estar vacía ni contener '..' ni saltos de línea.",
             ["Err_OdfRdfGraphBridge_ServiceClauseNotAllowed"] = "No se permiten las consultas federadas de SPARQL (cláusula SERVICE): harían que la biblioteca enviara solicitudes de red a los puntos de conexión indicados en la consulta.",
+            ["Err_OdfEncryption_PlaintextSizeMismatch"] = "El tamaño de la entrada descifrada no coincide con manifest:size ({0} declarados, {1} bytes reales).",
+            ["Err_OdfDatabaseFormDesigner_UnsupportedDocumentKind"] = "El diseño de formularios requiere un documento de texto o un documento de base de datos.",
+            ["Err_OdfDatabaseFormDesigner_TimeOutsideDay"] = "La hora debe estar entre 00:00:00 y 24:00:00, incluidos ambos límites.",
+            ["Err_TextDocumentNotesEngine_SecondaryIndexKeyRequiresPrimary"] = "Una clave de índice secundaria requiere una clave de índice primaria.",
+            ["Err_OdfDocumentSettingsEngine_ValueDoesNotFitType"] = "El valor de la configuración no se puede representar con el tipo de datos declarado.",
         };
     }
 }

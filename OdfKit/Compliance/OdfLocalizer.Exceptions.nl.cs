@@ -144,7 +144,7 @@ public static partial class OdfLocalizer
             ["Err_LibreOfficeRenderer_LibreofficeExitedCode"] = "LibreOffice is afgesloten met code {0}.",
             ["Err_LocalProcessBackend_NativeLibreofficeConversionSuccessfully"] = "Native LibreOffice-conversie levert niet de verwachte resultaten op.",
             ["Err_XlsxToOdfConverter_XlsxInputSizeLimitExceeded"] = "De XLSX-invoerstroom overschrijdt de groottelimiet ({0} > {1} bytes).",
-            ["Err_OdfAngle_AngleCannotBeEmpty"] = "De hoekwaarde mag niet leeg zijn en mag geen controletekens bevatten.",
+            ["Err_OdfAngle_AngleCannotBeEmpty"] = "De waarde moet een geldige ODF-hoek zijn.",
             ["Err_OdfBorderWidths_BorderLineWidthThree"] = "De breedte van de grenslijn moet drie positieve lengtewaarden zijn, gescheiden door witruimte.",
             ["Err_OdfBorderWidths_BorderLineWidthsOnly"] = "Randlijnbreedten kunnen alleen cm, mm, in, pt, pc of px lengtes groter dan 0 gebruiken.",
             ["Err_OdfBouncyCastleOpenPgpProvider_EcdhKdfRequiresNamed"] = "ECDH KDF vereist benoemde curven en ondersteunt geen anonieme curveparameters.",
@@ -175,7 +175,7 @@ public static partial class OdfLocalizer
             ["Err_OdfCellRangeAddressList_CellRangeAddressList"] = "De adreslijst van het celbereik moet voldoen aan de ODF cellRangeAddressList-indeling.",
             ["Err_OdfCellRangeAddressList_ListCannotBeEmpty"] = "De lijst met celbereikadressen mag niet leeg zijn.",
             ["Err_OdfCellRangeAddress_CellRangeAddressesConform"] = "Adressen voor celbereiken moeten voldoen aan de ODF cellRangeAddress-indeling.",
-            ["Err_OdfCharacter_CharacterValueSingleText"] = "De tekenwaarde moet uit één tekstelement bestaan ​​en mag geen controletekens bevatten.",
+            ["Err_OdfCharacter_CharacterValueSingleText"] = "De tekenwaarde moet één geldig XML-teken zijn.",
             ["Err_OdfChartDocument_AxisCannotBeEmpty"] = "Asafmetingen mogen niet leeg zijn.",
             ["Err_OdfChartDocument_CategoryCannotBeEmpty"] = "Het categorielabelbereikadres mag niet leeg zijn.",
             ["Err_OdfChartDocument_DataCannotBeEmpty"] = "Het gegevensbereikadres mag niet leeg zijn.",
@@ -665,6 +665,11 @@ public static partial class OdfLocalizer
             ["Err_OdfDocumentMerge_CannotMergeIntoItself"] = "Een document kan niet aan zichzelf worden toegevoegd of met zichzelf worden samengevoegd.",
             ["Err_LibreOfficeRenderer_InvalidTargetFormat"] = "De conversie-indeling '{0}' is ongeldig: het extensiedeel mag niet leeg zijn en mag geen '..' of regeleinden bevatten.",
             ["Err_OdfRdfGraphBridge_ServiceClauseNotAllowed"] = "Gefedereerde SPARQL-query's (SERVICE-clausule) zijn niet toegestaan: ze zouden de bibliotheek netwerkverzoeken laten sturen naar de eindpunten die in de query worden genoemd.",
+            ["Err_OdfEncryption_PlaintextSizeMismatch"] = "De grootte van de ontsleutelde vermelding komt niet overeen met manifest:size ({0} opgegeven, {1} werkelijke bytes).",
+            ["Err_OdfDatabaseFormDesigner_UnsupportedDocumentKind"] = "Voor formulierontwerp is een tekstdocument of een databasedocument vereist.",
+            ["Err_OdfDatabaseFormDesigner_TimeOutsideDay"] = "De tijd moet tussen 00:00:00 en 24:00:00 liggen, inclusief de grenswaarden.",
+            ["Err_TextDocumentNotesEngine_SecondaryIndexKeyRequiresPrimary"] = "Een secundaire indexsleutel vereist een primaire indexsleutel.",
+            ["Err_OdfDocumentSettingsEngine_ValueDoesNotFitType"] = "De instellingswaarde kan niet worden weergegeven met het opgegeven gegevenstype.",
         };
     }
 }

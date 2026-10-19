@@ -1,4 +1,4 @@
-﻿{
+{
   "Err_ObjectDataReader_NoReadableProperties": "Typen {0} har ingen lesbare offentlige egenskaper som kan tilordnes til datalesekolonner.",
   "Err_ObjectDataReader_Disposed": "Kan ikke få tilgang til en avhendet ObjectDataReader.",
   "Err_OdfSpreadsheetTable_ColumnNotFound": "Regnearktabellkolonnen '{0}' ble ikke funnet.",
@@ -126,7 +126,7 @@
   "Err_LibreOfficeRenderer_LibreofficeExitedCode": "LibreOffice avsluttet med koden {0}.",
   "Err_LocalProcessBackend_NativeLibreofficeConversionSuccessfully": "Native LibreOffice-konvertering gir ikke forventede resultater.",
   "Err_XlsxToOdfConverter_XlsxInputSizeLimitExceeded": "XLSX-inndatastrømmen overskrider størrelsesgrensen ({0} > {1} byte).",
-  "Err_OdfAngle_AngleCannotBeEmpty": "Vinkelverdien kan ikke være tom og kan ikke inneholde kontrolltegn.",
+  "Err_OdfAngle_AngleCannotBeEmpty": "Verdien må være en gyldig ODF-vinkel.",
   "Err_OdfBorderWidths_BorderLineWidthThree": "Kantlinjebredden må være tre positive lengdeverdier atskilt med mellomrom.",
   "Err_OdfBorderWidths_BorderLineWidthsOnly": "Kantlinjebredder kan bare bruke cm, mm, in, pt, pc eller px lengder større enn 0.",
   "Err_OdfBouncyCastleOpenPgpProvider_EcdhKdfRequiresNamed": "ECDH KDF krever navngitte kurver og støtter ikke anonyme kurveparametere.",
@@ -157,7 +157,7 @@
   "Err_OdfCellRangeAddressList_CellRangeAddressList": "Adresselisten for celleområde må samsvare med ODF cellRangeAddressList-formatet.",
   "Err_OdfCellRangeAddressList_ListCannotBeEmpty": "Listen over celleområdeadresser kan ikke være tom.",
   "Err_OdfCellRangeAddress_CellRangeAddressesConform": "Celleområdeadresser må samsvare med ODF cellRangeAddress-formatet.",
-  "Err_OdfCharacter_CharacterValueSingleText": "Tegnverdien må være et enkelt tekstelement og kan ikke inneholde kontrolltegn.",
+  "Err_OdfCharacter_CharacterValueSingleText": "Tegnverdien må være ett gyldig XML-tegn.",
   "Err_OdfChartDocument_AxisCannotBeEmpty": "Aksedimensjoner kan ikke være tomme.",
   "Err_OdfChartDocument_CategoryCannotBeEmpty": "Områdeadressen for kategorietiketten kan ikke være tom.",
   "Err_OdfChartDocument_DataCannotBeEmpty": "Dataområdeadressen kan ikke være tom.",
@@ -646,5 +646,10 @@
   "Err_OdfXmlReader_DtdProhibited": "DTD- og XML-markeringsdeklarasjoner er forbudt.",
   "Err_OdfDocumentMerge_CannotMergeIntoItself": "Et dokument kan ikke legges til eller flettes med seg selv.",
   "Err_LibreOfficeRenderer_InvalidTargetFormat": "Konverteringsformatet '{0}' er ugyldig: filtypedelen kan ikke være tom og kan ikke inneholde '..' eller linjeskift.",
-  "Err_OdfRdfGraphBridge_ServiceClauseNotAllowed": "Føderte SPARQL-spørringer (SERVICE-klausulen) er ikke tillatt: de ville fått biblioteket til å sende nettverksforespørsler til endepunktene som er oppgitt i spørringen."
+  "Err_OdfRdfGraphBridge_ServiceClauseNotAllowed": "Føderte SPARQL-spørringer (SERVICE-klausulen) er ikke tillatt: de ville fått biblioteket til å sende nettverksforespørsler til endepunktene som er oppgitt i spørringen.",
+  "Err_OdfEncryption_PlaintextSizeMismatch": "Størrelsen på den dekrypterte oppføringen samsvarer ikke med manifest:size ({0} oppgitt, {1} faktiske byte).",
+  "Err_OdfDatabaseFormDesigner_UnsupportedDocumentKind": "Skjemautforming krever et tekstdokument eller et databasedokument.",
+  "Err_OdfDatabaseFormDesigner_TimeOutsideDay": "Tiden må være mellom 00:00:00 og 24:00:00, inkludert grensene.",
+  "Err_TextDocumentNotesEngine_SecondaryIndexKeyRequiresPrimary": "En sekundær indeksnøkkel krever en primær indeksnøkkel.",
+  "Err_OdfDocumentSettingsEngine_ValueDoesNotFitType": "Innstillingsverdien kan ikke representeres med den deklarerte datatypen."
 }
