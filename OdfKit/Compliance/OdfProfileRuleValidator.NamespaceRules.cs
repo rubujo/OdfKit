@@ -346,6 +346,10 @@ internal static partial class OdfProfileRuleValidator
         return names;
     }
 
+    private static bool IsSchemaDefinedXhtmlAttribute(XName name) =>
+        name.NamespaceName == "http://www.w3.org/1999/xhtml" &&
+        name.LocalName is "about" or "property" or "content" or "datatype";
+
     private static void SanitizeForeignContentForSchemaValidation(
         XElement element,
         OdfSchemaSet schema,
@@ -356,10 +360,13 @@ internal static partial class OdfProfileRuleValidator
         var namespaceContext = new OdfSchemaNamespaceContext(element, parentNamespaceContext);
         element.AddAnnotation(namespaceContext);
         // 移除 foreign 屬性
+        // xhtml:about、xhtml:property、xhtml:content、xhtml:datatype 由 ODF schema 定義（RDFa），
+        // 不是 foreign 屬性；先剝除會讓只寫一半的 RDFa 屬性組在 Extended 被接受。
         var foreignAttrs = element.Attributes()
             .Where(a => !a.IsNamespaceDeclaration &&
                         !IsInfrastructureOrMathNamespace(a.Name.NamespaceName) &&
-                        !IsStandardNamespace(a.Name.NamespaceName))
+                        !IsStandardNamespace(a.Name.NamespaceName) &&
+                        !IsSchemaDefinedXhtmlAttribute(a.Name))
             .ToList();
         foreach (var attr in foreignAttrs)
         {
