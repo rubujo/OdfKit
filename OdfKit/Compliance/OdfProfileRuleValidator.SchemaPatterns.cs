@@ -637,7 +637,9 @@ internal static partial class OdfProfileRuleValidator
                 element.Attribute(style + "layout-grid-ruby-height") is not null &&
                 element.Attribute(style + "layout-grid-standard-mode")?.Value.Trim(' ', '\t', '\r', '\n') != "false")
                 issues.Add(new OdfValidationIssue(
-                    rule.DefaultSeverity,
+                    // LibreOffice 預設頁面配置普遍只寫 ruby-height 而不宣告 standard-mode，
+                    // OASIS 測試文件及 TDF 驗證器也接受，故以警告回報而非阻擋。
+                    OdfIssueSeverity.Warning,
                     "ODF3131",
                     "A ruby grid height requires layout-grid-standard-mode explicitly set to false on the same page-layout-properties element.",
                     packagePath,

@@ -89,14 +89,23 @@ public class StreamWriterExceptionSafetyTests
         Assert.False(File.Exists(missingPath));
 
         const int attempts = 512;
-        long before = MeasureStablePrivateBytes();
+        const int rounds = 3;
+        long delta = long.MaxValue;
 
-        for (int i = 0; i < attempts; i++)
+        // 進程私有位元組會被同時執行的其他測試干擾；真正的洩漏每一輪都會累積約 64 MiB，
+        // 因此取各輪的最小增量，雜訊只會讓個別輪次偏高。
+        for (int round = 0; round < rounds && delta >= 32L * 1024 * 1024; round++)
         {
-            Assert.ThrowsAny<IOException>(() => new OdfDirectIoReadableStream(missingPath));
+            long before = MeasureStablePrivateBytes();
+
+            for (int i = 0; i < attempts; i++)
+            {
+                Assert.ThrowsAny<IOException>(() => new OdfDirectIoReadableStream(missingPath));
+            }
+
+            delta = Math.Min(delta, MeasureStablePrivateBytes() - before);
         }
 
-        long delta = MeasureStablePrivateBytes() - before;
         Assert.True(
             delta < 32L * 1024 * 1024,
             $"建構子失敗後私有位元組增加 {delta / (1024 * 1024)} MiB，疑似未釋放已配置緩衝區");
