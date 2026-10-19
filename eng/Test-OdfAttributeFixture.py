@@ -38,9 +38,10 @@ def load():
 
 
 def document(namespaces, case, value):
-    group, version, attribute, carrier, kind, valid, invalid, body = case
+    group, version, attribute, carrier, kind, valid, invalid, body = case[:8]
     if value != valid:
-        body = body.replace(f' {attribute}="{escape(valid)}"', f' {attribute}="{escape(value)}"', 1)
+        replacement = '' if value is None else f' {attribute}="{escape(value)}"'
+        body = body.replace(f' {attribute}="{escape(valid)}"', replacement, 1)
     if kind == 'base':
         return f'<?xml version="1.0" encoding="UTF-8"?><office:document-content{namespaces} office:version="{version}">{body}</office:document-content>'
     return (f'<?xml version="1.0" encoding="UTF-8"?><office:document{namespaces} office:mimetype="application/vnd.oasis.opendocument.{kind}" '
@@ -90,6 +91,14 @@ def main():
             negative = f'{index}|neg'
             by_version[case[1]][negative] = document(namespaces, case, case[6])
             expected[negative] = False
+        if case[8] is not None:
+            absent = f'{index}|absent'
+            by_version[case[1]][absent] = document(namespaces, case, None)
+            expected[absent] = case[8]
+        for number, extra in enumerate(case[9]):
+            extra_key = f'{index}|enum{number}'
+            by_version[case[1]][extra_key] = document(namespaces, case, extra)
+            expected[extra_key] = True
     failures = []
     for version, documents in sorted(by_version.items()):
         rejected = run_jing(options.jing, version, documents)

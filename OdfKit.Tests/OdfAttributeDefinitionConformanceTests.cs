@@ -82,6 +82,51 @@ public class OdfAttributeDefinitionConformanceTests
         Assert.True(failures.Count == 0, string.Join(Environment.NewLine, failures.Distinct().Take(10)));
     }
 
+    /// <summary>
+    /// Omitting an attribute is judged exactly as the official schema judges it: optional attributes may be absent and required ones may not.
+    /// 省略屬性的判定與官方 schema 相同：可選屬性可以缺省，必要屬性不可缺省。
+    /// </summary>
+    /// <param name="group">The semantic group identifier. / 語意群組識別碼。</param>
+    /// <param name="version">The ODF version label. / ODF 版本標籤。</param>
+    [Theory]
+    [MemberData(nameof(GroupVersions))]
+    public void OmittedAttributesFollowTheSchema(string group, string version)
+    {
+        List<string> failures = [];
+        foreach (AttributeCase item in Cases(group, version).Where(item => item.AbsentValid is not null))
+            foreach (OdfComplianceProfile profile in Profiles(version))
+            {
+                OdfValidationReport report = Validate(item, null, profile);
+                // 官方 schema 接受時，驗證器可再依規範文字的條件（其他規則編號）拒絕，但不得出現 schema 錯誤。
+                bool schemaRejected = report.Issues.Any(issue => issue.RuleId == "ODF3101");
+                if (schemaRejected == item.AbsentValid)
+                    failures.Add($"{item.Attribute} omitted on {item.Carrier}: schema {(item.AbsentValid == true ? "accepts" : "rejects")} but the validator disagrees");
+            }
+        Assert.True(failures.Count == 0, string.Join(Environment.NewLine, failures.Distinct().Take(10)));
+    }
+
+    /// <summary>
+    /// Every defined value of an enumerated attribute that the official schema accepts is accepted by the validator.
+    /// 列舉屬性中官方 schema 接受的每個定義值，驗證器也接受。
+    /// </summary>
+    /// <param name="group">The semantic group identifier. / 語意群組識別碼。</param>
+    /// <param name="version">The ODF version label. / ODF 版本標籤。</param>
+    [Theory]
+    [MemberData(nameof(GroupVersions))]
+    public void DefinedValuesAreAccepted(string group, string version)
+    {
+        List<string> failures = [];
+        foreach (AttributeCase item in Cases(group, version))
+            foreach (string value in item.ExtraValues)
+                foreach (OdfComplianceProfile profile in Profiles(version))
+                {
+                    OdfValidationReport report = Validate(item, value, profile);
+                    if (!report.IsValid)
+                        failures.Add($"{item.Attribute} on {item.Carrier}={value}: " + string.Join(";", report.Issues.Take(2).Select(issue => issue.RuleId + ":" + issue.Message)));
+                }
+        Assert.True(failures.Count == 0, string.Join(Environment.NewLine, failures.Select(failure => failure.Length > 300 ? failure[..300] : failure).Distinct().Take(10)));
+    }
+
     private static TheoryData<string, string> BuildGroupVersions()
     {
         TheoryData<string, string> data = [];
@@ -92,9 +137,11 @@ public class OdfAttributeDefinitionConformanceTests
 
     private static AttributeCase[] Cases(string group, string version) => Fixture.Value.Cases.Where(item => item.Group == group && item.Version == version).ToArray();
 
-    private static OdfValidationReport Validate(AttributeCase item, string value, OdfComplianceProfile profile)
+    private static OdfValidationReport Validate(AttributeCase item, string? value, OdfComplianceProfile profile)
     {
-        string body = item.Value == value ? item.Body : item.Body.Replace($" {item.Attribute}=\"{Escape(item.Value)}\"", $" {item.Attribute}=\"{Escape(value)}\"", StringComparison.Ordinal);
+        string body = item.Value == value
+            ? item.Body
+            : item.Body.Replace($" {item.Attribute}=\"{Escape(item.Value)}\"", value is null ? string.Empty : $" {item.Attribute}=\"{Escape(value)}\"", StringComparison.Ordinal);
         if (item.Kind == "base")
             return ValidatePackage(item, body, profile);
         string extension = item.Kind switch
@@ -161,7 +208,7 @@ public class OdfAttributeDefinitionConformanceTests
         while (reader.ReadLine() is { } line)
         {
             JsonElement row = JsonDocument.Parse(line).RootElement;
-            cases.Add(new AttributeCase(row[0].GetString()!, row[1].GetString()!, row[2].GetString()!, row[3].GetString()!, row[4].GetString()!, row[5].GetString()!, row[6].ValueKind == JsonValueKind.Null ? null : row[6].GetString(), row[7].GetString()!));
+            cases.Add(new AttributeCase(row[0].GetString()!, row[1].GetString()!, row[2].GetString()!, row[3].GetString()!, row[4].GetString()!, row[5].GetString()!, row[6].ValueKind == JsonValueKind.Null ? null : row[6].GetString(), row[7].GetString()!, row[8].ValueKind == JsonValueKind.Null ? null : row[8].GetBoolean(), row[9].EnumerateArray().Select(value => value.GetString()!).ToArray()));
         }
         return (namespaces, cases.ToArray());
     }
@@ -173,5 +220,5 @@ public class OdfAttributeDefinitionConformanceTests
         _ => [OdfComplianceProfiles.OasisOdf14Strict, OdfComplianceProfiles.OasisOdf14Extended]
     };
 
-    private sealed record AttributeCase(string Group, string Version, string Attribute, string Carrier, string Kind, string Value, string? Invalid, string Body);
+    private sealed record AttributeCase(string Group, string Version, string Attribute, string Carrier, string Kind, string Value, string? Invalid, string Body, bool? AbsentValid, string[] ExtraValues);
 }
