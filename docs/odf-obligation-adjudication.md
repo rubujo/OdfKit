@@ -276,17 +276,20 @@ SDK 沒有自動更新作者欄位的功能，測試另證明載入與儲存不�
 尚無語意分類，未列入。兩框架各 5,038 項回歸通過，直接裁決累計 **211 組、5,651 組待裁決**
 （189 組具執行期實作與測試證據）。
 
-屬性定義批次（ODF 1.2～1.4 的 398 個「General Attributes」群組）以官方 RELAX NG schema
+屬性定義批次（ODF 1.2～1.4 的 537 個「General Attributes」群組）以官方 RELAX NG schema
 為每個列出的載體元素合成最小實例，先由 Jing 獨立判定，再要求驗證器在 Strict 與 Extended
-給出相同結果：Jing 接受的正例驗證器也接受，資料型別可構造的無效值 Jing 拒絕者驗證器同樣拒絕。
+給出相同結果：Jing 接受的正例驗證器也接受，資料型別可構造的無效值 Jing 拒絕者驗證器同樣拒絕，
+省略屬性的判定與官方 schema 一致（可選就可缺省，缺省本身不是錯誤；規範文字另有條件時驗證器
+可再以其他規則編號拒絕，但不得出現 schema 錯誤），列舉屬性的其餘定義值也逐一驗證。
 固定資料為 [OdfAttributeCases.jsonl.gz](../OdfKit.Tests/TestData/OdfAttributeCases.jsonl.gz)
-（5,757 個案例、1,036 個群組），以[差異測試](../OdfKit.Tests/OdfAttributeDefinitionConformanceTests.cs)
-逐群組逐版本執行，並可用 `eng/Test-OdfAttributeFixture.py` 單獨重驗 Jing 判定。
-這批發現並修正一個驗證器缺陷：XML Schema 正則的 `\i`、`\c` 名稱字元跳脫沒有翻譯成 .NET
-正則，導致 CURIE／SafeCURIE 樣式整個失敗，Strict 設定檔誤拒絕 `xhtml:about`、`xhtml:property`
-等屬性。附帶情況：`draw:z-index` 在 dr3d 場景子層與 `text:measure` 的祖先限制未合成而不列入；
-含預設值、列舉說明、條件義務或其他子句的群組保留待個別裁決。兩框架各 11,111 項回歸通過，
-直接裁決累計 **609 組、5,253 組待裁決**（587 組具執行期實作與測試證據）。
+（5,979 個案例、1,058 個群組），以[差異測試](../OdfKit.Tests/OdfAttributeDefinitionConformanceTests.cs)
+逐群組逐版本執行，並可用 `eng/Test-OdfAttributeFixture.py` 單獨以 Jing 重驗全部 16,405 份文件。
+這批發現並修正兩個驗證器缺陷：一、XML Schema 正則的 `\i`、`\c` 名稱字元跳脫沒有翻譯成 .NET
+正則，導致 CURIE／SafeCURIE 樣式整個失敗，Strict 設定檔誤拒 `xhtml:about`、`xhtml:property`
+等屬性；二、Extended 剝除外來屬性時連 ODF schema 定義的四個 RDFa 屬性一併剝除，使只寫一半的
+RDFa 屬性組被接受，現改為保留。`draw:z-index` 在 dr3d 場景子層與 `text:measure` 的祖先限制
+未合成而不列入；含條件義務或其他子句的群組保留待個別裁決。兩框架各 17,447 項回歸通過，
+直接裁決累計 **748 組、5,114 組待裁決**（726 組具執行期實作與測試證據）。
 
 表單型別批次已修正並完整核驗兩項不同的驗證缺口，三個型別子節已計入直接裁決：
 CLR 的 `XmlConvert` 會接受 `Infinity`、`nan` 等 XML Schema 不允許的特殊詞彙，
