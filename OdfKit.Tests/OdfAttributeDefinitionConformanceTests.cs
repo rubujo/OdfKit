@@ -215,6 +215,7 @@ public class OdfAttributeDefinitionConformanceTests
 
     private static OdfComplianceProfile[] Profiles(string version) => version switch
     {
+        "1.1" => [OdfComplianceProfiles.OasisOdf11],
         "1.2" => [OdfComplianceProfiles.OasisOdf12Strict, OdfComplianceProfiles.OasisOdf12Extended],
         "1.3" => [OdfComplianceProfiles.OasisOdf13Strict, OdfComplianceProfiles.OasisOdf13Extended],
         _ => [OdfComplianceProfiles.OasisOdf14Strict, OdfComplianceProfiles.OasisOdf14Extended]

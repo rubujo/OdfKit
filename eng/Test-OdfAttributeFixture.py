@@ -18,6 +18,7 @@ from pathlib import Path
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = {
+    '1.1': 'OpenDocument-schema-v1.1.rng',
     '1.2': 'OpenDocument-v1.2-os-schema.rng',
     '1.3': 'OpenDocument-v1.3-schema.rng',
     '1.4': 'OpenDocument-v1.4-schema.rng',
