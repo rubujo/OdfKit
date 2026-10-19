@@ -27679,6 +27679,196 @@
       "sourceContextEvidenceSha256": "d01fe76d460367034273aa3025f9e767896291e6a7c91f86394a2f78fc3f8c0d"
     },
     {
+      "groupId": "ODFG-1c54a1f8193461e1b5de",
+      "memberSha256": "cd9bee6da943bcc225f56bd4fdac53a27eb33bdc37d49bad0dc7e09100b00259",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B00804/S001",
+            "ODF-1.3/schema/B00817/S001",
+            "ODF-1.4/schema/B00819/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "定義欄位表示的資料語意；資料模型、儲存、讀取及適用的驗證屬 SDK 範圍。此分類不將所有呈現語意轉成輸入拒絕規則，也不證明 SDK 已提供實體渲染。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00805/S001",
+            "ODF-1.3/schema/B00818/S001",
+            "ODF-1.4/schema/B00820/S001"
+          ]
+        },
+        {
+          "kind": "permission",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "含 may／can 的許可或可用性說明；驗證不得因使用該許可而拒絕，producer 可選擇是否使用。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00805/S002",
+            "ODF-1.3/schema/B00818/S002",
+            "ODF-1.4/schema/B00820/S002"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子以具名元素或屬性為主詞，定義資料性質、處理要求或使用權限；保留主詞、原始動詞、條件、否定及引用。角色適用、義務拆分與實作證據仍待後續裁決，不能把 MAY 解讀為啟用功能後無須遵守限制，也不能將 MUST render 一律改為資料拒絕。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00805/S003",
+            "ODF-1.3/schema/B00818/S003",
+            "ODF-1.4/schema/B00820/S003"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子說明構造的資料語意、用途或指涉；資料模型、儲存與讀取屬 SDK 範圍，不推論新增輸入拒絕規則，也不把說明性文字當作已提供的呈現功能。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00805/S004",
+            "ODF-1.2/schema/B00806/S001",
+            "ODF-1.3/schema/B00818/S004",
+            "ODF-1.3/schema/B00819/S001",
+            "ODF-1.4/schema/B00820/S004",
+            "ODF-1.4/schema/B00821/S001"
+          ]
+        },
+        {
+          "kind": "conditional-permission-and-requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "含條件、限制或例外的完整句子；前提與結果分別保留，條件分支須逐項實作裁決，不將前提不成立的情境當作錯誤。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00806/S002",
+            "ODF-1.2/schema/B00808/S001",
+            "ODF-1.2/schema/B00808/S002",
+            "ODF-1.2/schema/B00809/S001",
+            "ODF-1.2/schema/B00809/S002",
+            "ODF-1.2/schema/B00810/S001",
+            "ODF-1.3/schema/B00819/S002",
+            "ODF-1.3/schema/B00821/S001",
+            "ODF-1.3/schema/B00821/S002",
+            "ODF-1.3/schema/B00822/S001",
+            "ODF-1.3/schema/B00822/S002",
+            "ODF-1.3/schema/B00823/S001",
+            "ODF-1.4/schema/B00821/S002",
+            "ODF-1.4/schema/B00823/S001",
+            "ODF-1.4/schema/B00823/S002",
+            "ODF-1.4/schema/B00824/S001",
+            "ODF-1.4/schema/B00824/S002",
+            "ODF-1.4/schema/B00825/S001"
+          ]
+        },
+        {
+          "kind": "informative-context",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "說明性或舉例性文字；保守地不予豁免，仍保留資料語意責任供後續逐項裁決。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00807/S001",
+            "ODF-1.3/schema/B00820/S001",
+            "ODF-1.4/schema/B00822/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "元素的適用父元素清單；結構與輸出位置在 SDK 範圍，不推論出現次數。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00811/S001",
+            "ODF-1.3/schema/B00824/S001",
+            "ODF-1.4/schema/B00826/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "原生元素沒有定義屬性；驗證仍須依版本、Strict／Extended 與 foreign 規則判定，不將擴充條件一併略過。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00812/S001",
+            "ODF-1.3/schema/B00825/S001",
+            "ODF-1.4/schema/B00827/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "子元素清單；順序、基數及條件仍需沿 schema 與所引用條款展開，不以英文單複數推定。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00813/S001",
+            "ODF-1.3/schema/B00826/S001",
+            "ODF-1.4/schema/B00828/S001"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.2/schema": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+        "ODF-1.3/schema": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+        "ODF-1.4/schema": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f"
+      }
+    },
+    {
       "groupId": "ODFG-1c595e18c867b279a218",
       "memberSha256": "450bf903fac0a22500bc474e5d75f848547cc2806cce7bc908954be4913dad94",
       "versions": [
@@ -29222,6 +29412,135 @@
       }
     },
     {
+      "groupId": "ODFG-1e0b1bdfa851bacd4aa5",
+      "memberSha256": "fad338c3e83b74f0b4439d8cca190052cfd158a7f17803e9825ce7c803cc2b71",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B09092/S001",
+            "ODF-1.3/schema/B09210/S001",
+            "ODF-1.4/schema/B09368/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子說明構造的資料語意、用途或指涉；資料模型、儲存與讀取屬 SDK 範圍，不推論新增輸入拒絕規則，也不把說明性文字當作已提供的呈現功能。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B09093/S001",
+            "ODF-1.2/schema/B09093/S002",
+            "ODF-1.2/schema/B09094/S001",
+            "ODF-1.3/schema/B09211/S002",
+            "ODF-1.3/schema/B09211/S004",
+            "ODF-1.3/schema/B09212/S001",
+            "ODF-1.4/schema/B09369/S002",
+            "ODF-1.4/schema/B09369/S004",
+            "ODF-1.4/schema/B09370/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "完整句子說明構造的結構或內容模型；結構與輸出位置屬 SDK 範圍，順序與基數仍須沿 grammar 核對。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B09094/S002",
+            "ODF-1.3/schema/B09211/S003",
+            "ODF-1.4/schema/B09369/S003"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "屬性的適用元素清單；結構與輸出位置在 SDK 範圍，不推論屬性必填。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B09095/S001",
+            "ODF-1.3/schema/B09213/S001",
+            "ODF-1.4/schema/B09371/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "屬性值是具明確個數的空白分隔型別序列；保存個數、分隔方式與本版型別引用，不把整串當單一型別值，也不將序列誤當可任選其中一項。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B09096/S001",
+            "ODF-1.3/schema/B09214/S001",
+            "ODF-1.4/schema/B09372/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "定義欄位表示的資料語意；資料模型、儲存、讀取及適用的驗證屬 SDK 範圍。此分類不將所有呈現語意轉成輸入拒絕規則，也不證明 SDK 已提供實體渲染。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.3/schema/B09211/S001",
+            "ODF-1.4/schema/B09369/S001"
+          ]
+        },
+        {
+          "kind": "requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "含 shall／must 的明示要求；依條件拆分為輸入驗證與輸出義務，強度依本版 Notation。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.4/schema/B09369/S005",
+            "ODF-1.4/schema/B09369/S006"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.2/schema": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+        "ODF-1.3/schema": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+        "ODF-1.4/schema": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f"
+      }
+    },
+    {
       "groupId": "ODFG-1e0ccbb2def3f8b20c9b",
       "memberSha256": "41cd30b01f457de1771f359b4b468384323123a69e3e6301441f628294b7f7f3",
       "versions": [
@@ -29387,6 +29706,161 @@
       ],
       "sourceArchiveSha256": {
         "ODF-1.1/spec": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d"
+      }
+    },
+    {
+      "groupId": "ODFG-1e8a2e4ef66c7c5c281a",
+      "memberSha256": "62e80af3b748ca1737d32fe717023ed8953620d33e5c71170203855442ad0369",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B15357/S001",
+            "ODF-1.3/schema/B15600/S001",
+            "ODF-1.4/schema/B15845/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "定義欄位表示的資料語意；資料模型、儲存、讀取及適用的驗證屬 SDK 範圍。此分類不將所有呈現語意轉成輸入拒絕規則，也不證明 SDK 已提供實體渲染。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B15358/S001",
+            "ODF-1.3/schema/B15601/S001",
+            "ODF-1.4/schema/B15846/S001"
+          ]
+        },
+        {
+          "kind": "permission",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "含 may／can 的許可或可用性說明；驗證不得因使用該許可而拒絕，producer 可選擇是否使用。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B15359/S001",
+            "ODF-1.2/schema/B15361/S001",
+            "ODF-1.3/schema/B15602/S001",
+            "ODF-1.3/schema/B15604/S001",
+            "ODF-1.4/schema/B15847/S001",
+            "ODF-1.4/schema/B15849/S001"
+          ]
+        },
+        {
+          "kind": "requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "含 shall／must 的明示要求；依條件拆分為輸入驗證與輸出義務，強度依本版 Notation。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B15360/S001",
+            "ODF-1.3/schema/B15603/S001",
+            "ODF-1.4/schema/B15848/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "來源屬性／子元素清單中的概念標籤，保留原詞及本版參照作為待展開依賴；不能拿顯示名稱當 namespace、XML 名稱、列舉 literal 或功能已實作的證明。僅接受沒有條件／處理述詞的標籤。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B15360/S002",
+            "ODF-1.2/schema/B15360/S003",
+            "ODF-1.3/schema/B15603/S002",
+            "ODF-1.3/schema/B15603/S003",
+            "ODF-1.4/schema/B15848/S002",
+            "ODF-1.4/schema/B15848/S003"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子說明構造的資料語意、用途或指涉；資料模型、儲存與讀取屬 SDK 範圍，不推論新增輸入拒絕規則，也不把說明性文字當作已提供的呈現功能。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B15360/S004",
+            "ODF-1.2/schema/B15361/S002",
+            "ODF-1.3/schema/B15603/S004",
+            "ODF-1.3/schema/B15604/S002",
+            "ODF-1.4/schema/B15848/S004",
+            "ODF-1.4/schema/B15849/S002"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "屬性的適用元素清單；結構與輸出位置在 SDK 範圍，不推論屬性必填。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B15362/S001",
+            "ODF-1.3/schema/B15605/S001",
+            "ODF-1.4/schema/B15850/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "完整句子說明構造的結構或內容模型；結構與輸出位置屬 SDK 範圍，順序與基數仍須沿 grammar 核對。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B15363/S001",
+            "ODF-1.2/schema/B15363/S002",
+            "ODF-1.2/schema/B15363/S003",
+            "ODF-1.3/schema/B15606/S001",
+            "ODF-1.3/schema/B15606/S002",
+            "ODF-1.3/schema/B15606/S003",
+            "ODF-1.4/schema/B15851/S001",
+            "ODF-1.4/schema/B15851/S002",
+            "ODF-1.4/schema/B15851/S003"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.2/schema": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+        "ODF-1.3/schema": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+        "ODF-1.4/schema": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f"
       }
     },
     {
@@ -39448,6 +39922,178 @@
       }
     },
     {
+      "groupId": "ODFG-29b1b85555df9f1077dc",
+      "memberSha256": "f33b14db03bdcae362d51c86722e2f92729115bb45c3a57cd40f0bdf1816b3b1",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B07106/S001",
+            "ODF-1.3/schema/B07181/S001",
+            "ODF-1.4/schema/B07310/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "定義欄位表示的資料語意；資料模型、儲存、讀取及適用的驗證屬 SDK 範圍。此分類不將所有呈現語意轉成輸入拒絕規則，也不證明 SDK 已提供實體渲染。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B07107/S001",
+            "ODF-1.3/schema/B07182/S001",
+            "ODF-1.4/schema/B07311/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子說明構造的資料語意、用途或指涉；資料模型、儲存與讀取屬 SDK 範圍，不推論新增輸入拒絕規則，也不把說明性文字當作已提供的呈現功能。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B07107/S002",
+            "ODF-1.2/schema/B07107/S004",
+            "ODF-1.2/schema/B07111/S001",
+            "ODF-1.2/schema/B07112/S001",
+            "ODF-1.2/schema/B07113/S001",
+            "ODF-1.3/schema/B07182/S002",
+            "ODF-1.3/schema/B07182/S004",
+            "ODF-1.3/schema/B07186/S001",
+            "ODF-1.3/schema/B07187/S001",
+            "ODF-1.3/schema/B07188/S001",
+            "ODF-1.4/schema/B07311/S002",
+            "ODF-1.4/schema/B07311/S004",
+            "ODF-1.4/schema/B07315/S001",
+            "ODF-1.4/schema/B07316/S001",
+            "ODF-1.4/schema/B07317/S001"
+          ]
+        },
+        {
+          "kind": "permission",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "含 may／can 的許可或可用性說明；驗證不得因使用該許可而拒絕，producer 可選擇是否使用。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B07107/S003",
+            "ODF-1.3/schema/B07182/S003",
+            "ODF-1.4/schema/B07311/S003"
+          ]
+        },
+        {
+          "kind": "informative-context",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "說明性或舉例性文字；保守地不予豁免，仍保留資料語意責任供後續逐項裁決。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B07108/S001",
+            "ODF-1.3/schema/B07183/S001",
+            "ODF-1.4/schema/B07312/S001"
+          ]
+        },
+        {
+          "kind": "conditional-permission-and-requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "含條件、限制或例外的完整句子；前提與結果分別保留，條件分支須逐項實作裁決，不將前提不成立的情境當作錯誤。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B07109/S001",
+            "ODF-1.2/schema/B07110/S001",
+            "ODF-1.3/schema/B07184/S001",
+            "ODF-1.3/schema/B07185/S001",
+            "ODF-1.4/schema/B07313/S001",
+            "ODF-1.4/schema/B07314/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "屬性缺省時的值語意；不推論 producer 必須明寫預設值，也不將缺省本身當作錯誤。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B07114/S001",
+            "ODF-1.3/schema/B07189/S001",
+            "ODF-1.4/schema/B07318/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "屬性的適用元素清單；結構與輸出位置在 SDK 範圍，不推論屬性必填。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B07115/S001",
+            "ODF-1.3/schema/B07190/S001",
+            "ODF-1.4/schema/B07319/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "屬性型別宣告；型別 lexical space、值域與引用定義納入 SDK 資料驗證及輸出責任。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B07116/S001",
+            "ODF-1.3/schema/B07191/S001",
+            "ODF-1.4/schema/B07320/S001"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.2/schema": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+        "ODF-1.3/schema": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+        "ODF-1.4/schema": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f"
+      }
+    },
+    {
       "groupId": "ODFG-29c53184ef4690505f97",
       "memberSha256": "333e5f88ca066d337559be776b8dfb5ea1981a0fcbd86612e4b7dd6623dc8ec1",
       "versions": [
@@ -48651,6 +49297,179 @@
         "ODF-1.2/schema": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
         "ODF-1.3/schema": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
         "ODF-1.4/schema": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f"
+      }
+    },
+    {
+      "groupId": "ODFG-2ec45266d5f6b29064a5",
+      "memberSha256": "c858ed7a7880a7db790be36d315b45501d98a27d3f01d59b1aae493408c0c65c",
+      "versions": [
+        "1.1"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.1/spec/B09737/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "定義欄位表示的資料語意；資料模型、儲存、讀取及適用的驗證屬 SDK 範圍。此分類不將所有呈現語意轉成輸入拒絕規則，也不證明 SDK 已提供實體渲染。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B09738/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子說明構造的資料語意、用途或指涉；資料模型、儲存與讀取屬 SDK 範圍，不推論新增輸入拒絕規則，也不把說明性文字當作已提供的呈現功能。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B09738/S002",
+            "ODF-1.1/spec/B09744/S001"
+          ]
+        },
+        {
+          "kind": "informative-context",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "說明性或舉例性文字；保守地不予豁免，仍保留資料語意責任供後續逐項裁決。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B09738/S003",
+            "ODF-1.1/spec/B09739/S001",
+            "ODF-1.1/spec/B09740/S001",
+            "ODF-1.1/spec/B09741/S001",
+            "ODF-1.1/spec/B09742/S001",
+            "ODF-1.1/spec/B09743/S001"
+          ]
+        },
+        {
+          "kind": "permission",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "含 may／can 的許可或可用性說明；驗證不得因使用該許可而拒絕，producer 可選擇是否使用。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B09744/S002",
+            "ODF-1.1/spec/B09745/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "RELAX NG 構造片段：保留 operator、name、type、combine、default annotation 及內容 hash；語法分類不等於已證明 SDK pattern matcher 與整份官方 grammar 等價。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B09746/S001",
+            "ODF-1.1/spec/B09747/S001",
+            "ODF-1.1/spec/B09748/S001",
+            "ODF-1.1/spec/B09749/S001",
+            "ODF-1.1/spec/B09750/S001",
+            "ODF-1.1/spec/B09751/S001",
+            "ODF-1.1/spec/B09752/S001",
+            "ODF-1.1/spec/B09753/S001",
+            "ODF-1.1/spec/B09754/S001",
+            "ODF-1.1/spec/B09755/S001",
+            "ODF-1.1/spec/B09756/S001",
+            "ODF-1.1/spec/B09757/S001",
+            "ODF-1.1/spec/B09758/S001",
+            "ODF-1.1/spec/B09759/S001",
+            "ODF-1.1/spec/B09760/S001",
+            "ODF-1.1/spec/B09761/S001",
+            "ODF-1.1/spec/B09762/S001",
+            "ODF-1.1/spec/B09763/S001",
+            "ODF-1.1/spec/B09764/S001",
+            "ODF-1.1/spec/B09765/S001",
+            "ODF-1.1/spec/B09766/S001",
+            "ODF-1.1/spec/B09767/S001",
+            "ODF-1.1/spec/B09768/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "引入目前元素的屬性清單；須由實際 text:list、完整成員及無歧義元素背景共同成立。清單標籤是屬性定義依賴，不自行當作 XML 名稱或必填宣告。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B09769/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "來源屬性／子元素清單中的概念標籤，保留原詞及本版參照作為待展開依賴；不能拿顯示名稱當 namespace、XML 名稱、列舉 literal 或功能已實作的證明。僅接受沒有條件／處理述詞的標籤。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B09770/S001",
+            "ODF-1.1/spec/B09771/S001",
+            "ODF-1.1/spec/B09772/S001",
+            "ODF-1.1/spec/B09774/S001",
+            "ODF-1.1/spec/B09775/S001",
+            "ODF-1.1/spec/B09776/S001",
+            "ODF-1.1/spec/B09777/S001",
+            "ODF-1.1/spec/B09778/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "引入目前元素可包含的子元素清單；保留具名元素或概念參照，基數、順序與混合內容仍沿完整 grammar，不能由清單名稱推論全部子節點必填。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B09773/S001"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.1/spec": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d"
       }
     },
     {
@@ -59183,6 +60002,139 @@
         "ODF-1.2/packages": "5af30e8e566c0a6cf082212d844f536b863603f887c5c1006c5412c608bfc82f",
         "ODF-1.3/packages": "64ca54c09ccb8d5f21a2f21460c4ae621d1b30d5cbbe18a320a6f0fe44ef2349",
         "ODF-1.4/packages": "21bc3d576a601f8aaf8681a1ffc8de353711474f3de31aa0ffc702211d9948c0"
+      }
+    },
+    {
+      "groupId": "ODFG-397560f25c3fb1c4cc01",
+      "memberSha256": "1569544aa7a5e84e1796b60a81dee71a5cfbd59420dc5ae309f7d0210849b716",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B06734/S001",
+            "ODF-1.3/schema/B06813/S001",
+            "ODF-1.4/schema/B06942/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "定義欄位表示的資料語意；資料模型、儲存、讀取及適用的驗證屬 SDK 範圍。此分類不將所有呈現語意轉成輸入拒絕規則，也不證明 SDK 已提供實體渲染。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B06735/S001",
+            "ODF-1.3/schema/B06814/S001",
+            "ODF-1.4/schema/B06943/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子說明構造的資料語意、用途或指涉；資料模型、儲存與讀取屬 SDK 範圍，不推論新增輸入拒絕規則，也不把說明性文字當作已提供的呈現功能。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B06735/S002",
+            "ODF-1.2/schema/B06736/S001",
+            "ODF-1.3/schema/B06814/S002",
+            "ODF-1.3/schema/B06815/S001",
+            "ODF-1.4/schema/B06943/S002",
+            "ODF-1.4/schema/B06944/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "完整句子說明構造的結構或內容模型；結構與輸出位置屬 SDK 範圍，順序與基數仍須沿 grammar 核對。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B06737/S001",
+            "ODF-1.2/schema/B06738/S001",
+            "ODF-1.2/schema/B06739/S001",
+            "ODF-1.2/schema/B06740/S001",
+            "ODF-1.2/schema/B06741/S001",
+            "ODF-1.2/schema/B06742/S001",
+            "ODF-1.2/schema/B06743/S001",
+            "ODF-1.2/schema/B06744/S001",
+            "ODF-1.3/schema/B06816/S001",
+            "ODF-1.3/schema/B06817/S001",
+            "ODF-1.3/schema/B06818/S001",
+            "ODF-1.3/schema/B06819/S001",
+            "ODF-1.3/schema/B06820/S001",
+            "ODF-1.3/schema/B06821/S001",
+            "ODF-1.3/schema/B06822/S001",
+            "ODF-1.3/schema/B06823/S001",
+            "ODF-1.4/schema/B06945/S001",
+            "ODF-1.4/schema/B06946/S001",
+            "ODF-1.4/schema/B06947/S001",
+            "ODF-1.4/schema/B06948/S001",
+            "ODF-1.4/schema/B06949/S001",
+            "ODF-1.4/schema/B06950/S001",
+            "ODF-1.4/schema/B06951/S001",
+            "ODF-1.4/schema/B06952/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "屬性的適用元素清單；結構與輸出位置在 SDK 範圍，不推論屬性必填。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B06745/S001",
+            "ODF-1.3/schema/B06824/S001",
+            "ODF-1.4/schema/B06953/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "屬性型別宣告；型別 lexical space、值域與引用定義納入 SDK 資料驗證及輸出責任。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B06746/S001",
+            "ODF-1.3/schema/B06825/S001",
+            "ODF-1.4/schema/B06954/S001"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.2/schema": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+        "ODF-1.3/schema": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+        "ODF-1.4/schema": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f"
       }
     },
     {
@@ -111299,6 +112251,94 @@
       }
     },
     {
+      "groupId": "ODFG-6bb6cf8aab6b7cb368e8",
+      "memberSha256": "89d9b38f08ef1b525d2c09d5ac478901f55537d761c338b336071f8343b0c1d9",
+      "versions": [
+        "1.1"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.1/spec/B26306/S001"
+          ]
+        },
+        {
+          "kind": "informative-context",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "說明性或舉例性文字；保守地不予豁免，仍保留資料語意責任供後續逐項裁決。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B26307/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子說明構造的資料語意、用途或指涉；資料模型、儲存與讀取屬 SDK 範圍，不推論新增輸入拒絕規則，也不把說明性文字當作已提供的呈現功能。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B26308/S001",
+            "ODF-1.1/spec/B26310/S001",
+            "ODF-1.1/spec/B26311/S001",
+            "ODF-1.1/spec/B26311/S002",
+            "ODF-1.1/spec/B26312/S001",
+            "ODF-1.1/spec/B26313/S001",
+            "ODF-1.1/spec/B26313/S004"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "來源屬性／子元素清單中的概念標籤，保留原詞及本版參照作為待展開依賴；不能拿顯示名稱當 namespace、XML 名稱、列舉 literal 或功能已實作的證明。僅接受沒有條件／處理述詞的標籤。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B26309/S001"
+          ]
+        },
+        {
+          "kind": "requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "含 shall／must 的明示要求；依條件拆分為輸入驗證與輸出義務，強度依本版 Notation。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B26313/S002",
+            "ODF-1.1/spec/B26313/S003"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.1/spec": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d"
+      }
+    },
+    {
       "groupId": "ODFG-6bc42e8efe2949633edd",
       "memberSha256": "4ace376bab9b54c6899bed8b0f6320ee3a94a49a9dd9440b49fc363411d6dd3c",
       "versions": [
@@ -123832,6 +124872,94 @@
       "sourceReferenceEvidenceSha256": "31e118247f737149f8e679243083d3292d4c91f5f60e1d8dbccf472490ccebb3"
     },
     {
+      "groupId": "ODFG-76dc293ef322636ec238",
+      "memberSha256": "9414ba71ec3366fb73bc9a81c68d3eca53bb5c02fd2f81105a05234b08380436",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B12388/S001",
+            "ODF-1.3/schema/B12552/S001",
+            "ODF-1.4/schema/B12712/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "以外部標準指定資料定義；引用依賴必須追蹤，不因跨標準而豁免，也不宣告該標準所有功能已實作。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B12389/S001",
+            "ODF-1.3/schema/B12553/S001",
+            "ODF-1.4/schema/B12713/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子說明構造的資料語意、用途或指涉；資料模型、儲存與讀取屬 SDK 範圍，不推論新增輸入拒絕規則，也不把說明性文字當作已提供的呈現功能。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B12390/S001",
+            "ODF-1.2/schema/B12391/S001",
+            "ODF-1.2/schema/B12392/S001",
+            "ODF-1.2/schema/B12393/S001",
+            "ODF-1.3/schema/B12554/S001",
+            "ODF-1.3/schema/B12555/S001",
+            "ODF-1.3/schema/B12556/S001",
+            "ODF-1.3/schema/B12557/S001",
+            "ODF-1.4/schema/B12714/S001",
+            "ODF-1.4/schema/B12715/S001",
+            "ODF-1.4/schema/B12716/S001",
+            "ODF-1.4/schema/B12717/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "屬性的適用元素清單；結構與輸出位置在 SDK 範圍，不推論屬性必填。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B12394/S001",
+            "ODF-1.3/schema/B12558/S001",
+            "ODF-1.4/schema/B12718/S001"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.2/schema": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+        "ODF-1.3/schema": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+        "ODF-1.4/schema": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f"
+      }
+    },
+    {
       "groupId": "ODFG-76f1ce44fe6f036aa2fc",
       "memberSha256": "7071ed90b1de6284f73ba0b8eff03869261721e24dbc250a7b3307214ffdfcbd",
       "versions": [
@@ -126297,6 +127425,117 @@
       }
     },
     {
+      "groupId": "ODFG-79b6a5aa555bcb5f9fcc",
+      "memberSha256": "50a6a8929ae5534740ab6bb9b26476f083dbfb708989a21d1a9aa4381d2dacf3",
+      "versions": [
+        "1.1"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.1/spec/B22899/S001"
+          ]
+        },
+        {
+          "kind": "requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "含 shall／must 的明示要求；依條件拆分為輸入驗證與輸出義務，強度依本版 Notation。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B22900/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子說明構造的資料語意、用途或指涉；資料模型、儲存與讀取屬 SDK 範圍，不推論新增輸入拒絕規則，也不把說明性文字當作已提供的呈現功能。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B22900/S002",
+            "ODF-1.1/spec/B22901/S002"
+          ]
+        },
+        {
+          "kind": "permission",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "含 may／can 的許可或可用性說明；驗證不得因使用該許可而拒絕，producer 可選擇是否使用。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B22901/S001",
+            "ODF-1.1/spec/B22901/S003"
+          ]
+        },
+        {
+          "kind": "informative-context",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "說明性或舉例性文字；保守地不予豁免，仍保留資料語意責任供後續逐項裁決。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B22902/S001",
+            "ODF-1.1/spec/B22903/S001",
+            "ODF-1.1/spec/B22903/S002",
+            "ODF-1.1/spec/B22904/S001",
+            "ODF-1.1/spec/B22905/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "RELAX NG 構造片段：保留 operator、name、type、combine、default annotation 及內容 hash；語法分類不等於已證明 SDK pattern matcher 與整份官方 grammar 等價。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B22906/S001",
+            "ODF-1.1/spec/B22907/S001",
+            "ODF-1.1/spec/B22908/S001",
+            "ODF-1.1/spec/B22909/S001",
+            "ODF-1.1/spec/B22910/S001",
+            "ODF-1.1/spec/B22911/S001",
+            "ODF-1.1/spec/B22912/S001",
+            "ODF-1.1/spec/B22913/S001",
+            "ODF-1.1/spec/B22914/S001",
+            "ODF-1.1/spec/B22915/S001",
+            "ODF-1.1/spec/B22916/S001",
+            "ODF-1.1/spec/B22917/S001"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.1/spec": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d"
+      }
+    },
+    {
       "groupId": "ODFG-79c11a152f1c4a5019cb",
       "memberSha256": "5768e9fa431072d691ff05ac7d0c16e4bf7ee0034a777e81f2dabb1d7c09d389",
       "versions": [
@@ -126578,6 +127817,146 @@
       ],
       "sourceArchiveSha256": {
         "ODF-1.1/spec": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d"
+      }
+    },
+    {
+      "groupId": "ODFG-79ff6faf1817d827826e",
+      "memberSha256": "a57aaa96be36d8d45839f642392d0effc67fb707ce48ef4b48c19877bad56b85",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B02693/S001",
+            "ODF-1.3/schema/B02728/S001",
+            "ODF-1.4/schema/B02750/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "定義欄位表示的資料語意；資料模型、儲存、讀取及適用的驗證屬 SDK 範圍。此分類不將所有呈現語意轉成輸入拒絕規則，也不證明 SDK 已提供實體渲染。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B02694/S001",
+            "ODF-1.3/schema/B02729/S001",
+            "ODF-1.4/schema/B02751/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子說明構造的資料語意、用途或指涉；資料模型、儲存與讀取屬 SDK 範圍，不推論新增輸入拒絕規則，也不把說明性文字當作已提供的呈現功能。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B02694/S002",
+            "ODF-1.2/schema/B02694/S003",
+            "ODF-1.2/schema/B02694/S005",
+            "ODF-1.2/schema/B02694/S006",
+            "ODF-1.2/schema/B02694/S008",
+            "ODF-1.3/schema/B02729/S002",
+            "ODF-1.3/schema/B02729/S003",
+            "ODF-1.3/schema/B02729/S005",
+            "ODF-1.3/schema/B02729/S006",
+            "ODF-1.3/schema/B02729/S008",
+            "ODF-1.4/schema/B02751/S002",
+            "ODF-1.4/schema/B02751/S003",
+            "ODF-1.4/schema/B02751/S005",
+            "ODF-1.4/schema/B02751/S006",
+            "ODF-1.4/schema/B02751/S008"
+          ]
+        },
+        {
+          "kind": "conditional-permission-and-requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "含條件、限制或例外的完整句子；前提與結果分別保留，條件分支須逐項實作裁決，不將前提不成立的情境當作錯誤。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B02694/S004",
+            "ODF-1.2/schema/B02694/S007",
+            "ODF-1.3/schema/B02729/S004",
+            "ODF-1.3/schema/B02729/S007",
+            "ODF-1.4/schema/B02751/S004",
+            "ODF-1.4/schema/B02751/S007"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "元素的適用父元素清單；結構與輸出位置在 SDK 範圍，不推論出現次數。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B02695/S001",
+            "ODF-1.3/schema/B02730/S001",
+            "ODF-1.4/schema/B02752/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "元素屬性清單；每個屬性的型別、必填及條件仍需沿引用條款與 schema 展開。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B02696/S001",
+            "ODF-1.3/schema/B02731/S001",
+            "ODF-1.4/schema/B02753/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "原生元素沒有定義子元素；character data、foreign 內容與 whitespace 的合法性須另外依 schema 及版本裁決。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B02697/S001",
+            "ODF-1.3/schema/B02732/S001",
+            "ODF-1.4/schema/B02754/S001"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.2/schema": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+        "ODF-1.3/schema": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+        "ODF-1.4/schema": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f"
       }
     },
     {
@@ -141684,6 +143063,146 @@
         "ODF-1.2/schema": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
         "ODF-1.3/schema": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
         "ODF-1.4/schema": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f"
+      }
+    },
+    {
+      "groupId": "ODFG-895ebc519b193e37849f",
+      "memberSha256": "33a6e81b476d855149a57dd185da2b0e0cb0c97eed3f48f817d0613248bf707b",
+      "versions": [
+        "1.1"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.1/spec/B06457/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子說明構造的資料語意、用途或指涉；資料模型、儲存與讀取屬 SDK 範圍，不推論新增輸入拒絕規則，也不把說明性文字當作已提供的呈現功能。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B06458/S001",
+            "ODF-1.1/spec/B06458/S003",
+            "ODF-1.1/spec/B06459/S001",
+            "ODF-1.1/spec/B06459/S002",
+            "ODF-1.1/spec/B06459/S003",
+            "ODF-1.1/spec/B06459/S004"
+          ]
+        },
+        {
+          "kind": "permission",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "含 may／can 的許可或可用性說明；驗證不得因使用該許可而拒絕，producer 可選擇是否使用。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B06458/S002"
+          ]
+        },
+        {
+          "kind": "requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "含 shall／must 的明示要求；依條件拆分為輸入驗證與輸出義務，強度依本版 Notation。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B06458/S004"
+          ]
+        },
+        {
+          "kind": "informative-context",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "說明性或舉例性文字；保守地不予豁免，仍保留資料語意責任供後續逐項裁決。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B06459/S005",
+            "ODF-1.1/spec/B06462/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "引入目前元素的屬性清單；須由實際 text:list、完整成員及無歧義元素背景共同成立。清單標籤是屬性定義依賴，不自行當作 XML 名稱或必填宣告。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B06460/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "來源屬性／子元素清單中的概念標籤，保留原詞及本版參照作為待展開依賴；不能拿顯示名稱當 namespace、XML 名稱、列舉 literal 或功能已實作的證明。僅接受沒有條件／處理述詞的標籤。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B06461/S001",
+            "ODF-1.1/spec/B06463/S001",
+            "ODF-1.1/spec/B06464/S001",
+            "ODF-1.1/spec/B06465/S001",
+            "ODF-1.1/spec/B06466/S001",
+            "ODF-1.1/spec/B06467/S001",
+            "ODF-1.1/spec/B06468/S001",
+            "ODF-1.1/spec/B06469/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "RELAX NG 構造片段：保留 operator、name、type、combine、default annotation 及內容 hash；語法分類不等於已證明 SDK pattern matcher 與整份官方 grammar 等價。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B06470/S001",
+            "ODF-1.1/spec/B06471/S001",
+            "ODF-1.1/spec/B06472/S001",
+            "ODF-1.1/spec/B06473/S001",
+            "ODF-1.1/spec/B06474/S001",
+            "ODF-1.1/spec/B06475/S001"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.1/spec": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d"
       }
     },
     {
@@ -191704,6 +193223,184 @@
       }
     },
     {
+      "groupId": "ODFG-bf0f4987f403090a8acd",
+      "memberSha256": "25bc7c06a3e38b9606d5c7ce03d35579666bf173494849435bfb8a94c5486bb6",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04038/S001",
+            "ODF-1.3/schema/B04113/S001",
+            "ODF-1.4/schema/B04193/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "定義欄位表示的資料語意；資料模型、儲存、讀取及適用的驗證屬 SDK 範圍。此分類不將所有呈現語意轉成輸入拒絕規則，也不證明 SDK 已提供實體渲染。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04039/S001",
+            "ODF-1.3/schema/B04114/S001",
+            "ODF-1.4/schema/B04194/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "完整句子說明構造的結構或內容模型；結構與輸出位置屬 SDK 範圍，順序與基數仍須沿 grammar 核對。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04039/S002",
+            "ODF-1.3/schema/B04114/S002",
+            "ODF-1.4/schema/B04194/S002"
+          ]
+        },
+        {
+          "kind": "conditional-permission-and-requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "含條件、限制或例外的完整句子；前提與結果分別保留，條件分支須逐項實作裁決，不將前提不成立的情境當作錯誤。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04040/S001",
+            "ODF-1.2/schema/B04040/S002",
+            "ODF-1.3/schema/B04115/S001",
+            "ODF-1.3/schema/B04115/S002",
+            "ODF-1.4/schema/B04195/S001",
+            "ODF-1.4/schema/B04195/S002"
+          ]
+        },
+        {
+          "kind": "permission",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "含 may／can 的許可或可用性說明；驗證不得因使用該許可而拒絕，producer 可選擇是否使用。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04041/S001",
+            "ODF-1.2/schema/B04044/S001",
+            "ODF-1.3/schema/B04118/S001",
+            "ODF-1.4/schema/B04198/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子說明構造的資料語意、用途或指涉；資料模型、儲存與讀取屬 SDK 範圍，不推論新增輸入拒絕規則，也不把說明性文字當作已提供的呈現功能。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04042/S001",
+            "ODF-1.2/schema/B04044/S002",
+            "ODF-1.3/schema/B04116/S001",
+            "ODF-1.3/schema/B04118/S002",
+            "ODF-1.4/schema/B04196/S001",
+            "ODF-1.4/schema/B04198/S002"
+          ]
+        },
+        {
+          "kind": "informative-context",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "說明性或舉例性文字；保守地不予豁免，仍保留資料語意責任供後續逐項裁決。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04043/S001",
+            "ODF-1.3/schema/B04117/S001",
+            "ODF-1.4/schema/B04197/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "元素的適用父元素清單；結構與輸出位置在 SDK 範圍，不推論出現次數。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04045/S001",
+            "ODF-1.3/schema/B04119/S001",
+            "ODF-1.4/schema/B04199/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "元素屬性清單；每個屬性的型別、必填及條件仍需沿引用條款與 schema 展開。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04046/S001",
+            "ODF-1.3/schema/B04120/S001",
+            "ODF-1.4/schema/B04200/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "子元素清單；順序、基數及條件仍需沿 schema 與所引用條款展開，不以英文單複數推定。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04047/S001",
+            "ODF-1.3/schema/B04121/S001",
+            "ODF-1.4/schema/B04201/S001"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.2/schema": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+        "ODF-1.3/schema": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+        "ODF-1.4/schema": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f"
+      }
+    },
+    {
       "groupId": "ODFG-bf13b1a3fcb33106abdd",
       "memberSha256": "3c68053573e55c5a19d82259ae647c89ebdaf57d262a816951cb0dbe126c40ae",
       "versions": [
@@ -200344,6 +202041,145 @@
       }
     },
     {
+      "groupId": "ODFG-c8560aa600eaf892291b",
+      "memberSha256": "3a93b0f2b02961e2bdcd3a16eb9d61c3a727a6786db9097bb8dfabea48a35b95",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B02172/S001",
+            "ODF-1.3/schema/B02200/S001",
+            "ODF-1.4/schema/B02204/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "定義欄位表示的資料語意；資料模型、儲存、讀取及適用的驗證屬 SDK 範圍。此分類不將所有呈現語意轉成輸入拒絕規則，也不證明 SDK 已提供實體渲染。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B02173/S001",
+            "ODF-1.3/schema/B02201/S001",
+            "ODF-1.4/schema/B02205/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "完整句子說明構造的結構或內容模型；結構與輸出位置屬 SDK 範圍，順序與基數仍須沿 grammar 核對。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B02174/S001",
+            "ODF-1.2/schema/B02175/S001",
+            "ODF-1.2/schema/B02176/S001",
+            "ODF-1.3/schema/B02202/S001",
+            "ODF-1.3/schema/B02203/S001",
+            "ODF-1.3/schema/B02204/S001",
+            "ODF-1.3/schema/B02207/S001",
+            "ODF-1.3/schema/B02208/S001",
+            "ODF-1.3/schema/B02209/S001",
+            "ODF-1.4/schema/B02206/S001",
+            "ODF-1.4/schema/B02207/S001",
+            "ODF-1.4/schema/B02208/S001",
+            "ODF-1.4/schema/B02211/S001",
+            "ODF-1.4/schema/B02212/S001",
+            "ODF-1.4/schema/B02213/S001"
+          ]
+        },
+        {
+          "kind": "conditional-permission-and-requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "含條件、限制或例外的完整句子；前提與結果分別保留，條件分支須逐項實作裁決，不將前提不成立的情境當作錯誤。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B02177/S001",
+            "ODF-1.2/schema/B02178/S001",
+            "ODF-1.3/schema/B02205/S001",
+            "ODF-1.3/schema/B02206/S001",
+            "ODF-1.4/schema/B02209/S001",
+            "ODF-1.4/schema/B02210/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "元素的適用父元素清單；結構與輸出位置在 SDK 範圍，不推論出現次數。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B02179/S001",
+            "ODF-1.3/schema/B02210/S001",
+            "ODF-1.4/schema/B02214/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "元素屬性清單；每個屬性的型別、必填及條件仍需沿引用條款與 schema 展開。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B02180/S001",
+            "ODF-1.3/schema/B02211/S001",
+            "ODF-1.4/schema/B02215/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "子元素清單；順序、基數及條件仍需沿 schema 與所引用條款展開，不以英文單複數推定。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B02181/S001",
+            "ODF-1.3/schema/B02212/S001",
+            "ODF-1.4/schema/B02216/S001"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.2/schema": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+        "ODF-1.3/schema": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+        "ODF-1.4/schema": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f"
+      }
+    },
+    {
       "groupId": "ODFG-c85a04851534e8a8fc47",
       "memberSha256": "66b28aa3622c7958248a0da564c1f048920e841f2cb132a0edd01917c8c8fe6b",
       "versions": [
@@ -201804,6 +203640,198 @@
         "ODF-1.2/formula": "25fe2e45e776dce1443eae483dc631aa622cd8a8718e95ff8882eda7df834ef9",
         "ODF-1.3/formula": "4886530aa0972e20f83272be28c5fc938861f510d1d9381d61566f852f44c5cf",
         "ODF-1.4/formula": "f2d9daebb8a66dbdb039d570d6d3b90f123cd1cefbeb13412e1655f2b3e61a8c"
+      }
+    },
+    {
+      "groupId": "ODFG-c9b46b3c8b94a01a0cb3",
+      "memberSha256": "894d12973a615221358c6793df1601db21dc2b5949e528855fd2e24b0f3dd53b",
+      "versions": [
+        "1.1"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.1/spec/B18414/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "定義欄位表示的資料語意；資料模型、儲存、讀取及適用的驗證屬 SDK 範圍。此分類不將所有呈現語意轉成輸入拒絕規則，也不證明 SDK 已提供實體渲染。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B18415/S001",
+            "ODF-1.1/spec/B18426/S001",
+            "ODF-1.1/spec/B18444/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "元素若出現必須位於所列父元素；保留 If used 條件，不推論元素必填。僅在來源元素背景唯一時接受，順序與基數仍依 grammar。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B18416/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "RELAX NG 構造片段：保留 operator、name、type、combine、default annotation 及內容 hash；語法分類不等於已證明 SDK pattern matcher 與整份官方 grammar 等價。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B18417/S001",
+            "ODF-1.1/spec/B18418/S001",
+            "ODF-1.1/spec/B18419/S001",
+            "ODF-1.1/spec/B18420/S001",
+            "ODF-1.1/spec/B18421/S001",
+            "ODF-1.1/spec/B18422/S001",
+            "ODF-1.1/spec/B18423/S001",
+            "ODF-1.1/spec/B18427/S001",
+            "ODF-1.1/spec/B18428/S001",
+            "ODF-1.1/spec/B18429/S001",
+            "ODF-1.1/spec/B18430/S001",
+            "ODF-1.1/spec/B18431/S001",
+            "ODF-1.1/spec/B18432/S001",
+            "ODF-1.1/spec/B18433/S001",
+            "ODF-1.1/spec/B18436/S001",
+            "ODF-1.1/spec/B18437/S001",
+            "ODF-1.1/spec/B18438/S001",
+            "ODF-1.1/spec/B18439/S001",
+            "ODF-1.1/spec/B18440/S001",
+            "ODF-1.1/spec/B18441/S001",
+            "ODF-1.1/spec/B18442/S001",
+            "ODF-1.1/spec/B18448/S001",
+            "ODF-1.1/spec/B18449/S001",
+            "ODF-1.1/spec/B18450/S001",
+            "ODF-1.1/spec/B18451/S001",
+            "ODF-1.1/spec/B18452/S001",
+            "ODF-1.1/spec/B18453/S001",
+            "ODF-1.1/spec/B18454/S001",
+            "ODF-1.1/spec/B18455/S001",
+            "ODF-1.1/spec/B18456/S001",
+            "ODF-1.1/spec/B18457/S001"
+          ]
+        },
+        {
+          "kind": "permission",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "含 may／can 的許可或可用性說明；驗證不得因使用該許可而拒絕，producer 可選擇是否使用。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B18424/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "舊版的條款參照；保留該版節號及文字目的，不外推新版同號條款，也不把參照當已完成驗證證據。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B18424/S002"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "來源屬性／子元素清單中的概念標籤，保留原詞及本版參照作為待展開依賴；不能拿顯示名稱當 namespace、XML 名稱、列舉 literal 或功能已實作的證明。僅接受沒有條件／處理述詞的標籤。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B18425/S001",
+            "ODF-1.1/spec/B18434/S001",
+            "ODF-1.1/spec/B18443/S001"
+          ]
+        },
+        {
+          "kind": "conditional-permission-and-requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "含條件、限制或例外的完整句子；前提與結果分別保留，條件分支須逐項實作裁決，不將前提不成立的情境當作錯誤。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B18426/S002",
+            "ODF-1.1/spec/B18426/S003",
+            "ODF-1.1/spec/B18435/S002",
+            "ODF-1.1/spec/B18435/S003",
+            "ODF-1.1/spec/B18445/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子說明構造的資料語意、用途或指涉；資料模型、儲存與讀取屬 SDK 範圍，不推論新增輸入拒絕規則，也不把說明性文字當作已提供的呈現功能。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B18435/S001",
+            "ODF-1.1/spec/B18444/S003",
+            "ODF-1.1/spec/B18446/S001",
+            "ODF-1.1/spec/B18447/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "單一已辨識屬性的值域或值語意；保留 is／can be／must be 等原始表達，不將可能值清單誤當完整封閉值域。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B18444/S002"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.1/spec": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d"
       }
     },
     {
@@ -224276,6 +226304,173 @@
       }
     },
     {
+      "groupId": "ODFG-df725c4c3ee7c3e7ea73",
+      "memberSha256": "18a062b3ab574912ef7aac63bb70df7aa184fa44b473d6d08525a6b022cc41d1",
+      "versions": [
+        "1.1"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.1/spec/B18336/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "定義欄位表示的資料語意；資料模型、儲存、讀取及適用的驗證屬 SDK 範圍。此分類不將所有呈現語意轉成輸入拒絕規則，也不證明 SDK 已提供實體渲染。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B18337/S001"
+          ]
+        },
+        {
+          "kind": "permission",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "含 may／can 的許可或可用性說明；驗證不得因使用該許可而拒絕，producer 可選擇是否使用。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B18338/S001",
+            "ODF-1.1/spec/B18339/S002"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子以具名元素或屬性為主詞，定義資料性質、處理要求或使用權限；保留主詞、原始動詞、條件、否定及引用。角色適用、義務拆分與實作證據仍待後續裁決，不能把 MAY 解讀為啟用功能後無須遵守限制，也不能將 MUST render 一律改為資料拒絕。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B18339/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "RELAX NG 構造片段：保留 operator、name、type、combine、default annotation 及內容 hash；語法分類不等於已證明 SDK pattern matcher 與整份官方 grammar 等價。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B18340/S001",
+            "ODF-1.1/spec/B18341/S001",
+            "ODF-1.1/spec/B18342/S001",
+            "ODF-1.1/spec/B18343/S001",
+            "ODF-1.1/spec/B18344/S001",
+            "ODF-1.1/spec/B18345/S001",
+            "ODF-1.1/spec/B18346/S001",
+            "ODF-1.1/spec/B18347/S001",
+            "ODF-1.1/spec/B18350/S001",
+            "ODF-1.1/spec/B18351/S001",
+            "ODF-1.1/spec/B18352/S001",
+            "ODF-1.1/spec/B18353/S001",
+            "ODF-1.1/spec/B18354/S001",
+            "ODF-1.1/spec/B18355/S001",
+            "ODF-1.1/spec/B18356/S001",
+            "ODF-1.1/spec/B18357/S001",
+            "ODF-1.1/spec/B18358/S001",
+            "ODF-1.1/spec/B18359/S001",
+            "ODF-1.1/spec/B18360/S001",
+            "ODF-1.1/spec/B18361/S001",
+            "ODF-1.1/spec/B18362/S001",
+            "ODF-1.1/spec/B18363/S001",
+            "ODF-1.1/spec/B18364/S001",
+            "ODF-1.1/spec/B18365/S001",
+            "ODF-1.1/spec/B18366/S001",
+            "ODF-1.1/spec/B18367/S001",
+            "ODF-1.1/spec/B18368/S001",
+            "ODF-1.1/spec/B18369/S001",
+            "ODF-1.1/spec/B18370/S001",
+            "ODF-1.1/spec/B18371/S001",
+            "ODF-1.1/spec/B18372/S001",
+            "ODF-1.1/spec/B18373/S001",
+            "ODF-1.1/spec/B18374/S001",
+            "ODF-1.1/spec/B18375/S001",
+            "ODF-1.1/spec/B18376/S001",
+            "ODF-1.1/spec/B18377/S001",
+            "ODF-1.1/spec/B18378/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "RELAX NG 片段中的註解；仍可能承載 schema 外的 prose 條件，保留內容 hash 與義務訊號供批次裁決，不將 XML comment 一概豁免。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B18348/S001",
+            "ODF-1.1/spec/B18349/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "舊版的條款參照；保留該版節號及文字目的，不外推新版同號條款，也不把參照當已完成驗證證據。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B18379/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "完整句子說明構造的結構或內容模型；結構與輸出位置屬 SDK 範圍，順序與基數仍須沿 grammar 核對。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.1/spec/B18380/S001",
+            "ODF-1.1/spec/B18381/S001",
+            "ODF-1.1/spec/B18382/S001",
+            "ODF-1.1/spec/B18383/S001",
+            "ODF-1.1/spec/B18384/S001",
+            "ODF-1.1/spec/B18385/S001",
+            "ODF-1.1/spec/B18386/S001",
+            "ODF-1.1/spec/B18387/S001"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.1/spec": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d"
+      }
+    },
+    {
       "groupId": "ODFG-df81bdb6434f483338e7",
       "memberSha256": "746055f9cd2d766f3764a6134d797430e6ed196b6ff22c9adf41b22aa570fd4d",
       "versions": [
@@ -234653,6 +236848,103 @@
       }
     },
     {
+      "groupId": "ODFG-eb665aa9fa0acb9cd938",
+      "memberSha256": "f0879de87fa255a52284cfb9dcfe95c1e315b4693768d94a1d90c108a65f0da6",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B00859/S001",
+            "ODF-1.3/schema/B00872/S001",
+            "ODF-1.4/schema/B00874/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子說明構造的資料語意、用途或指涉；資料模型、儲存與讀取屬 SDK 範圍，不推論新增輸入拒絕規則，也不把說明性文字當作已提供的呈現功能。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00860/S001",
+            "ODF-1.2/schema/B00860/S002",
+            "ODF-1.2/schema/B00867/S001",
+            "ODF-1.3/schema/B00873/S001",
+            "ODF-1.3/schema/B00873/S002",
+            "ODF-1.3/schema/B00880/S001",
+            "ODF-1.4/schema/B00875/S001",
+            "ODF-1.4/schema/B00875/S002",
+            "ODF-1.4/schema/B00882/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "完整句子說明構造的結構或內容模型；結構與輸出位置屬 SDK 範圍，順序與基數仍須沿 grammar 核對。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00861/S001",
+            "ODF-1.2/schema/B00862/S001",
+            "ODF-1.2/schema/B00863/S001",
+            "ODF-1.2/schema/B00864/S001",
+            "ODF-1.2/schema/B00865/S001",
+            "ODF-1.3/schema/B00874/S001",
+            "ODF-1.3/schema/B00875/S001",
+            "ODF-1.3/schema/B00876/S001",
+            "ODF-1.3/schema/B00877/S001",
+            "ODF-1.3/schema/B00878/S001",
+            "ODF-1.4/schema/B00876/S001",
+            "ODF-1.4/schema/B00877/S001",
+            "ODF-1.4/schema/B00878/S001",
+            "ODF-1.4/schema/B00879/S001",
+            "ODF-1.4/schema/B00880/S001"
+          ]
+        },
+        {
+          "kind": "informative-context",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "說明性或舉例性文字；保守地不予豁免，仍保留資料語意責任供後續逐項裁決。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00866/S001",
+            "ODF-1.3/schema/B00879/S001",
+            "ODF-1.4/schema/B00881/S001"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.2/schema": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+        "ODF-1.3/schema": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+        "ODF-1.4/schema": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f"
+      }
+    },
+    {
       "groupId": "ODFG-eb7cf1d07b26a2c85509",
       "memberSha256": "a2a67c5e789dcf92b65f13b4bd6e4369e221d2cce59badea0d05923b5134d310",
       "versions": [
@@ -242683,6 +244975,153 @@
         "ODF-1.2/formula": "25fe2e45e776dce1443eae483dc631aa622cd8a8718e95ff8882eda7df834ef9",
         "ODF-1.3/formula": "4886530aa0972e20f83272be28c5fc938861f510d1d9381d61566f852f44c5cf",
         "ODF-1.4/formula": "f2d9daebb8a66dbdb039d570d6d3b90f123cd1cefbeb13412e1655f2b3e61a8c"
+      }
+    },
+    {
+      "groupId": "ODFG-f474662cc0b154356b52",
+      "memberSha256": "82d5ffbda5823af55894cc9e6d02290053af41b220e772e1f47aaba9d8af3cc6",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐組核對各版完整文字及原始 ID；人工審閱只分類語意角色與 SDK 責任，不宣告各版等價，也不證明 SDK 已實作，實作裁決仍待證據。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "實際 text:h 標題只定位來源，不獨立施加義務。",
+          "conditions": "僅實際來源標題。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B07706/S001",
+            "ODF-1.3/schema/B07810/S001",
+            "ODF-1.4/schema/B07943/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "定義欄位表示的資料語意；資料模型、儲存、讀取及適用的驗證屬 SDK 範圍。此分類不將所有呈現語意轉成輸入拒絕規則，也不證明 SDK 已提供實體渲染。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B07707/S001",
+            "ODF-1.3/schema/B07811/S001",
+            "ODF-1.4/schema/B07944/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子以具名元素或屬性為主詞，定義資料性質、處理要求或使用權限；保留主詞、原始動詞、條件、否定及引用。角色適用、義務拆分與實作證據仍待後續裁決，不能把 MAY 解讀為啟用功能後無須遵守限制，也不能將 MUST render 一律改為資料拒絕。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B07708/S001",
+            "ODF-1.3/schema/B07812/S001",
+            "ODF-1.4/schema/B07945/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "已明示屬性的值型別、資料域或處理義務；保留原始 modal 及 predicate，依角色和條件另行裁決，不能將 can be 清單推定為封閉值域。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B07708/S002",
+            "ODF-1.3/schema/B07812/S002",
+            "ODF-1.4/schema/B07945/S002"
+          ]
+        },
+        {
+          "kind": "conditional-permission-and-requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "含條件、限制或例外的完整句子；前提與結果分別保留，條件分支須逐項實作裁決，不將前提不成立的情境當作錯誤。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B07709/S001",
+            "ODF-1.2/schema/B07709/S002",
+            "ODF-1.2/schema/B07709/S003",
+            "ODF-1.3/schema/B07813/S001",
+            "ODF-1.3/schema/B07813/S002",
+            "ODF-1.3/schema/B07813/S003"
+          ]
+        },
+        {
+          "kind": "informative-context",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "說明性或舉例性文字；保守地不予豁免，仍保留資料語意責任供後續逐項裁決。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B07710/S001",
+            "ODF-1.3/schema/B07814/S001",
+            "ODF-1.3/schema/B07815/S001",
+            "ODF-1.4/schema/B07946/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "屬性的適用元素清單；結構與輸出位置在 SDK 範圍，不推論屬性必填。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B07711/S001",
+            "ODF-1.3/schema/B07816/S001",
+            "ODF-1.4/schema/B07947/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "完整句子說明構造的資料語意、用途或指涉；資料模型、儲存與讀取屬 SDK 範圍，不推論新增輸入拒絕規則，也不把說明性文字當作已提供的呈現功能。",
+          "conditions": "ODF 規範文字的資料、結構、引用及 SDK 已提供功能語意；實體排版與完整辦公套件 UI 另依 docs/udx-non-goals.md。條件、否定、許可、推薦及共用定義須逐項實作裁決；modal 用語的義務強度依本版 Notation，不將任意文字出現的 modal 當作無條件輸入拒絕。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B07712/S001",
+            "ODF-1.3/schema/B07817/S001",
+            "ODF-1.4/schema/B07948/S001"
+          ]
+        }
+      ],
+      "sourceArchiveSha256": {
+        "ODF-1.2/schema": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+        "ODF-1.3/schema": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+        "ODF-1.4/schema": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f"
       }
     },
     {
