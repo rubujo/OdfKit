@@ -255,6 +255,16 @@ numeric／currency 目前值，共 7 組）已核對核准勘誤的生效文字�
 （86 組具執行期實作與測試證據）；被引用的 W3C 型別族及其他儲存格屬性仍為獨立相依，
 不宣稱完整合規。
 
+作者與寄件人欄位批次（ODF 1.1 的 Sender／Author Fields 與 1.2～1.4 的 Subsequent
+Author／Author Fields，共 37 組、17 種 text:author-*／text:sender-* 元素）以
+[欄位回歸](../OdfKit.Tests/OdfAuthorSenderFieldConformanceTests.cs)逐版核對：
+各文件列出的父元素均可使用，字元資料經兩種讀取器與寫出路徑保留，text:fixed 缺省、
+true、false 皆合法，其他值、未知原生屬性、原生子元素、錯誤位置及外來同名元素被拒絕。
+SDK 沒有自動更新作者欄位的功能，測試另證明載入與儲存不改寫 fixed 與非 fixed 欄位的值。
+這批沒有發現 SDK 缺陷；使用者資訊對話框屬宿主 UI，不是核心責任，text:fixed 的布林型別
+另為獨立相依。兩框架各 5,017 項回歸通過，直接裁決累計 **145 組、5,717 組待裁決**
+（123 組具執行期實作與測試證據）。
+
 表單型別批次已修正並完整核驗兩項不同的驗證缺口，三個型別子節已計入直接裁決：
 CLR 的 `XmlConvert` 會接受 `Infinity`、`nan` 等 XML Schema 不允許的特殊詞彙，
 因此 float／double 轉換前增加線性 ASCII 詞彙檢查，保留合法的指數與 `INF`、`-INF`、`NaN`。
