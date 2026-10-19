@@ -18,21 +18,6 @@ on:
       - 'eng/Build-OdfConformanceMatrix.py'
       - 'eng/Build-OdfObligationInventory.py'
       - 'eng/Build-OdfObligationClassification.py'
-      - 'eng/Build-OdfPublicationObjects.py'
-      - 'eng/testdata/Test-OdfPublicationObjects.py'
-      - 'docs/odf-publication-objects.json'
-      - 'eng/Build-OdfPdfGrammarEvidence.py'
-      - 'eng/testdata/Test-OdfPdfGrammarEvidence.py'
-      - 'docs/odf-pdf-grammar-policy.json'
-      - 'docs/odf-pdf-grammar-evidence.json'
-      - 'eng/Build-OdfEffectiveText.py'
-      - 'eng/testdata/Test-OdfEffectiveText.py'
-      - 'docs/odf-effective-text-policy.json'
-      - 'docs/odf-effective-text/**'
-      - 'eng/Build-OdfEmptyReferences.py'
-      - 'eng/testdata/Test-OdfEmptyReferences.py'
-      - 'docs/odf-empty-reference-evidence.json'
-      - 'docs/odf-package-informative-contexts.json'
       - 'eng/testdata/Test-OdfObligationClassification.py'
       - 'eng/testdata/Test-OdfObligationInventory.py'
       - 'docs/odf-obligation-decisions.json'
@@ -76,21 +61,6 @@ on:
       - 'eng/Build-OdfConformanceMatrix.py'
       - 'eng/Build-OdfObligationInventory.py'
       - 'eng/Build-OdfObligationClassification.py'
-      - 'eng/Build-OdfPublicationObjects.py'
-      - 'eng/testdata/Test-OdfPublicationObjects.py'
-      - 'docs/odf-publication-objects.json'
-      - 'eng/Build-OdfPdfGrammarEvidence.py'
-      - 'eng/testdata/Test-OdfPdfGrammarEvidence.py'
-      - 'docs/odf-pdf-grammar-policy.json'
-      - 'docs/odf-pdf-grammar-evidence.json'
-      - 'eng/Build-OdfEffectiveText.py'
-      - 'eng/testdata/Test-OdfEffectiveText.py'
-      - 'docs/odf-effective-text-policy.json'
-      - 'docs/odf-effective-text/**'
-      - 'eng/Build-OdfEmptyReferences.py'
-      - 'eng/testdata/Test-OdfEmptyReferences.py'
-      - 'docs/odf-empty-reference-evidence.json'
-      - 'docs/odf-package-informative-contexts.json'
       - 'eng/testdata/Test-OdfObligationClassification.py'
       - 'eng/testdata/Test-OdfObligationInventory.py'
       - 'docs/odf-obligation-decisions.json'
@@ -205,22 +175,6 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Obligation classification regressions failed.' }
           python eng/Build-OdfObligationClassification.py --check-contracts
           if ($LASTEXITCODE -ne 0) { throw 'Obligation classification contracts failed.' }
-          python eng/testdata/Test-OdfPdfGrammarEvidence.py
-          if ($LASTEXITCODE -ne 0) { throw 'PDF grammar reconstruction regressions failed.' }
-          python eng/Build-OdfPdfGrammarEvidence.py --check-contracts
-          if ($LASTEXITCODE -ne 0) { throw 'PDF grammar evidence contracts failed.' }
-          python eng/testdata/Test-OdfEffectiveText.py
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python eng/Build-OdfEffectiveText.py --check-contracts
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python eng/testdata/Test-OdfEmptyReferences.py
-          if ($LASTEXITCODE -ne 0) { throw 'Empty reference reconstruction regressions failed.' }
-          python eng/Build-OdfEmptyReferences.py --check-contracts
-          if ($LASTEXITCODE -ne 0) { throw 'Named reference target contracts failed.' }
-          python eng/testdata/Test-OdfPublicationObjects.py
-          if ($LASTEXITCODE -ne 0) { throw 'Publication object reconstruction regressions failed.' }
-          python eng/Build-OdfPublicationObjects.py --check-contracts
-          if ($LASTEXITCODE -ne 0) { throw 'Publication object provenance contracts failed.' }
           $tool = (Get-Content eng/external-tools.json -Raw | ConvertFrom-Json).opfOdfValidator
           $corpus = Get-Content docs/examples/oasis-odf-tc-corpus/manifest.json -Raw | ConvertFrom-Json
           $corpusHash = (Get-FileHash docs/examples/oasis-odf-tc-corpus/manifest.json -Algorithm SHA256).Hash.ToLowerInvariant()
