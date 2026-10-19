@@ -35,6 +35,8 @@
   <ItemGroup>
     <EmbeddedResource Include="TestData\OdfAttributeCases.jsonl.gz" LogicalName="OdfAttributeCases.jsonl.gz" />
     <EmbeddedResource Include="TestData\OdfAttributeCases.manifest.txt" LogicalName="OdfAttributeCases.manifest.txt" />
+    <EmbeddedResource Include="TestData\OdfElementCases.jsonl.gz" LogicalName="OdfElementCases.jsonl.gz" />
+    <EmbeddedResource Include="TestData\OdfElementCases.manifest.txt" LogicalName="OdfElementCases.manifest.txt" />
   </ItemGroup>
 
   <ItemGroup>
