@@ -23,7 +23,6 @@
 | 腳本 | 用途 |
 |------|------|
 | `Format-Safe.ps1` | 安全格式化與共用靜態閘門：避免全方案 `dotnet format` 污染雙 TFM 測試專案，並檢查衝突標記、環境變數隔離、一行式 summary 與雙語 XML 文件。 |
-| `Format-Workspace.ps1` | 格式化 OdfKit 工作區，排除會觸發 Visual Studio 合併標記的 `OdfKit.Tests` 專案。 |
 
 ### 測試與驗證
 
@@ -155,7 +154,6 @@ cache 命中時仍會重新驗證雜湊。
 |------|------|
 | `Analyze-PartialSplits.ps1` | 分析目前 partial 型別的拆分狀況，列出明確保留邊界（schema 驅動、功能區切割、加密管線等）的巨型型別。 |
 | `Build-AnalyzerReport.ps1` | 產生 OdfKit 建置 binlog 供 Analyzer Summary 剖析（本機診斷用）。 |
-| `Detect-TypeBoundaries.ps1` | 在指定檔案中以正規表達式找出符合的行號（通用搜尋輔助）。 |
 | `List-LargeCsFiles.ps1` | 列出 `OdfKit` 中超過指定行數門檻的最大 `.cs` 檔案，用於評估是否需要 god class 拆分。 |
 | `Expand-OptionalParameters.py` | 將「恰好一個」尾端可選參數的公開／保護方法展開為明確多載鏈（工程腳本，非執行時相依）。 |
 | `Generate-PublicApiBaseline.ps1` | 以 PublicApiAnalyzers RS0016 code fix 重產雙 TFM 的 `PublicAPI.Unshipped.txt`；建議加 `-Verify`。 |

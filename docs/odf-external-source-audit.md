@@ -140,9 +140,9 @@ hash 下載，不把第三方 binary 複製進單元測試。既有自訂 patter
   關係、公式結果、數位簽章真實性或 consumer 行為。
 - 核心驗證對裸 MathML 根節點有明確 schema pattern 豁免，不能以該 gate 的通過宣稱
   MathML 已完整驗證；formula 保留／來回讀寫亦不代表完整 OpenFormula 重算。
-- 已建立 [ODF 1.0～1.4 條款矩陣](odf-conformance-matrix.md)，保留結構證據、人工裁決、
-  未涵蓋與範圍界線。所有 normative obligation 的逐句裁決與完整跨產品互通證據仍未完成，
-  不能把條款索引的完整登錄解讀為全部合規。
+- 已建立 [ODF 1.0～1.4 條款矩陣](odf-conformance-matrix.md)，保留結構證據、未涵蓋與範圍界線；
+  驗證方法見 [條款對測試追蹤](odf-conformance-tracking.md)。不追蹤逐句義務，也沒有完整跨產品
+  互通證據，不能把條款索引的完整登錄解讀為全部合規。
 
 目前可支援的說法是：OdfKit 以 OASIS 官方 schema 與版本化 profile 為依據，對列明的
 文件與操作提供可重現的結構、封裝及來回讀寫驗證，另以 Jing／TDF／OPF 交叉檢查；
