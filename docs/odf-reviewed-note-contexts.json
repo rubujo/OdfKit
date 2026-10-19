@@ -1,0 +1,2949 @@
+{
+  "schemaVersion": 1,
+  "informativeContexts": [
+    {
+      "groupId": "ODFG-9f53b2d5f779dbcc598f",
+      "first": {
+        "id": "ODF-1.2/schema/B00473",
+        "textSha256": "bd04748cfc2c9f58cc393f6681bb88d664eb1f777de07b64cd9c3f1d18aa7a5c",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B00474",
+        "textSha256": "c9ea707ea42426a156607c23f30ff4dfeb8b2e99431388943cb5741af8b28e92",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-a9392eb753a0289cc379",
+      "first": {
+        "id": "ODF-1.2/schema/B00487",
+        "textSha256": "99c96a1a18479a046961bba529c64755e1069084b54323cc4a3a5e9ab08aca27",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B00488",
+        "textSha256": "aa196954c6681279efd10e3b8b0c09c7aca62c3b5389dc67a843a3726d854665",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-4a3bbfcac1121967e6a9",
+      "first": {
+        "id": "ODF-1.2/schema/B00532",
+        "textSha256": "8f2f6c7014895bd250071176962d6506c68a935db7d99358ad0454af4fdc1411",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B00533",
+        "textSha256": "6aae74b13d6040bf8bd9b1cad02d1e3c3392a8e0e0929aeb01ffaec5b8124d75",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-1642afd716e0207d7dce",
+      "first": {
+        "id": "ODF-1.2/schema/B00562",
+        "textSha256": "68bd55559cb4f08a02a2b9f9bff68233f9e1c279fa249d0fc8203e1b235493cc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B00563",
+        "textSha256": "b9310dc643fc0909abcae96708a8d44376eb32825f305dc4fedb697dce37d2b9",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-265c16f29fb3af72b140",
+      "first": {
+        "id": "ODF-1.2/schema/B00816",
+        "textSha256": "b976e50e18883f485ba019808aecf5413129547ca075510a2547ed0ea2d285c5",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B00817",
+        "textSha256": "e1b0646b75d8587c0948755b143152579facb90693f100a4ce380a0595ebf0f0",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-d1cbb69aad3a089b4194",
+      "first": {
+        "id": "ODF-1.2/schema/B00883",
+        "textSha256": "ff9033d6ed6c7001c2ef29e3ba4cea289266b284c56482e92de803d63314655a",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B00884",
+        "textSha256": "466141f8b502c5cd4c1c36d90ca29b7cafe6075638fa6bf218ca5ab4ed189f55",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-37b6d8df491b55093ab4",
+      "first": {
+        "id": "ODF-1.2/schema/B01028",
+        "textSha256": "d1881648f357a8f52b9f9603b5dd6092dd1e04d047cdac768e5a451193d675ff",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B01029",
+        "textSha256": "ef760b5301bd2dce5bda87e6ef445be0870228cf99696feedbcc8c8f6845f22a",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-35bbbabc20976293d6d1",
+      "first": {
+        "id": "ODF-1.2/schema/B01062",
+        "textSha256": "9275aa7c59ae492211a61b08a604d446e187dbff46d1e1d4fe316b50f9ce96a3",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B01063",
+        "textSha256": "70d6a7613763121136f0375fac73ccfe3734ece1271bd9c6220969c2664c5609",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-62e94026a8dae85515f0",
+      "first": {
+        "id": "ODF-1.2/schema/B01270",
+        "textSha256": "0e80e6a410623ea9fe1e03d43f522aa3f1f4c1d536f7668520c03e8e85535cae",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B01271",
+        "textSha256": "7313e99bce4748b4f9c49708dc5dc62be299bf76e7f92163e0045d0aaa6c6dee",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-95d7be41cb497da92194",
+      "first": {
+        "id": "ODF-1.2/schema/B01277",
+        "textSha256": "ec6ca281e615acfb81fec0d919662195c1effc0271016423821f8974e4a02722",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B01278",
+        "textSha256": "b259f78c022d6e35b2861848911d66e03f26a2d9ed2e42c47bd65b40d5b76160",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-375348523a163332d018",
+      "first": {
+        "id": "ODF-1.2/schema/B01324",
+        "textSha256": "73c78b1b14c4e7cb42b95ffb9c6d3a8c3e01a5a6b15f6f4ee9facc26f79177fe",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B01325",
+        "textSha256": "da72e7f5fb067a3723e5561c8c2534ac9b456518e85461a7815bb09caacf1c13",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-505b9211e380f4913511",
+      "first": {
+        "id": "ODF-1.2/schema/B01868",
+        "textSha256": "31171c312b041b8b750dbe545b636049519b24acc2126adb166cd4b5c47c0686",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B01869",
+        "textSha256": "a3612ca3d6b3aeb07bc60311ef9231771cc90f5887167db284c6eb83c1bab9d2",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-442d1314353985f1e464",
+      "first": {
+        "id": "ODF-1.2/schema/B02010",
+        "textSha256": "3e8901b3a3b4120fbfeff4dd0d72e0d91eaad66332aabd55665375e8b0fa555c",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B02011",
+        "textSha256": "f0c4d852ddc330f13645c0ac32034215aa621a44d74556815b0f793f675be35e",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-4313ff3218c5377f945c",
+      "first": {
+        "id": "ODF-1.2/schema/B02029",
+        "textSha256": "b6f01c8a89f0f4e4260c99c17fbbd32f628cdbce6f8b74fec15b343b8ae7b572",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B02030",
+        "textSha256": "9850c839d5f6c9e08233198f27acea6dc20c0a10a726cd8d3033203323f35e31",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-79c11a152f1c4a5019cb",
+      "first": {
+        "id": "ODF-1.2/schema/B02605",
+        "textSha256": "f6c12e0d8cba994259cf76397a54499d10ff46273abbf45f79b8f6cc55bc80ca",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B02606",
+        "textSha256": "399a202fc96ce353d4077e7bd99314c76c052d30ddcc7a9b56d5b1e3ab1451ad",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-a2d026fad08855eb0913",
+      "first": {
+        "id": "ODF-1.2/schema/B02624",
+        "textSha256": "66d8a67b909a886db3b9cdb718b7a76d711dd1d2667bbcf7d635283d0fcb38a9",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B02625",
+        "textSha256": "e43531b118a3a7a0f39abb86655ab54de1cef24e010f3a608c18afe8c7023cca",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-952765be563ea9f59696",
+      "first": {
+        "id": "ODF-1.2/schema/B02679",
+        "textSha256": "7a54edf2a9f8d9447a990e0578176c4da9c3fc0504883b81dca4026a65b015cc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B02680",
+        "textSha256": "5bfe2a7682c392837daf22a9e92f34a83310b499bfbdc298503d0811eb24e46b",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-c54d1524d62e128a99d9",
+      "first": {
+        "id": "ODF-1.2/schema/B02786",
+        "textSha256": "4a37c158e3add8417bd3e8f55108ce6015b8ea109272d139629c4d23216c29bc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B02787",
+        "textSha256": "6389d3ffff4e26342485815f6d759ac5e6e3bd97b1d4a57b65d5dead7e255fa3",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-a4e72372420990581360",
+      "first": {
+        "id": "ODF-1.2/schema/B02798",
+        "textSha256": "4a37c158e3add8417bd3e8f55108ce6015b8ea109272d139629c4d23216c29bc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B02799",
+        "textSha256": "431edf7a9c68ac8e95a0cd7fcc50087b72ab686f9e11a8250e50fdd1c41a009e",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-f901ff0ca70c2125b49d",
+      "first": {
+        "id": "ODF-1.2/schema/B02810",
+        "textSha256": "4a37c158e3add8417bd3e8f55108ce6015b8ea109272d139629c4d23216c29bc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B02811",
+        "textSha256": "fdf921e6a1846d5e1813347a98ac21fdb779168143b176b3de96e7424ba440f8",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-6422a267719b24ac4d18",
+      "first": {
+        "id": "ODF-1.2/schema/B02827",
+        "textSha256": "26d3a8c4a8689eb1234534d4ab324a5c2bf0e797c0cda54d594ee3fd7482c4aa",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B02828",
+        "textSha256": "104da24d8e37778dab661486cb02aac01a62a71597f867bbeb98ee74f3385428",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-7fd906aa7762a9d56ec6",
+      "first": {
+        "id": "ODF-1.2/schema/B02920",
+        "textSha256": "3ecbeea6c73193bc0ab34e278062f667e5ce445e1acb23bb91543a94799ad4dd",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B02921",
+        "textSha256": "52668e7ae435adf97920fa8b34556436b355477daa762f4abfefcdc71d4323cc",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-e34f1cfa012d1e3ab075",
+      "first": {
+        "id": "ODF-1.2/schema/B03003",
+        "textSha256": "edb89d209b27d4296dc25dfca18d2925d53500a0350077aebc6f2f7398449cfb",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B03004",
+        "textSha256": "0ad624efa2bcdba7fdb46f0b882e23f495c6d7023f410e113781d25b1f28e1e8",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-bf78eb5d61b20c8ab76e",
+      "first": {
+        "id": "ODF-1.2/schema/B03071",
+        "textSha256": "d1a7ed57f669b03df4e415d6dba939c0ff4a8163f09e6cdaf3fb0bcfee030288",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B03072",
+        "textSha256": "9fdf0829b47eb83f15de5318437867a8e03b17c0be424671e78a611f0b317588",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-ff049b8b263e70d68cca",
+      "first": {
+        "id": "ODF-1.2/schema/B03339",
+        "textSha256": "bbd6f2b021487c9a2cedce18f0743e281403d30888ca6a353e6fc92ccbe3e7e5",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B03340",
+        "textSha256": "2c7f73389a22fe6e4724e2a1ab0dd789a6d4d08578f3e6995ed42f790ae91e41",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-767016beb257be818ff2",
+      "first": {
+        "id": "ODF-1.2/schema/B03367",
+        "textSha256": "82a55bf5b70ba18870e8b492dc7f5cb6945b99416c04dceb6bd7575be96de649",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B03368",
+        "textSha256": "677fcc11c0ecbbd35824c1efec1c596301b33834344d8ed8682ec042aa8b0279",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-3a01285f8d2ccd33a455",
+      "first": {
+        "id": "ODF-1.2/schema/B03527",
+        "textSha256": "770f1464014b8cb4e672f2df01b4f0f58ff8a4e77eb9af895e4caaeef001dd70",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B03528",
+        "textSha256": "2ca79b9233096d35f473cc061bf5a8bfb9f170ebbd2dfdae17fdb607c18d9ee9",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-f0048af4c4d4023b30d9",
+      "first": {
+        "id": "ODF-1.2/schema/B03618",
+        "textSha256": "6e513c2b08613f9cc2485d8e4d389fa1f1725df899e3adfd871e146505a03f86",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B03619",
+        "textSha256": "67baf06098aa60db6e1ca2626222100f99e99e6dbbf7191bd3df0a2b894c3e20",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-43e065ab38ed3cde1e14",
+      "first": {
+        "id": "ODF-1.2/schema/B04310",
+        "textSha256": "15eaadab0867c8030e413ea82907913a4d2577df61d7a0874b2a5649784823ed",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B04311",
+        "textSha256": "10d15b64a0f63883619566fe32288e70231441eba544864c634b1ce763dd3ddf",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-2b688871173934421172",
+      "first": {
+        "id": "ODF-1.2/schema/B04334",
+        "textSha256": "5eb17eb439b5d0ef83917951f220eab6f2f8f5205f68ad4de0d9127e0c39e2a8",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B04335",
+        "textSha256": "55d98be0342b04d5efa530c479773f498f06094afc63b4189a8c92143a675a93",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-fe4ffe675e032f0e81c0",
+      "first": {
+        "id": "ODF-1.2/schema/B04367",
+        "textSha256": "2faeed4982a10404a11d0e888d8a73031ef29a529f0b3cc85a09b738c8d0d75a",
+        "kind": "paragraph",
+        "label": "Note 1:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B04368",
+        "textSha256": "fd6c139192b0e04a53c60f355c13b9409e5284fc47737efcf1f4fa534a440cbd",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-530833de4425e9201d70",
+      "first": {
+        "id": "ODF-1.2/schema/B04672",
+        "textSha256": "4a4b659465f7299a90d4f4fdaf61dc8bf5759ab653ea627a4696568ba3b87fb9",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B04673",
+        "textSha256": "b3932d2836d0cae469fcf36f5d4e9d3483ffdfdbb38500de862b4e6c38b81a77",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-d86d1985ba04b0ea310f",
+      "first": {
+        "id": "ODF-1.2/schema/B04692",
+        "textSha256": "b415585f6d274b65c3e815822f83b8f9168555563601f6bf60593ec0378ad4ff",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B04693",
+        "textSha256": "d533a69cebda575bedca249a773447b61ddf411966ff0fc854b39845ef6b0f3e",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-46a0f2d93e466a12c7a4",
+      "first": {
+        "id": "ODF-1.2/schema/B04733",
+        "textSha256": "477c820d5bd5b3c65baeaea7ee463b474dedd2724730891a30b0a66c30408d4e",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B04734",
+        "textSha256": "aafca3da81abb2b7641f002ac6f149e88cf0cfb2d7bc333387c6007495c2cc54",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-369e3929a0e549a8437a",
+      "first": {
+        "id": "ODF-1.2/schema/B05990",
+        "textSha256": "0641b02e1a1c8aecff4e5c235dc19a27ab5679377ad812575bd74c8088921e8f",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B05991",
+        "textSha256": "31b490177a06ecce8e8b7d4edd75ef65a2bf449d20a5300525a90fd2e3a78d5d",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-f734a21b41b99e40f949",
+      "first": {
+        "id": "ODF-1.2/schema/B07001",
+        "textSha256": "8048959c69ab0e01aef33df989a64e587f2ef06403b625e70b57ef99d4ccf326",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B07002",
+        "textSha256": "35322f2661d27b69978afbc30bda672ed95fecad2f7ec97a3a0d64ba1ee7be65",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-3786943d131dedda24ee",
+      "first": {
+        "id": "ODF-1.2/schema/B07054",
+        "textSha256": "e9365c84f738f5f2494cd45a9e06690d9191ca28eca8d70bd80f0ceef11b3a22",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B07055",
+        "textSha256": "7723dae764f487a5c62c6dea7ae74c1ce70d85d5dbc7aef9237a5356c9ba8f29",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-b5718f97d28c5e4f7902",
+      "first": {
+        "id": "ODF-1.2/schema/B07333",
+        "textSha256": "d07679c210ba13a290bd1008d978eabc8525cf75903e8dbaacbd052fa157ef19",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B07334",
+        "textSha256": "6dce5d6e15461d58cbdee7901276da4fff29f8a60caae45473e7995a261b0d66",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-74dca986e2b8df8836be",
+      "first": {
+        "id": "ODF-1.2/schema/B07653",
+        "textSha256": "27ada6bfc394bb96913707726a0635b90d7d5c859bfbf839e92b7d3f218233cc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B07654",
+        "textSha256": "9efe6f2ea6367ad513994375012925e9c5e1b53476990486843a053bc765b16c",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-dbce7a2beb55e5d1bdfd",
+      "first": {
+        "id": "ODF-1.2/schema/B07858",
+        "textSha256": "c3c9f3172da3f72c30bb4c37f601730187ef1ccfdff876f0aa4298f09149cc04",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B07859",
+        "textSha256": "8af3d11300572b05534708604be93c75e0c71c2b4483e0e73baccdd6d1d07bf1",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-366aab1ca6175d3e811f",
+      "first": {
+        "id": "ODF-1.2/schema/B08423",
+        "textSha256": "da24ef61ff15daab615589d39824eabcd79ff8e154eca6110f509279e4113c73",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B08424",
+        "textSha256": "7b14f0f0d9230a8bcd609dadcc698da26ecadb1612cf4623567bf1ef071c282c",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-14da078459bf7b12c66e",
+      "first": {
+        "id": "ODF-1.2/schema/B08510",
+        "textSha256": "0c25c617a359e53f1e3182906cbbe036c253391f6446b86330a6ac245c51b234",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B08511",
+        "textSha256": "9a1018498fac5ae6eff0879a64c998477f786dac5b8693cf05e2eeda00bf8345",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-45f5bd6ce7052af979d7",
+      "first": {
+        "id": "ODF-1.2/schema/B08561",
+        "textSha256": "382c93dd955e8283c188045053e8f0243c4d5f080c1a6035f137331275d97b9c",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B08562",
+        "textSha256": "1ba923d928b440d21be060df610d4256645f2ed36e3b7657e02628e105565696",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-9581773b7c2e9ba35b2d",
+      "first": {
+        "id": "ODF-1.2/schema/B08973",
+        "textSha256": "6cc212cb76b24d28b3078c53edce1c76e9c669eb78939914728cd4e922529978",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B08974",
+        "textSha256": "f3335aaf1996cd78a6658d5108eb327f207338102c81cc7d22cac339200a95bd",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-d566d14e1f102b02033d",
+      "first": {
+        "id": "ODF-1.2/schema/B09303",
+        "textSha256": "32e161be9763d3144022502735e53e2995877e3e130b8831095cebde093a0682",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B09304",
+        "textSha256": "11a130f3d941c3ba1336d500e96b941d85fcbf6ed8da0c19d0081625b904db43",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-d7f941937edbec943680",
+      "first": {
+        "id": "ODF-1.2/schema/B10860",
+        "textSha256": "0d452f01d345c7c8fd3d39e8e9fdf33393f0043649382b3af652af583936d8ba",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B10861",
+        "textSha256": "76b8752fb9ae4e15c26e6e0ff29d08fa690bc3472a4874d9ea6fd26d37328d84",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-6583833692072503d162",
+      "first": {
+        "id": "ODF-1.2/schema/B10923",
+        "textSha256": "427db2fed0418f7bf37cd1b774fcc7d54580fb022760a849a33e0b55ea181fd9",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B10924",
+        "textSha256": "02212bf7181fcf9c9f04a12152ee865fc5779365e5fe26373c1b443104db7b4b",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-77a3622d9d3512665b0f",
+      "first": {
+        "id": "ODF-1.2/schema/B11350",
+        "textSha256": "62bace6e6436dfd544b525dcacf09778b7104c6086b162d5157162a7fd5712b6",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B11351",
+        "textSha256": "469e2b1d078799e73dce359815fa3ee1b2d55caaa6d93a49bc83a20573641909",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-dd9c65ac7b809797dc84",
+      "first": {
+        "id": "ODF-1.2/schema/B11376",
+        "textSha256": "f91b7c84053e9d8f07e44fa7cb7b4cf7c1798ac6fb912baf11fe0c65360dd7de",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B11377",
+        "textSha256": "66d32ed25235c495c8b492e7c3a543441cec11df1aa1e74dc24ffa7b7125e699",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-7c13b32bc5db6e933ac2",
+      "first": {
+        "id": "ODF-1.2/schema/B11461",
+        "textSha256": "3969a579800e2526049053b450c71bef84735c48b7bc96c4742a3e65b07f66ee",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B11462",
+        "textSha256": "6835ae4baa6938f33215b3ddcb831218b3728215c2ce0671b0aae3eed62d82c6",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-1bb585c2ce72e16a3b3e",
+      "first": {
+        "id": "ODF-1.2/schema/B11895",
+        "textSha256": "147702e317cab99ef38c39c1fed5ddd1b0893000fa61ee128ebefa9941e7f9c9",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B11896",
+        "textSha256": "e7ef68501f75d7d26d4f77f1532f0bf26d3603e41aedb0452ad772080ae851d7",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-81258144d62c87969401",
+      "first": {
+        "id": "ODF-1.2/schema/B12664",
+        "textSha256": "20a642bb838dbb5ec2e575daf81131810262fdd7b2078d5a505d4c26fcbbb0bf",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B12665",
+        "textSha256": "9414973a53e3f777d4e7e12de3b27286d5efafd3072359d32e022ce8a1ae3f49",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-e4001b1e10a5749d455e",
+      "first": {
+        "id": "ODF-1.2/schema/B12854",
+        "textSha256": "292c64086ecfc58dc06013eff7e6096750e55420a2777400a559d97cddd53d6b",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B12855",
+        "textSha256": "14604fc32f84742271e4640fdb455ef3ed0ccb99499f1dcb608f48b9ad187166",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-3abcf3fdcc2181c36e10",
+      "first": {
+        "id": "ODF-1.2/schema/B13103",
+        "textSha256": "f4dfd2ce62d29e197cf2c216b7323a5cf2f6008c713cb0779e9a768528df1a9b",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B13104",
+        "textSha256": "e250661741e278bffcfa73e84dd97120e9308bc77e529e1cc19ddbd41264590f",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-667563505052b8b14dd4",
+      "first": {
+        "id": "ODF-1.2/schema/B13344",
+        "textSha256": "c3f0c37088323b42e7fea3b04dfc35d6d3d800f5b0c024eabea7b2f067f29879",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B13345",
+        "textSha256": "4eefdf7581f318471852fd4c0878c8a0c13cbe4ddeb1310074e01c6e7b27fc1a",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-15e3f4760b821ee58378",
+      "first": {
+        "id": "ODF-1.2/schema/B13511",
+        "textSha256": "b8f5c86ec11d48c902afe5597dedbac3e26c6500fe33ad2db2f8e0de9a2399a2",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B13512",
+        "textSha256": "2269a32f77ed139df37c5dd5881300bde4899d0e76fc83b87deffd51385b2413",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-ac4157e7b85ef5fcef80",
+      "first": {
+        "id": "ODF-1.2/schema/B15269",
+        "textSha256": "7195a70bcf422f1657c52ef7e38c26a1c4e51158922c16312c9feeceb2a10ad2",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B15270",
+        "textSha256": "28b652485b89be9de3e13932c4880625f56edd66c3d39eba8f84d777f733a13a",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-9428e5ebedd3dd98f359",
+      "first": {
+        "id": "ODF-1.2/schema/B15334",
+        "textSha256": "0b909e63aa0c05c11bc89b93282a0c1580c42be3b46de44f30bc5f978e712df2",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B15335",
+        "textSha256": "bddf2c53a17302e468cda644ef63e4c3aeec1426af0ee0d4c66c36cbb462c9f8",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-27b267b0b5f77ea45b5b",
+      "first": {
+        "id": "ODF-1.2/schema/B15405",
+        "textSha256": "439bf5f6000ebde9fc40b24cb2c6df4937e131ce53cc7359251fb68e039c512c",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B15406",
+        "textSha256": "30c9bdb507476b5f7961d4b2a166ab38cfacc679df78a685b91a2ef85a787287",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-9f53b2d5f779dbcc598f",
+      "first": {
+        "id": "ODF-1.3/schema/B00487",
+        "textSha256": "60b866ac77970aed85835cd70cb562f558beab90cc3a118a0b6f3931bbb39693",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B00488",
+        "textSha256": "c9ea707ea42426a156607c23f30ff4dfeb8b2e99431388943cb5741af8b28e92",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-a9392eb753a0289cc379",
+      "first": {
+        "id": "ODF-1.3/schema/B00498",
+        "textSha256": "99c96a1a18479a046961bba529c64755e1069084b54323cc4a3a5e9ab08aca27",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B00499",
+        "textSha256": "d8d681c5a83b612d8144a351b22d313b437cb92bce107775deeb54133fea57fb",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-4a3bbfcac1121967e6a9",
+      "first": {
+        "id": "ODF-1.3/schema/B00544",
+        "textSha256": "a10579708d0ab10e4578780c3d2eed6411aa0208203360b9ac3f47fb159c61a2",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B00545",
+        "textSha256": "6aae74b13d6040bf8bd9b1cad02d1e3c3392a8e0e0929aeb01ffaec5b8124d75",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-1642afd716e0207d7dce",
+      "first": {
+        "id": "ODF-1.3/schema/B00574",
+        "textSha256": "68bd55559cb4f08a02a2b9f9bff68233f9e1c279fa249d0fc8203e1b235493cc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B00575",
+        "textSha256": "b9310dc643fc0909abcae96708a8d44376eb32825f305dc4fedb697dce37d2b9",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-265c16f29fb3af72b140",
+      "first": {
+        "id": "ODF-1.3/schema/B00829",
+        "textSha256": "b976e50e18883f485ba019808aecf5413129547ca075510a2547ed0ea2d285c5",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B00830",
+        "textSha256": "c07aa5ea3acb2a5732850fbafef2579516f1d3ee3c128bbbefec4a7ef764e7f3",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-d1cbb69aad3a089b4194",
+      "first": {
+        "id": "ODF-1.3/schema/B00904",
+        "textSha256": "ff9033d6ed6c7001c2ef29e3ba4cea289266b284c56482e92de803d63314655a",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B00905",
+        "textSha256": "466141f8b502c5cd4c1c36d90ca29b7cafe6075638fa6bf218ca5ab4ed189f55",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-37b6d8df491b55093ab4",
+      "first": {
+        "id": "ODF-1.3/schema/B01048",
+        "textSha256": "d1881648f357a8f52b9f9603b5dd6092dd1e04d047cdac768e5a451193d675ff",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B01049",
+        "textSha256": "ef760b5301bd2dce5bda87e6ef445be0870228cf99696feedbcc8c8f6845f22a",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-35bbbabc20976293d6d1",
+      "first": {
+        "id": "ODF-1.3/schema/B01081",
+        "textSha256": "9275aa7c59ae492211a61b08a604d446e187dbff46d1e1d4fe316b50f9ce96a3",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B01082",
+        "textSha256": "512dc68a81089c96959f97d12850b4654c04290c213c9f956bebb70af6e98d6e",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-62e94026a8dae85515f0",
+      "first": {
+        "id": "ODF-1.3/schema/B01289",
+        "textSha256": "0e80e6a410623ea9fe1e03d43f522aa3f1f4c1d536f7668520c03e8e85535cae",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B01290",
+        "textSha256": "7313e99bce4748b4f9c49708dc5dc62be299bf76e7f92163e0045d0aaa6c6dee",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-95d7be41cb497da92194",
+      "first": {
+        "id": "ODF-1.3/schema/B01296",
+        "textSha256": "ec6ca281e615acfb81fec0d919662195c1effc0271016423821f8974e4a02722",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B01297",
+        "textSha256": "b259f78c022d6e35b2861848911d66e03f26a2d9ed2e42c47bd65b40d5b76160",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-375348523a163332d018",
+      "first": {
+        "id": "ODF-1.3/schema/B01354",
+        "textSha256": "73c78b1b14c4e7cb42b95ffb9c6d3a8c3e01a5a6b15f6f4ee9facc26f79177fe",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B01355",
+        "textSha256": "da72e7f5fb067a3723e5561c8c2534ac9b456518e85461a7815bb09caacf1c13",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-505b9211e380f4913511",
+      "first": {
+        "id": "ODF-1.3/schema/B01895",
+        "textSha256": "31171c312b041b8b750dbe545b636049519b24acc2126adb166cd4b5c47c0686",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B01896",
+        "textSha256": "b6bbcc6f6b7068994dffbb9bd409b05047514f18c782fedb9650cec17b306d91",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-442d1314353985f1e464",
+      "first": {
+        "id": "ODF-1.3/schema/B02038",
+        "textSha256": "3e8901b3a3b4120fbfeff4dd0d72e0d91eaad66332aabd55665375e8b0fa555c",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B02039",
+        "textSha256": "f0c4d852ddc330f13645c0ac32034215aa621a44d74556815b0f793f675be35e",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-4313ff3218c5377f945c",
+      "first": {
+        "id": "ODF-1.3/schema/B02057",
+        "textSha256": "b6f01c8a89f0f4e4260c99c17fbbd32f628cdbce6f8b74fec15b343b8ae7b572",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B02058",
+        "textSha256": "9850c839d5f6c9e08233198f27acea6dc20c0a10a726cd8d3033203323f35e31",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-79c11a152f1c4a5019cb",
+      "first": {
+        "id": "ODF-1.3/schema/B02637",
+        "textSha256": "f6c12e0d8cba994259cf76397a54499d10ff46273abbf45f79b8f6cc55bc80ca",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B02638",
+        "textSha256": "399a202fc96ce353d4077e7bd99314c76c052d30ddcc7a9b56d5b1e3ab1451ad",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-a2d026fad08855eb0913",
+      "first": {
+        "id": "ODF-1.3/schema/B02656",
+        "textSha256": "66d8a67b909a886db3b9cdb718b7a76d711dd1d2667bbcf7d635283d0fcb38a9",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B02657",
+        "textSha256": "e43531b118a3a7a0f39abb86655ab54de1cef24e010f3a608c18afe8c7023cca",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-952765be563ea9f59696",
+      "first": {
+        "id": "ODF-1.3/schema/B02714",
+        "textSha256": "7a54edf2a9f8d9447a990e0578176c4da9c3fc0504883b81dca4026a65b015cc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B02715",
+        "textSha256": "935e0967940e718f5c87fb7c243e963f8b39258137e53fa37538ef20f52f530b",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-c54d1524d62e128a99d9",
+      "first": {
+        "id": "ODF-1.3/schema/B02821",
+        "textSha256": "4a37c158e3add8417bd3e8f55108ce6015b8ea109272d139629c4d23216c29bc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B02822",
+        "textSha256": "6389d3ffff4e26342485815f6d759ac5e6e3bd97b1d4a57b65d5dead7e255fa3",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-a4e72372420990581360",
+      "first": {
+        "id": "ODF-1.3/schema/B02833",
+        "textSha256": "4a37c158e3add8417bd3e8f55108ce6015b8ea109272d139629c4d23216c29bc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B02834",
+        "textSha256": "431edf7a9c68ac8e95a0cd7fcc50087b72ab686f9e11a8250e50fdd1c41a009e",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-f901ff0ca70c2125b49d",
+      "first": {
+        "id": "ODF-1.3/schema/B02845",
+        "textSha256": "4a37c158e3add8417bd3e8f55108ce6015b8ea109272d139629c4d23216c29bc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B02846",
+        "textSha256": "fdf921e6a1846d5e1813347a98ac21fdb779168143b176b3de96e7424ba440f8",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-6422a267719b24ac4d18",
+      "first": {
+        "id": "ODF-1.3/schema/B02862",
+        "textSha256": "26d3a8c4a8689eb1234534d4ab324a5c2bf0e797c0cda54d594ee3fd7482c4aa",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B02863",
+        "textSha256": "104da24d8e37778dab661486cb02aac01a62a71597f867bbeb98ee74f3385428",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-7fd906aa7762a9d56ec6",
+      "first": {
+        "id": "ODF-1.3/schema/B02972",
+        "textSha256": "9b7a929657d37131d4d06353929217d6a3091eee6a99078af35b0075418b452d",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B02973",
+        "textSha256": "704fd04fae699cf4daefabe838051645a26af4a701bc5c7c027442671a06013c",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-e34f1cfa012d1e3ab075",
+      "first": {
+        "id": "ODF-1.3/schema/B03055",
+        "textSha256": "edb89d209b27d4296dc25dfca18d2925d53500a0350077aebc6f2f7398449cfb",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B03056",
+        "textSha256": "0ad624efa2bcdba7fdb46f0b882e23f495c6d7023f410e113781d25b1f28e1e8",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-bf78eb5d61b20c8ab76e",
+      "first": {
+        "id": "ODF-1.3/schema/B03123",
+        "textSha256": "efd0a63ff6430f6125de3dac12b38af030efa8e5031f0d2f252159d1ac3f6b07",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B03124",
+        "textSha256": "9fdf0829b47eb83f15de5318437867a8e03b17c0be424671e78a611f0b317588",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-ff049b8b263e70d68cca",
+      "first": {
+        "id": "ODF-1.3/schema/B03391",
+        "textSha256": "bbd6f2b021487c9a2cedce18f0743e281403d30888ca6a353e6fc92ccbe3e7e5",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B03392",
+        "textSha256": "2c7f73389a22fe6e4724e2a1ab0dd789a6d4d08578f3e6995ed42f790ae91e41",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-767016beb257be818ff2",
+      "first": {
+        "id": "ODF-1.3/schema/B03419",
+        "textSha256": "82a55bf5b70ba18870e8b492dc7f5cb6945b99416c04dceb6bd7575be96de649",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B03420",
+        "textSha256": "677fcc11c0ecbbd35824c1efec1c596301b33834344d8ed8682ec042aa8b0279",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-3a01285f8d2ccd33a455",
+      "first": {
+        "id": "ODF-1.3/schema/B03585",
+        "textSha256": "770f1464014b8cb4e672f2df01b4f0f58ff8a4e77eb9af895e4caaeef001dd70",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B03586",
+        "textSha256": "2ca79b9233096d35f473cc061bf5a8bfb9f170ebbd2dfdae17fdb607c18d9ee9",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-f0048af4c4d4023b30d9",
+      "first": {
+        "id": "ODF-1.3/schema/B03676",
+        "textSha256": "6e513c2b08613f9cc2485d8e4d389fa1f1725df899e3adfd871e146505a03f86",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B03677",
+        "textSha256": "67baf06098aa60db6e1ca2626222100f99e99e6dbbf7191bd3df0a2b894c3e20",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-e5e03c09390c4d24d4a1",
+      "first": {
+        "id": "ODF-1.3/schema/B03914",
+        "textSha256": "6a16d3a1e8b2f61a543f7370e05a48f4bce27fd254c33441f3b4ad60111cd282",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B03915",
+        "textSha256": "44bc9bc826ef91f506a27d7ab203e073907cca1d018f8356b597fe2b7ac6bd88",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-43e065ab38ed3cde1e14",
+      "first": {
+        "id": "ODF-1.3/schema/B04384",
+        "textSha256": "15eaadab0867c8030e413ea82907913a4d2577df61d7a0874b2a5649784823ed",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B04385",
+        "textSha256": "10d15b64a0f63883619566fe32288e70231441eba544864c634b1ce763dd3ddf",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-2b688871173934421172",
+      "first": {
+        "id": "ODF-1.3/schema/B04408",
+        "textSha256": "5eb17eb439b5d0ef83917951f220eab6f2f8f5205f68ad4de0d9127e0c39e2a8",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B04409",
+        "textSha256": "55d98be0342b04d5efa530c479773f498f06094afc63b4189a8c92143a675a93",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-fe4ffe675e032f0e81c0",
+      "first": {
+        "id": "ODF-1.3/schema/B04441",
+        "textSha256": "c6016e578a61ca7f07c6e38765c6a47d0bf69aaf9ec306058907407b89155892",
+        "kind": "paragraph",
+        "label": "Note 1:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B04442",
+        "textSha256": "fd6c139192b0e04a53c60f355c13b9409e5284fc47737efcf1f4fa534a440cbd",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-530833de4425e9201d70",
+      "first": {
+        "id": "ODF-1.3/schema/B04746",
+        "textSha256": "4a4b659465f7299a90d4f4fdaf61dc8bf5759ab653ea627a4696568ba3b87fb9",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B04747",
+        "textSha256": "52974d51483b418e1709101010f4772c2555cfe9fc98134484e4be6ab4e3cf0e",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-d86d1985ba04b0ea310f",
+      "first": {
+        "id": "ODF-1.3/schema/B04765",
+        "textSha256": "b415585f6d274b65c3e815822f83b8f9168555563601f6bf60593ec0378ad4ff",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B04766",
+        "textSha256": "a32ea527b949e06cbc310785fe1548fa0f962cf209bae1f19e5a78f163ba954e",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-46a0f2d93e466a12c7a4",
+      "first": {
+        "id": "ODF-1.3/schema/B04806",
+        "textSha256": "815c53d6afb43cebbc02d18429147b26009bca8847a482a6e962bbc5b3e77799",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B04807",
+        "textSha256": "aafca3da81abb2b7641f002ac6f149e88cf0cfb2d7bc333387c6007495c2cc54",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-369e3929a0e549a8437a",
+      "first": {
+        "id": "ODF-1.3/schema/B06064",
+        "textSha256": "0641b02e1a1c8aecff4e5c235dc19a27ab5679377ad812575bd74c8088921e8f",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B06065",
+        "textSha256": "31b490177a06ecce8e8b7d4edd75ef65a2bf449d20a5300525a90fd2e3a78d5d",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-f734a21b41b99e40f949",
+      "first": {
+        "id": "ODF-1.3/schema/B07078",
+        "textSha256": "62615857c6b23b8ed4579908c3d0663d6a4c80b310618eb0bc18fa382924c253",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B07079",
+        "textSha256": "35322f2661d27b69978afbc30bda672ed95fecad2f7ec97a3a0d64ba1ee7be65",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-3786943d131dedda24ee",
+      "first": {
+        "id": "ODF-1.3/schema/B07130",
+        "textSha256": "b1d24615b083c818353e9adae1d5caecc7ba7194fe1cbab00653a6e903e91abc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B07131",
+        "textSha256": "7723dae764f487a5c62c6dea7ae74c1ce70d85d5dbc7aef9237a5356c9ba8f29",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-b5718f97d28c5e4f7902",
+      "first": {
+        "id": "ODF-1.3/schema/B07410",
+        "textSha256": "d07679c210ba13a290bd1008d978eabc8525cf75903e8dbaacbd052fa157ef19",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B07411",
+        "textSha256": "27442f2979b80111fb424cdf6a4b4fe368ef235348fe4af4e024910164da404f",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-74dca986e2b8df8836be",
+      "first": {
+        "id": "ODF-1.3/schema/B07759",
+        "textSha256": "27ada6bfc394bb96913707726a0635b90d7d5c859bfbf839e92b7d3f218233cc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B07760",
+        "textSha256": "9efe6f2ea6367ad513994375012925e9c5e1b53476990486843a053bc765b16c",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-dbce7a2beb55e5d1bdfd",
+      "first": {
+        "id": "ODF-1.3/schema/B07963",
+        "textSha256": "c3c9f3172da3f72c30bb4c37f601730187ef1ccfdff876f0aa4298f09149cc04",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B07964",
+        "textSha256": "8af3d11300572b05534708604be93c75e0c71c2b4483e0e73baccdd6d1d07bf1",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-366aab1ca6175d3e811f",
+      "first": {
+        "id": "ODF-1.3/schema/B08535",
+        "textSha256": "da24ef61ff15daab615589d39824eabcd79ff8e154eca6110f509279e4113c73",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B08536",
+        "textSha256": "7b14f0f0d9230a8bcd609dadcc698da26ecadb1612cf4623567bf1ef071c282c",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-14da078459bf7b12c66e",
+      "first": {
+        "id": "ODF-1.3/schema/B08621",
+        "textSha256": "0c25c617a359e53f1e3182906cbbe036c253391f6446b86330a6ac245c51b234",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B08622",
+        "textSha256": "9a1018498fac5ae6eff0879a64c998477f786dac5b8693cf05e2eeda00bf8345",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-45f5bd6ce7052af979d7",
+      "first": {
+        "id": "ODF-1.3/schema/B08671",
+        "textSha256": "f8cfc7cd0eeeee0a7d70b8f6ed8c3e4d13a13dd76232096a8410bde85a4f28a1",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B08672",
+        "textSha256": "1ba923d928b440d21be060df610d4256645f2ed36e3b7657e02628e105565696",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-9581773b7c2e9ba35b2d",
+      "first": {
+        "id": "ODF-1.3/schema/B09091",
+        "textSha256": "6cc212cb76b24d28b3078c53edce1c76e9c669eb78939914728cd4e922529978",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B09092",
+        "textSha256": "f3335aaf1996cd78a6658d5108eb327f207338102c81cc7d22cac339200a95bd",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-d566d14e1f102b02033d",
+      "first": {
+        "id": "ODF-1.3/schema/B09437",
+        "textSha256": "32e161be9763d3144022502735e53e2995877e3e130b8831095cebde093a0682",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B09438",
+        "textSha256": "11a130f3d941c3ba1336d500e96b941d85fcbf6ed8da0c19d0081625b904db43",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-d7f941937edbec943680",
+      "first": {
+        "id": "ODF-1.3/schema/B11006",
+        "textSha256": "93502f99ce25df95428d8df112666445e28551cc1e934a1210bbe83cf607b205",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B11007",
+        "textSha256": "76b8752fb9ae4e15c26e6e0ff29d08fa690bc3472a4874d9ea6fd26d37328d84",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-6583833692072503d162",
+      "first": {
+        "id": "ODF-1.3/schema/B11069",
+        "textSha256": "5fabb64b4d481735031684a4cff6dd49d1b606eb8946d8fa217a878335c42782",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B11070",
+        "textSha256": "02212bf7181fcf9c9f04a12152ee865fc5779365e5fe26373c1b443104db7b4b",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-77a3622d9d3512665b0f",
+      "first": {
+        "id": "ODF-1.3/schema/B11503",
+        "textSha256": "62bace6e6436dfd544b525dcacf09778b7104c6086b162d5157162a7fd5712b6",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B11504",
+        "textSha256": "469e2b1d078799e73dce359815fa3ee1b2d55caaa6d93a49bc83a20573641909",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-dd9c65ac7b809797dc84",
+      "first": {
+        "id": "ODF-1.3/schema/B11529",
+        "textSha256": "f91b7c84053e9d8f07e44fa7cb7b4cf7c1798ac6fb912baf11fe0c65360dd7de",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B11530",
+        "textSha256": "66d32ed25235c495c8b492e7c3a543441cec11df1aa1e74dc24ffa7b7125e699",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-7c13b32bc5db6e933ac2",
+      "first": {
+        "id": "ODF-1.3/schema/B11614",
+        "textSha256": "3969a579800e2526049053b450c71bef84735c48b7bc96c4742a3e65b07f66ee",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B11615",
+        "textSha256": "6835ae4baa6938f33215b3ddcb831218b3728215c2ce0671b0aae3eed62d82c6",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-1bb585c2ce72e16a3b3e",
+      "first": {
+        "id": "ODF-1.3/schema/B12052",
+        "textSha256": "4ac0895994386db9ab2eeae73bdedc0b6c9e80dfae943e6a3b6734272aef31a2",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B12053",
+        "textSha256": "e7ef68501f75d7d26d4f77f1532f0bf26d3603e41aedb0452ad772080ae851d7",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-81258144d62c87969401",
+      "first": {
+        "id": "ODF-1.3/schema/B12836",
+        "textSha256": "20a642bb838dbb5ec2e575daf81131810262fdd7b2078d5a505d4c26fcbbb0bf",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B12837",
+        "textSha256": "9414973a53e3f777d4e7e12de3b27286d5efafd3072359d32e022ce8a1ae3f49",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-e4001b1e10a5749d455e",
+      "first": {
+        "id": "ODF-1.3/schema/B13030",
+        "textSha256": "345948eaa0e1147097454f29e7a95983e07332bbc4ff675790afd4ad5f3ee059",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B13031",
+        "textSha256": "14604fc32f84742271e4640fdb455ef3ed0ccb99499f1dcb608f48b9ad187166",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-3abcf3fdcc2181c36e10",
+      "first": {
+        "id": "ODF-1.3/schema/B13324",
+        "textSha256": "f4dfd2ce62d29e197cf2c216b7323a5cf2f6008c713cb0779e9a768528df1a9b",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B13325",
+        "textSha256": "bdc7f1cfd867bcf38b161c3cd10f98800cd18334b3f9cae7fa1c42463c1a0ab2",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-667563505052b8b14dd4",
+      "first": {
+        "id": "ODF-1.3/schema/B13565",
+        "textSha256": "3bcb4cc848af87ce373de2f5ba4f307b63a9c45c057831b920fa8438e6fb630e",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B13566",
+        "textSha256": "4eefdf7581f318471852fd4c0878c8a0c13cbe4ddeb1310074e01c6e7b27fc1a",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-15e3f4760b821ee58378",
+      "first": {
+        "id": "ODF-1.3/schema/B13734",
+        "textSha256": "b8da282e4b653014cfafbbf2ea63515e52723aa9199c1306622f6f3a24450254",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B13735",
+        "textSha256": "2269a32f77ed139df37c5dd5881300bde4899d0e76fc83b87deffd51385b2413",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-9e90f95745fa258fc9cb",
+      "first": {
+        "id": "ODF-1.3/schema/B14348",
+        "textSha256": "a04547b76d137123b57568da599aed9daec1baf03295387565c4edae330c93b0",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B14349",
+        "textSha256": "405729278c86589989a6f07b1f96f23074b7e6fbc155f7dc21fb4a39253d4021",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-ac4157e7b85ef5fcef80",
+      "first": {
+        "id": "ODF-1.3/schema/B15512",
+        "textSha256": "7195a70bcf422f1657c52ef7e38c26a1c4e51158922c16312c9feeceb2a10ad2",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B15513",
+        "textSha256": "6bb60d07828af09338930e22983b4adf558fc393f0fd285b94e071dd653cc8ca",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-9428e5ebedd3dd98f359",
+      "first": {
+        "id": "ODF-1.3/schema/B15577",
+        "textSha256": "0b909e63aa0c05c11bc89b93282a0c1580c42be3b46de44f30bc5f978e712df2",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B15578",
+        "textSha256": "65fb880a99df0399b54327f53f1cf715830686101b56d74ee36f359d3e35875f",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-27b267b0b5f77ea45b5b",
+      "first": {
+        "id": "ODF-1.3/schema/B15648",
+        "textSha256": "439bf5f6000ebde9fc40b24cb2c6df4937e131ce53cc7359251fb68e039c512c",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B15649",
+        "textSha256": "e0a69d8538b9f7c679e407430c2b72ea13442ca9b822b8b09c178362cb2a3a7b",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-9f53b2d5f779dbcc598f",
+      "first": {
+        "id": "ODF-1.4/schema/B00489",
+        "textSha256": "60b866ac77970aed85835cd70cb562f558beab90cc3a118a0b6f3931bbb39693",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B00490",
+        "textSha256": "c9ea707ea42426a156607c23f30ff4dfeb8b2e99431388943cb5741af8b28e92",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-a9392eb753a0289cc379",
+      "first": {
+        "id": "ODF-1.4/schema/B00500",
+        "textSha256": "99c96a1a18479a046961bba529c64755e1069084b54323cc4a3a5e9ab08aca27",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B00501",
+        "textSha256": "d8d681c5a83b612d8144a351b22d313b437cb92bce107775deeb54133fea57fb",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-4a3bbfcac1121967e6a9",
+      "first": {
+        "id": "ODF-1.4/schema/B00546",
+        "textSha256": "a10579708d0ab10e4578780c3d2eed6411aa0208203360b9ac3f47fb159c61a2",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B00547",
+        "textSha256": "6aae74b13d6040bf8bd9b1cad02d1e3c3392a8e0e0929aeb01ffaec5b8124d75",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-1642afd716e0207d7dce",
+      "first": {
+        "id": "ODF-1.4/schema/B00576",
+        "textSha256": "68bd55559cb4f08a02a2b9f9bff68233f9e1c279fa249d0fc8203e1b235493cc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B00577",
+        "textSha256": "b9310dc643fc0909abcae96708a8d44376eb32825f305dc4fedb697dce37d2b9",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-265c16f29fb3af72b140",
+      "first": {
+        "id": "ODF-1.4/schema/B00831",
+        "textSha256": "b976e50e18883f485ba019808aecf5413129547ca075510a2547ed0ea2d285c5",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B00832",
+        "textSha256": "c07aa5ea3acb2a5732850fbafef2579516f1d3ee3c128bbbefec4a7ef764e7f3",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-d1cbb69aad3a089b4194",
+      "first": {
+        "id": "ODF-1.4/schema/B00906",
+        "textSha256": "ff9033d6ed6c7001c2ef29e3ba4cea289266b284c56482e92de803d63314655a",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B00907",
+        "textSha256": "466141f8b502c5cd4c1c36d90ca29b7cafe6075638fa6bf218ca5ab4ed189f55",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-37b6d8df491b55093ab4",
+      "first": {
+        "id": "ODF-1.4/schema/B01051",
+        "textSha256": "d1881648f357a8f52b9f9603b5dd6092dd1e04d047cdac768e5a451193d675ff",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B01052",
+        "textSha256": "ef760b5301bd2dce5bda87e6ef445be0870228cf99696feedbcc8c8f6845f22a",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-35bbbabc20976293d6d1",
+      "first": {
+        "id": "ODF-1.4/schema/B01085",
+        "textSha256": "9275aa7c59ae492211a61b08a604d446e187dbff46d1e1d4fe316b50f9ce96a3",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B01086",
+        "textSha256": "512dc68a81089c96959f97d12850b4654c04290c213c9f956bebb70af6e98d6e",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-62e94026a8dae85515f0",
+      "first": {
+        "id": "ODF-1.4/schema/B01293",
+        "textSha256": "0e80e6a410623ea9fe1e03d43f522aa3f1f4c1d536f7668520c03e8e85535cae",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B01294",
+        "textSha256": "7313e99bce4748b4f9c49708dc5dc62be299bf76e7f92163e0045d0aaa6c6dee",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-95d7be41cb497da92194",
+      "first": {
+        "id": "ODF-1.4/schema/B01300",
+        "textSha256": "ec6ca281e615acfb81fec0d919662195c1effc0271016423821f8974e4a02722",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B01301",
+        "textSha256": "b259f78c022d6e35b2861848911d66e03f26a2d9ed2e42c47bd65b40d5b76160",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-375348523a163332d018",
+      "first": {
+        "id": "ODF-1.4/schema/B01358",
+        "textSha256": "73c78b1b14c4e7cb42b95ffb9c6d3a8c3e01a5a6b15f6f4ee9facc26f79177fe",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B01359",
+        "textSha256": "da72e7f5fb067a3723e5561c8c2534ac9b456518e85461a7815bb09caacf1c13",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-505b9211e380f4913511",
+      "first": {
+        "id": "ODF-1.4/schema/B01899",
+        "textSha256": "31171c312b041b8b750dbe545b636049519b24acc2126adb166cd4b5c47c0686",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B01900",
+        "textSha256": "b6bbcc6f6b7068994dffbb9bd409b05047514f18c782fedb9650cec17b306d91",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-442d1314353985f1e464",
+      "first": {
+        "id": "ODF-1.4/schema/B02042",
+        "textSha256": "3e8901b3a3b4120fbfeff4dd0d72e0d91eaad66332aabd55665375e8b0fa555c",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B02043",
+        "textSha256": "f0c4d852ddc330f13645c0ac32034215aa621a44d74556815b0f793f675be35e",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-4313ff3218c5377f945c",
+      "first": {
+        "id": "ODF-1.4/schema/B02061",
+        "textSha256": "b6f01c8a89f0f4e4260c99c17fbbd32f628cdbce6f8b74fec15b343b8ae7b572",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B02062",
+        "textSha256": "9850c839d5f6c9e08233198f27acea6dc20c0a10a726cd8d3033203323f35e31",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-79c11a152f1c4a5019cb",
+      "first": {
+        "id": "ODF-1.4/schema/B02659",
+        "textSha256": "f6c12e0d8cba994259cf76397a54499d10ff46273abbf45f79b8f6cc55bc80ca",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B02660",
+        "textSha256": "399a202fc96ce353d4077e7bd99314c76c052d30ddcc7a9b56d5b1e3ab1451ad",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-a2d026fad08855eb0913",
+      "first": {
+        "id": "ODF-1.4/schema/B02678",
+        "textSha256": "66d8a67b909a886db3b9cdb718b7a76d711dd1d2667bbcf7d635283d0fcb38a9",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B02679",
+        "textSha256": "e43531b118a3a7a0f39abb86655ab54de1cef24e010f3a608c18afe8c7023cca",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-952765be563ea9f59696",
+      "first": {
+        "id": "ODF-1.4/schema/B02736",
+        "textSha256": "7a54edf2a9f8d9447a990e0578176c4da9c3fc0504883b81dca4026a65b015cc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B02737",
+        "textSha256": "935e0967940e718f5c87fb7c243e963f8b39258137e53fa37538ef20f52f530b",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-c54d1524d62e128a99d9",
+      "first": {
+        "id": "ODF-1.4/schema/B02893",
+        "textSha256": "4a37c158e3add8417bd3e8f55108ce6015b8ea109272d139629c4d23216c29bc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B02894",
+        "textSha256": "6389d3ffff4e26342485815f6d759ac5e6e3bd97b1d4a57b65d5dead7e255fa3",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-a4e72372420990581360",
+      "first": {
+        "id": "ODF-1.4/schema/B02905",
+        "textSha256": "4a37c158e3add8417bd3e8f55108ce6015b8ea109272d139629c4d23216c29bc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B02906",
+        "textSha256": "431edf7a9c68ac8e95a0cd7fcc50087b72ab686f9e11a8250e50fdd1c41a009e",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-f901ff0ca70c2125b49d",
+      "first": {
+        "id": "ODF-1.4/schema/B02917",
+        "textSha256": "4a37c158e3add8417bd3e8f55108ce6015b8ea109272d139629c4d23216c29bc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B02918",
+        "textSha256": "fdf921e6a1846d5e1813347a98ac21fdb779168143b176b3de96e7424ba440f8",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-6422a267719b24ac4d18",
+      "first": {
+        "id": "ODF-1.4/schema/B02934",
+        "textSha256": "26d3a8c4a8689eb1234534d4ab324a5c2bf0e797c0cda54d594ee3fd7482c4aa",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B02935",
+        "textSha256": "20beb23722a92797d378c60811a06e1842cbd692230d23d7ab3bef63a7fa3513",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-7fd906aa7762a9d56ec6",
+      "first": {
+        "id": "ODF-1.4/schema/B03040",
+        "textSha256": "9b7a929657d37131d4d06353929217d6a3091eee6a99078af35b0075418b452d",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B03041",
+        "textSha256": "704fd04fae699cf4daefabe838051645a26af4a701bc5c7c027442671a06013c",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-e34f1cfa012d1e3ab075",
+      "first": {
+        "id": "ODF-1.4/schema/B03123",
+        "textSha256": "edb89d209b27d4296dc25dfca18d2925d53500a0350077aebc6f2f7398449cfb",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B03124",
+        "textSha256": "0ad624efa2bcdba7fdb46f0b882e23f495c6d7023f410e113781d25b1f28e1e8",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-bf78eb5d61b20c8ab76e",
+      "first": {
+        "id": "ODF-1.4/schema/B03191",
+        "textSha256": "efd0a63ff6430f6125de3dac12b38af030efa8e5031f0d2f252159d1ac3f6b07",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B03192",
+        "textSha256": "9fdf0829b47eb83f15de5318437867a8e03b17c0be424671e78a611f0b317588",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-ff049b8b263e70d68cca",
+      "first": {
+        "id": "ODF-1.4/schema/B03459",
+        "textSha256": "bbd6f2b021487c9a2cedce18f0743e281403d30888ca6a353e6fc92ccbe3e7e5",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B03460",
+        "textSha256": "2c7f73389a22fe6e4724e2a1ab0dd789a6d4d08578f3e6995ed42f790ae91e41",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-767016beb257be818ff2",
+      "first": {
+        "id": "ODF-1.4/schema/B03487",
+        "textSha256": "82a55bf5b70ba18870e8b492dc7f5cb6945b99416c04dceb6bd7575be96de649",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B03488",
+        "textSha256": "677fcc11c0ecbbd35824c1efec1c596301b33834344d8ed8682ec042aa8b0279",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-3a01285f8d2ccd33a455",
+      "first": {
+        "id": "ODF-1.4/schema/B03653",
+        "textSha256": "770f1464014b8cb4e672f2df01b4f0f58ff8a4e77eb9af895e4caaeef001dd70",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B03654",
+        "textSha256": "2ca79b9233096d35f473cc061bf5a8bfb9f170ebbd2dfdae17fdb607c18d9ee9",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-f0048af4c4d4023b30d9",
+      "first": {
+        "id": "ODF-1.4/schema/B03744",
+        "textSha256": "6e513c2b08613f9cc2485d8e4d389fa1f1725df899e3adfd871e146505a03f86",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B03745",
+        "textSha256": "67baf06098aa60db6e1ca2626222100f99e99e6dbbf7191bd3df0a2b894c3e20",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-e5e03c09390c4d24d4a1",
+      "first": {
+        "id": "ODF-1.4/schema/B03983",
+        "textSha256": "6a16d3a1e8b2f61a543f7370e05a48f4bce27fd254c33441f3b4ad60111cd282",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B03984",
+        "textSha256": "44bc9bc826ef91f506a27d7ab203e073907cca1d018f8356b597fe2b7ac6bd88",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-43e065ab38ed3cde1e14",
+      "first": {
+        "id": "ODF-1.4/schema/B04476",
+        "textSha256": "15eaadab0867c8030e413ea82907913a4d2577df61d7a0874b2a5649784823ed",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B04477",
+        "textSha256": "10d15b64a0f63883619566fe32288e70231441eba544864c634b1ce763dd3ddf",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-2b688871173934421172",
+      "first": {
+        "id": "ODF-1.4/schema/B04500",
+        "textSha256": "5eb17eb439b5d0ef83917951f220eab6f2f8f5205f68ad4de0d9127e0c39e2a8",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B04501",
+        "textSha256": "55d98be0342b04d5efa530c479773f498f06094afc63b4189a8c92143a675a93",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-fe4ffe675e032f0e81c0",
+      "first": {
+        "id": "ODF-1.4/schema/B04533",
+        "textSha256": "c6016e578a61ca7f07c6e38765c6a47d0bf69aaf9ec306058907407b89155892",
+        "kind": "paragraph",
+        "label": "Note 1:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B04534",
+        "textSha256": "fd6c139192b0e04a53c60f355c13b9409e5284fc47737efcf1f4fa534a440cbd",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-530833de4425e9201d70",
+      "first": {
+        "id": "ODF-1.4/schema/B04842",
+        "textSha256": "4a4b659465f7299a90d4f4fdaf61dc8bf5759ab653ea627a4696568ba3b87fb9",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B04843",
+        "textSha256": "52974d51483b418e1709101010f4772c2555cfe9fc98134484e4be6ab4e3cf0e",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-d86d1985ba04b0ea310f",
+      "first": {
+        "id": "ODF-1.4/schema/B04861",
+        "textSha256": "b415585f6d274b65c3e815822f83b8f9168555563601f6bf60593ec0378ad4ff",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B04862",
+        "textSha256": "a32ea527b949e06cbc310785fe1548fa0f962cf209bae1f19e5a78f163ba954e",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-46a0f2d93e466a12c7a4",
+      "first": {
+        "id": "ODF-1.4/schema/B04902",
+        "textSha256": "815c53d6afb43cebbc02d18429147b26009bca8847a482a6e962bbc5b3e77799",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B04903",
+        "textSha256": "aafca3da81abb2b7641f002ac6f149e88cf0cfb2d7bc333387c6007495c2cc54",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-369e3929a0e549a8437a",
+      "first": {
+        "id": "ODF-1.4/schema/B06173",
+        "textSha256": "0641b02e1a1c8aecff4e5c235dc19a27ab5679377ad812575bd74c8088921e8f",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B06174",
+        "textSha256": "31b490177a06ecce8e8b7d4edd75ef65a2bf449d20a5300525a90fd2e3a78d5d",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-f734a21b41b99e40f949",
+      "first": {
+        "id": "ODF-1.4/schema/B07207",
+        "textSha256": "62615857c6b23b8ed4579908c3d0663d6a4c80b310618eb0bc18fa382924c253",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B07208",
+        "textSha256": "35322f2661d27b69978afbc30bda672ed95fecad2f7ec97a3a0d64ba1ee7be65",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-3786943d131dedda24ee",
+      "first": {
+        "id": "ODF-1.4/schema/B07259",
+        "textSha256": "b1d24615b083c818353e9adae1d5caecc7ba7194fe1cbab00653a6e903e91abc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B07260",
+        "textSha256": "7723dae764f487a5c62c6dea7ae74c1ce70d85d5dbc7aef9237a5356c9ba8f29",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-b5718f97d28c5e4f7902",
+      "first": {
+        "id": "ODF-1.4/schema/B07539",
+        "textSha256": "d07679c210ba13a290bd1008d978eabc8525cf75903e8dbaacbd052fa157ef19",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B07540",
+        "textSha256": "27442f2979b80111fb424cdf6a4b4fe368ef235348fe4af4e024910164da404f",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-74dca986e2b8df8836be",
+      "first": {
+        "id": "ODF-1.4/schema/B07888",
+        "textSha256": "27ada6bfc394bb96913707726a0635b90d7d5c859bfbf839e92b7d3f218233cc",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B07889",
+        "textSha256": "9efe6f2ea6367ad513994375012925e9c5e1b53476990486843a053bc765b16c",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-dbce7a2beb55e5d1bdfd",
+      "first": {
+        "id": "ODF-1.4/schema/B08094",
+        "textSha256": "c3c9f3172da3f72c30bb4c37f601730187ef1ccfdff876f0aa4298f09149cc04",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B08095",
+        "textSha256": "8af3d11300572b05534708604be93c75e0c71c2b4483e0e73baccdd6d1d07bf1",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-366aab1ca6175d3e811f",
+      "first": {
+        "id": "ODF-1.4/schema/B08666",
+        "textSha256": "da24ef61ff15daab615589d39824eabcd79ff8e154eca6110f509279e4113c73",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B08667",
+        "textSha256": "7b14f0f0d9230a8bcd609dadcc698da26ecadb1612cf4623567bf1ef071c282c",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-14da078459bf7b12c66e",
+      "first": {
+        "id": "ODF-1.4/schema/B08753",
+        "textSha256": "0c25c617a359e53f1e3182906cbbe036c253391f6446b86330a6ac245c51b234",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B08754",
+        "textSha256": "9a1018498fac5ae6eff0879a64c998477f786dac5b8693cf05e2eeda00bf8345",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-45f5bd6ce7052af979d7",
+      "first": {
+        "id": "ODF-1.4/schema/B08803",
+        "textSha256": "f8cfc7cd0eeeee0a7d70b8f6ed8c3e4d13a13dd76232096a8410bde85a4f28a1",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B08804",
+        "textSha256": "1ba923d928b440d21be060df610d4256645f2ed36e3b7657e02628e105565696",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-9581773b7c2e9ba35b2d",
+      "first": {
+        "id": "ODF-1.4/schema/B09249",
+        "textSha256": "6cc212cb76b24d28b3078c53edce1c76e9c669eb78939914728cd4e922529978",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B09250",
+        "textSha256": "f3335aaf1996cd78a6658d5108eb327f207338102c81cc7d22cac339200a95bd",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-d566d14e1f102b02033d",
+      "first": {
+        "id": "ODF-1.4/schema/B09595",
+        "textSha256": "32e161be9763d3144022502735e53e2995877e3e130b8831095cebde093a0682",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B09596",
+        "textSha256": "11a130f3d941c3ba1336d500e96b941d85fcbf6ed8da0c19d0081625b904db43",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-d7f941937edbec943680",
+      "first": {
+        "id": "ODF-1.4/schema/B11165",
+        "textSha256": "93502f99ce25df95428d8df112666445e28551cc1e934a1210bbe83cf607b205",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B11166",
+        "textSha256": "76b8752fb9ae4e15c26e6e0ff29d08fa690bc3472a4874d9ea6fd26d37328d84",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-6583833692072503d162",
+      "first": {
+        "id": "ODF-1.4/schema/B11228",
+        "textSha256": "5fabb64b4d481735031684a4cff6dd49d1b606eb8946d8fa217a878335c42782",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B11229",
+        "textSha256": "02212bf7181fcf9c9f04a12152ee865fc5779365e5fe26373c1b443104db7b4b",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-77a3622d9d3512665b0f",
+      "first": {
+        "id": "ODF-1.4/schema/B11663",
+        "textSha256": "62bace6e6436dfd544b525dcacf09778b7104c6086b162d5157162a7fd5712b6",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B11664",
+        "textSha256": "469e2b1d078799e73dce359815fa3ee1b2d55caaa6d93a49bc83a20573641909",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-dd9c65ac7b809797dc84",
+      "first": {
+        "id": "ODF-1.4/schema/B11689",
+        "textSha256": "f91b7c84053e9d8f07e44fa7cb7b4cf7c1798ac6fb912baf11fe0c65360dd7de",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B11690",
+        "textSha256": "66d32ed25235c495c8b492e7c3a543441cec11df1aa1e74dc24ffa7b7125e699",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-7c13b32bc5db6e933ac2",
+      "first": {
+        "id": "ODF-1.4/schema/B11774",
+        "textSha256": "3969a579800e2526049053b450c71bef84735c48b7bc96c4742a3e65b07f66ee",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B11775",
+        "textSha256": "6835ae4baa6938f33215b3ddcb831218b3728215c2ce0671b0aae3eed62d82c6",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-1bb585c2ce72e16a3b3e",
+      "first": {
+        "id": "ODF-1.4/schema/B12212",
+        "textSha256": "4ac0895994386db9ab2eeae73bdedc0b6c9e80dfae943e6a3b6734272aef31a2",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B12213",
+        "textSha256": "e7ef68501f75d7d26d4f77f1532f0bf26d3603e41aedb0452ad772080ae851d7",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-81258144d62c87969401",
+      "first": {
+        "id": "ODF-1.4/schema/B13071",
+        "textSha256": "20a642bb838dbb5ec2e575daf81131810262fdd7b2078d5a505d4c26fcbbb0bf",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B13072",
+        "textSha256": "9414973a53e3f777d4e7e12de3b27286d5efafd3072359d32e022ce8a1ae3f49",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-e4001b1e10a5749d455e",
+      "first": {
+        "id": "ODF-1.4/schema/B13272",
+        "textSha256": "345948eaa0e1147097454f29e7a95983e07332bbc4ff675790afd4ad5f3ee059",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B13273",
+        "textSha256": "14604fc32f84742271e4640fdb455ef3ed0ccb99499f1dcb608f48b9ad187166",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-3abcf3fdcc2181c36e10",
+      "first": {
+        "id": "ODF-1.4/schema/B13566",
+        "textSha256": "f4dfd2ce62d29e197cf2c216b7323a5cf2f6008c713cb0779e9a768528df1a9b",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B13567",
+        "textSha256": "bdc7f1cfd867bcf38b161c3cd10f98800cd18334b3f9cae7fa1c42463c1a0ab2",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-667563505052b8b14dd4",
+      "first": {
+        "id": "ODF-1.4/schema/B13807",
+        "textSha256": "3bcb4cc848af87ce373de2f5ba4f307b63a9c45c057831b920fa8438e6fb630e",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B13808",
+        "textSha256": "4eefdf7581f318471852fd4c0878c8a0c13cbe4ddeb1310074e01c6e7b27fc1a",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-15e3f4760b821ee58378",
+      "first": {
+        "id": "ODF-1.4/schema/B13976",
+        "textSha256": "b8da282e4b653014cfafbbf2ea63515e52723aa9199c1306622f6f3a24450254",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B13977",
+        "textSha256": "2269a32f77ed139df37c5dd5881300bde4899d0e76fc83b87deffd51385b2413",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-9e90f95745fa258fc9cb",
+      "first": {
+        "id": "ODF-1.4/schema/B14592",
+        "textSha256": "a04547b76d137123b57568da599aed9daec1baf03295387565c4edae330c93b0",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B14593",
+        "textSha256": "405729278c86589989a6f07b1f96f23074b7e6fbc155f7dc21fb4a39253d4021",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-ac4157e7b85ef5fcef80",
+      "first": {
+        "id": "ODF-1.4/schema/B15757",
+        "textSha256": "7195a70bcf422f1657c52ef7e38c26a1c4e51158922c16312c9feeceb2a10ad2",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B15758",
+        "textSha256": "6bb60d07828af09338930e22983b4adf558fc393f0fd285b94e071dd653cc8ca",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-9428e5ebedd3dd98f359",
+      "first": {
+        "id": "ODF-1.4/schema/B15822",
+        "textSha256": "0b909e63aa0c05c11bc89b93282a0c1580c42be3b46de44f30bc5f978e712df2",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B15823",
+        "textSha256": "65fb880a99df0399b54327f53f1cf715830686101b56d74ee36f359d3e35875f",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-27b267b0b5f77ea45b5b",
+      "first": {
+        "id": "ODF-1.4/schema/B15893",
+        "textSha256": "439bf5f6000ebde9fc40b24cb2c6df4937e131ce53cc7359251fb68e039c512c",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B15894",
+        "textSha256": "e0a69d8538b9f7c679e407430c2b72ea13442ca9b822b8b09c178362cb2a3a7b",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-54b76da9cbb3b361efce",
+      "first": {
+        "id": "ODF-1.4/schema/B16115",
+        "textSha256": "3018d837f409fb7648726614cfad0ee0b434100039cfa25700d0a6d1a652049a",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B16116",
+        "textSha256": "0449f84e396e868889fc98c3cec2c22df7b158291430f718296562f680bfb486",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-54b76da9cbb3b361efce",
+      "first": {
+        "id": "ODF-1.4/schema/B16118",
+        "textSha256": "f40718b78355cc38e8cdd124b036d6781f5bf9b84c21c618982208fdb26dfb85",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B16119",
+        "textSha256": "2f581c5389e814d11aff2cfcedcccc16c9d7548ad618e09383d38455430a01e7",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    },
+    {
+      "groupId": "ODFG-2da5a9a3d9795d6a372e",
+      "first": {
+        "id": "ODF-1.4/schema/B16127",
+        "textSha256": "9ce4bab5927fc6a5b12aa67ede9d4d7e23199f2d9606ebf8e52d7d9539f612c2",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B16128",
+        "textSha256": "8d4d5afb9f4669620fccd9cd49670501fc301b0917a935f5e70519dfcdfb6812",
+        "kind": "paragraph"
+      },
+      "sourceArchiveSha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f",
+      "assessment": "僅此完整、明示 Note 的原始段落，包含其延續句；不延伸至下一個段落，不使所引用的規範條款失去效力。"
+    }
+  ]
+}

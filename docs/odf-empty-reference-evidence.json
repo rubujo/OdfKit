@@ -1,0 +1,3122 @@
+{
+  "schemaVersion": 1,
+  "fullConformanceClaim": false,
+  "semanticClassificationComplete": false,
+  "renderedChapterNumbers": "not-computed",
+  "nonemptyReferenceConsistency": "pending",
+  "builderSha256": "308d9bcb400cf59ba6b120a42a36e1bc1d74b39a78bc554bfbff41e056a6a903",
+  "inventoryBuilderSha256": "39212a54ff7a564ddd7cae90add38806505ee47b9f76ced98fa0d1e6267eea04",
+  "effectiveTextEvidenceSha256": "21adcd0ae4bbb1e88158bdaefe9a4b0c8b60df81d351f92aae876486e4cf9333",
+  "sources": [
+    {
+      "version": "1.1",
+      "part": "spec",
+      "file": "1.1-spec-corrected.odt",
+      "sha256": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d"
+    },
+    {
+      "version": "1.2",
+      "part": "introduction",
+      "file": "1.2-part0.odt",
+      "sha256": "d1d2937faf7ece593dbcd2e8b0e116418a6bc8e2ad6f712cece1070653b9578f"
+    },
+    {
+      "version": "1.2",
+      "part": "schema",
+      "file": "1.2-part1.odt",
+      "sha256": "07c76a5ac11828005399dd4787244892ef6241211e467a61d5b409d0218488d1"
+    },
+    {
+      "version": "1.2",
+      "part": "formula",
+      "file": "1.2-part2.odt",
+      "sha256": "25fe2e45e776dce1443eae483dc631aa622cd8a8718e95ff8882eda7df834ef9"
+    },
+    {
+      "version": "1.2",
+      "part": "packages",
+      "file": "1.2-part3.odt",
+      "sha256": "5af30e8e566c0a6cf082212d844f536b863603f887c5c1006c5412c608bfc82f"
+    },
+    {
+      "version": "1.3",
+      "part": "introduction",
+      "file": "1.3-part1-introduction.odt",
+      "sha256": "e37860536569fd394150fd4e5c124305d357d416be5e3cd9a8b57718d370a512"
+    },
+    {
+      "version": "1.3",
+      "part": "packages",
+      "file": "1.3-part2-packages.odt",
+      "sha256": "64ca54c09ccb8d5f21a2f21460c4ae621d1b30d5cbbe18a320a6f0fe44ef2349"
+    },
+    {
+      "version": "1.3",
+      "part": "schema",
+      "file": "1.3-part3-schema.odt",
+      "sha256": "1fd30cb217f7a832dc3740ee3c79b435f578bd1e14adb0ca996f55578c666f71"
+    },
+    {
+      "version": "1.3",
+      "part": "formula",
+      "file": "1.3-part4-formula.odt",
+      "sha256": "4886530aa0972e20f83272be28c5fc938861f510d1d9381d61566f852f44c5cf"
+    },
+    {
+      "version": "1.4",
+      "part": "introduction",
+      "file": "1.4-part1-introduction.odt",
+      "sha256": "8baa6b537e1b0aa2931e1c9e4c694d033dbcfaa4b0057f25a4a343bd3a6f2609"
+    },
+    {
+      "version": "1.4",
+      "part": "packages",
+      "file": "1.4-part2-packages.odt",
+      "sha256": "21bc3d576a601f8aaf8681a1ffc8de353711474f3de31aa0ffc702211d9948c0"
+    },
+    {
+      "version": "1.4",
+      "part": "schema",
+      "file": "1.4-part3-schema.odt",
+      "sha256": "d8de205fa173720b5bce035663fe802e914fefd20045f4e51b8c06c054d0726f"
+    },
+    {
+      "version": "1.4",
+      "part": "formula",
+      "file": "1.4-part4-formula.odt",
+      "sha256": "f2d9daebb8a66dbdb039d570d6d3b90f123cd1cefbeb13412e1655f2b3e61a8c"
+    },
+    {
+      "version": "1.0",
+      "part": "errata02",
+      "file": "1.0-errata02.odt",
+      "sha256": "5af378436d855302185812f4a1e9373bc6629c4b4a0c8019e3fc49479a8a4bae"
+    },
+    {
+      "version": "1.1",
+      "part": "errata01",
+      "file": "1.1-errata01-authoritative.odt",
+      "sha256": "8dd80dd5df3681b194ff977f47a8825f9d337af53486c4bb478a92dcf659629c"
+    }
+  ],
+  "referenceFieldCount": 51694,
+  "emptyReferenceFieldCount": 70,
+  "references": [
+    {
+      "locator": "/office:document-content/office:body/office:text/p[1350]/reference-ref[1]",
+      "sourceXmlSha256": "c3386c06f59a7902f1d3e717d3d0d9f93bbd782eb1dd128b0c6bcdfd64578ef5",
+      "sourceBlockId": "ODF-1.1/spec/B01616",
+      "sourceBlockSha256": "9d062fa698875a0d62ee4293227ced2d88460c8a9965ce655ccdbb84a5960ba8",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[1350]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00054",
+      "family": "reference",
+      "name": "Formatted Heading Number",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[88]/reference-mark[1]",
+          "sourceXmlSha256": "1840f45bb50ef1ecc317f0ad95fb24e175e906f785018d4d81e8ea95c0deb0ee",
+          "sourceBlockId": "ODF-1.1/spec/B01423",
+          "sourceBlockSha256": "adffd3938a899bdcc5be3bc11d6fc16c9de2263867d036da439019937e9b7419",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[88]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Formatted Heading Number"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[1408]/reference-ref[1]",
+      "sourceXmlSha256": "c3386c06f59a7902f1d3e717d3d0d9f93bbd782eb1dd128b0c6bcdfd64578ef5",
+      "sourceBlockId": "ODF-1.1/spec/B01676",
+      "sourceBlockSha256": "634f906104b988be164ce199e5edf9a6f94a57cea1b4615f12cf17cb9403e183",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[1408]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00055",
+      "family": "reference",
+      "name": "Formatted Heading Number",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[88]/reference-mark[1]",
+          "sourceXmlSha256": "1840f45bb50ef1ecc317f0ad95fb24e175e906f785018d4d81e8ea95c0deb0ee",
+          "sourceBlockId": "ODF-1.1/spec/B01423",
+          "sourceBlockSha256": "adffd3938a899bdcc5be3bc11d6fc16c9de2263867d036da439019937e9b7419",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[88]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Formatted Heading Number"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[1533]/reference-ref[1]",
+      "sourceXmlSha256": "669cba615353c4c539f52878cbafb492859bb139d027f26888bcb98f72a4e1b4",
+      "sourceBlockId": "ODF-1.1/spec/B01821",
+      "sourceBlockSha256": "a76a894b1442cfff5ac8e9ec7b0a370dd6b19320abf17570913dec8da39f2e8b",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[1533]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00060",
+      "family": "reference",
+      "name": "Drawing Shapes",
+      "format": "chapter",
+      "cachedText": "9.2",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[672]/reference-mark-start[1]",
+          "sourceXmlSha256": "c85c1e30e4abd6ff6216ea7c93e3e70a4c5bc931ba00f13767bca735dd4c4d5b",
+          "sourceBlockId": "ODF-1.1/spec/B09472",
+          "sourceBlockSha256": "5c6c107e5b02fa51408f942c55b002a27cddb7ae0cb5aa0cf6e15b66058cda0a",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[672]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Drawing Shapes"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[1533]/reference-ref[2]",
+      "sourceXmlSha256": "56c9e38dac28e07182aa7f69e8f491aa0cbb4e8b6d5d353879b07949b8065e95",
+      "sourceBlockId": "ODF-1.1/spec/B01821",
+      "sourceBlockSha256": "a76a894b1442cfff5ac8e9ec7b0a370dd6b19320abf17570913dec8da39f2e8b",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[1533]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00061",
+      "family": "reference",
+      "name": "Text Anchor",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[731]/reference-mark[1]",
+          "sourceXmlSha256": "37041004ca4ee3999e6baba907746f97b6226ea22289d060c6e30a774374da72",
+          "sourceBlockId": "ODF-1.1/spec/B10479",
+          "sourceBlockSha256": "c3574f668ddb9d4ec0256ce2c0ea961659403c5486827f5c1f7347534290d488",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[731]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Text Anchor"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[1780]/reference-ref[1]",
+      "sourceXmlSha256": "031bf3b1f74e82806804339f71ea8029b22de0083a1de7b6eafd79908e9c6503",
+      "sourceBlockId": "ODF-1.1/spec/B02118",
+      "sourceBlockSha256": "345d5e95a127bd9ed7e69cf36659394f691967c80457f2aa7672f13f08ddbb8c",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[1780]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00074",
+      "family": "reference",
+      "name": "Use Soft Page Breaks",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[22]/reference-mark-start[1]",
+          "sourceXmlSha256": "900832f0992bae04d3772f393bd2211431bae876e480a74c97818f8fbcd2abcd",
+          "sourceBlockId": "ODF-1.1/spec/B00491",
+          "sourceBlockSha256": "e3935f9d9a82d38cc705564c6531d2bf63c089920f347333ef105b02f6868e86",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[22]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Use Soft Page Breaks"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[1780]/bookmark-ref[1]",
+      "sourceXmlSha256": "5c615fd273c4d130ce0ea22b297e8436f1ed7de49875cf543868d4e20dc499b0",
+      "sourceBlockId": "ODF-1.1/spec/B02118",
+      "sourceBlockSha256": "345d5e95a127bd9ed7e69cf36659394f691967c80457f2aa7672f13f08ddbb8c",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[1780]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00075",
+      "family": "bookmark",
+      "name": "__RefNumPara__140467_1873440258",
+      "format": "number",
+      "cachedText": "2.3.1",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[19]/bookmark-start[2]",
+          "sourceXmlSha256": "5fd491229c2f8fa0b81acdbaf7cd9cc7b3c1b704d17268078aa1453409b7bee7",
+          "sourceBlockId": "ODF-1.1/spec/B00419",
+          "sourceBlockSha256": "65266f9b07a87fd2b8f88de85e0abef2a647067442288b1f29068f589b00d577",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[19]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "bookmark",
+          "name": "__RefNumPara__140467_1873440258"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[1780]/reference-ref[2]",
+      "sourceXmlSha256": "55b0db5a79e38cf6ecb6ff94cec3717d511f6b623bd933a7e84a8671d13578b4",
+      "sourceBlockId": "ODF-1.1/spec/B02118",
+      "sourceBlockSha256": "345d5e95a127bd9ed7e69cf36659394f691967c80457f2aa7672f13f08ddbb8c",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[1780]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00076",
+      "family": "reference",
+      "name": "Use Soft Page Breaks",
+      "format": "text",
+      "cachedText": "Use Soft Page Breaks",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[22]/reference-mark-start[1]",
+          "sourceXmlSha256": "900832f0992bae04d3772f393bd2211431bae876e480a74c97818f8fbcd2abcd",
+          "sourceBlockId": "ODF-1.1/spec/B00491",
+          "sourceBlockSha256": "e3935f9d9a82d38cc705564c6531d2bf63c089920f347333ef105b02f6868e86",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[22]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Use Soft Page Breaks"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[2054]/reference-ref[1]",
+      "sourceXmlSha256": "669cba615353c4c539f52878cbafb492859bb139d027f26888bcb98f72a4e1b4",
+      "sourceBlockId": "ODF-1.1/spec/B02451",
+      "sourceBlockSha256": "9047c666e2c2fd5702e17df4c4a5fa21fd19e148d590bec1ab8c32d31209e0b3",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[2054]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00082",
+      "family": "reference",
+      "name": "Drawing Shapes",
+      "format": "chapter",
+      "cachedText": "9.2",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[672]/reference-mark-start[1]",
+          "sourceXmlSha256": "c85c1e30e4abd6ff6216ea7c93e3e70a4c5bc931ba00f13767bca735dd4c4d5b",
+          "sourceBlockId": "ODF-1.1/spec/B09472",
+          "sourceBlockSha256": "5c6c107e5b02fa51408f942c55b002a27cddb7ae0cb5aa0cf6e15b66058cda0a",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[672]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Drawing Shapes"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[2054]/reference-ref[2]",
+      "sourceXmlSha256": "56c9e38dac28e07182aa7f69e8f491aa0cbb4e8b6d5d353879b07949b8065e95",
+      "sourceBlockId": "ODF-1.1/spec/B02451",
+      "sourceBlockSha256": "9047c666e2c2fd5702e17df4c4a5fa21fd19e148d590bec1ab8c32d31209e0b3",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[2054]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00083",
+      "family": "reference",
+      "name": "Text Anchor",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[731]/reference-mark[1]",
+          "sourceXmlSha256": "37041004ca4ee3999e6baba907746f97b6226ea22289d060c6e30a774374da72",
+          "sourceBlockId": "ODF-1.1/spec/B10479",
+          "sourceBlockSha256": "c3574f668ddb9d4ec0256ce2c0ea961659403c5486827f5c1f7347534290d488",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[731]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Text Anchor"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[70]/list-item[2]/p[2]/reference-ref[1]",
+      "sourceXmlSha256": "8ef7ceddc35d0793fc00550e19dd6004eb86614552d30f4cf4a22badec53de15",
+      "sourceBlockId": "ODF-1.1/spec/B03542",
+      "sourceBlockSha256": "8c3cea6f5335eadf859a5968537deda7fd6d8d7c71d3345b4021ebbde3bd8fa0",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[70]/list-item[2]/p[2]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00154",
+      "family": "reference",
+      "name": "field-condition",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[245]/reference-mark-start[1]",
+          "sourceXmlSha256": "73e2badefbc2411b0113b04f43ee5e4da1192cdd37d96d8e12d0458ac8259eab",
+          "sourceBlockId": "ODF-1.1/spec/B03519",
+          "sourceBlockSha256": "39b36d38d6eb03c89206f3b7b74397e7a9d9abb081ad48e3f73dece59dab7ae4",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[245]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "field-condition"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[4674]/reference-ref[1]",
+      "sourceXmlSha256": "e6d6fd384d392541cbeb6edf139f2b9252edeee861a72eadc2389f7cdff7b68d",
+      "sourceBlockId": "ODF-1.1/spec/B05733",
+      "sourceBlockSha256": "3c96b29378c97488efed57818e2163cc10dfa6e9fd8dcd44c12ddb4b29339046",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[4674]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00191",
+      "family": "reference",
+      "name": "CellRangeAddressList",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[420]/reference-mark[1]",
+          "sourceXmlSha256": "47dcc4763dc66ebd019300976f23f11b939bb6dcb8824da7287b1a7d8f5c141e",
+          "sourceBlockId": "ODF-1.1/spec/B06371",
+          "sourceBlockSha256": "225ddd92cc209f6d825fde1ec8e7265f4870b07eb5538810f5ecc6a94f121a1d",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[420]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "CellRangeAddressList"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[4683]/reference-ref[1]",
+      "sourceXmlSha256": "031bf3b1f74e82806804339f71ea8029b22de0083a1de7b6eafd79908e9c6503",
+      "sourceBlockId": "ODF-1.1/spec/B05743",
+      "sourceBlockSha256": "345d5e95a127bd9ed7e69cf36659394f691967c80457f2aa7672f13f08ddbb8c",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[4683]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00192",
+      "family": "reference",
+      "name": "Use Soft Page Breaks",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[22]/reference-mark-start[1]",
+          "sourceXmlSha256": "900832f0992bae04d3772f393bd2211431bae876e480a74c97818f8fbcd2abcd",
+          "sourceBlockId": "ODF-1.1/spec/B00491",
+          "sourceBlockSha256": "e3935f9d9a82d38cc705564c6531d2bf63c089920f347333ef105b02f6868e86",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[22]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Use Soft Page Breaks"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[4683]/bookmark-ref[1]",
+      "sourceXmlSha256": "5c615fd273c4d130ce0ea22b297e8436f1ed7de49875cf543868d4e20dc499b0",
+      "sourceBlockId": "ODF-1.1/spec/B05743",
+      "sourceBlockSha256": "345d5e95a127bd9ed7e69cf36659394f691967c80457f2aa7672f13f08ddbb8c",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[4683]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00193",
+      "family": "bookmark",
+      "name": "__RefNumPara__140467_1873440258",
+      "format": "number",
+      "cachedText": "2.3.1",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[19]/bookmark-start[2]",
+          "sourceXmlSha256": "5fd491229c2f8fa0b81acdbaf7cd9cc7b3c1b704d17268078aa1453409b7bee7",
+          "sourceBlockId": "ODF-1.1/spec/B00419",
+          "sourceBlockSha256": "65266f9b07a87fd2b8f88de85e0abef2a647067442288b1f29068f589b00d577",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[19]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "bookmark",
+          "name": "__RefNumPara__140467_1873440258"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[4683]/reference-ref[2]",
+      "sourceXmlSha256": "55b0db5a79e38cf6ecb6ff94cec3717d511f6b623bd933a7e84a8671d13578b4",
+      "sourceBlockId": "ODF-1.1/spec/B05743",
+      "sourceBlockSha256": "345d5e95a127bd9ed7e69cf36659394f691967c80457f2aa7672f13f08ddbb8c",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[4683]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00194",
+      "family": "reference",
+      "name": "Use Soft Page Breaks",
+      "format": "text",
+      "cachedText": "Use Soft Page Breaks",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[22]/reference-mark-start[1]",
+          "sourceXmlSha256": "900832f0992bae04d3772f393bd2211431bae876e480a74c97818f8fbcd2abcd",
+          "sourceBlockId": "ODF-1.1/spec/B00491",
+          "sourceBlockSha256": "e3935f9d9a82d38cc705564c6531d2bf63c089920f347333ef105b02f6868e86",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[22]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Use Soft Page Breaks"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[133]/list-item[7]/p[1]/reference-ref[1]",
+      "sourceXmlSha256": "ba26d446205bb9007204a4bfb67a9b576304df1152e94554ada4bfa43254bd86",
+      "sourceBlockId": "ODF-1.1/spec/B05930",
+      "sourceBlockSha256": "1630565c403fd6cabf5a5821f98fc720b77c6556f994b578ec8f5191e4be429b",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[133]/list-item[7]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00197",
+      "family": "reference",
+      "name": "CellRangeAddress",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[419]/reference-mark[1]",
+          "sourceXmlSha256": "7f21500db94ece672c5c6eb476a732b1fdf70cb9dfffe4e8ba57623749860b3d",
+          "sourceBlockId": "ODF-1.1/spec/B06359",
+          "sourceBlockSha256": "c27aaacc4ec211b2af9a67b170e38c4a1699262ae3f7bc89eb48e8a82f7ad2bc",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[419]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "CellRangeAddress"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[133]/list-item[7]/p[1]/reference-ref[2]",
+      "sourceXmlSha256": "050aab26abfb569c1855eefc48c0488f35759eac093c2d4c6b861aa91499cdcd",
+      "sourceBlockId": "ODF-1.1/spec/B05930",
+      "sourceBlockSha256": "1630565c403fd6cabf5a5821f98fc720b77c6556f994b578ec8f5191e4be429b",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[133]/list-item[7]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00198",
+      "family": "reference",
+      "name": "CellRangeAddress",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[419]/reference-mark[1]",
+          "sourceXmlSha256": "7f21500db94ece672c5c6eb476a732b1fdf70cb9dfffe4e8ba57623749860b3d",
+          "sourceBlockId": "ODF-1.1/spec/B06359",
+          "sourceBlockSha256": "c27aaacc4ec211b2af9a67b170e38c4a1699262ae3f7bc89eb48e8a82f7ad2bc",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[419]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "CellRangeAddress"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[133]/list-item[7]/p[1]/reference-ref[3]",
+      "sourceXmlSha256": "ce256406fe346502e611f8768053013cf5928661f8320126c52d7db4be7d07d4",
+      "sourceBlockId": "ODF-1.1/spec/B05930",
+      "sourceBlockSha256": "1630565c403fd6cabf5a5821f98fc720b77c6556f994b578ec8f5191e4be429b",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[133]/list-item[7]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00199",
+      "family": "reference",
+      "name": "CellRangeAddressList",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[420]/reference-mark[1]",
+          "sourceXmlSha256": "47dcc4763dc66ebd019300976f23f11b939bb6dcb8824da7287b1a7d8f5c141e",
+          "sourceBlockId": "ODF-1.1/spec/B06371",
+          "sourceBlockSha256": "225ddd92cc209f6d825fde1ec8e7265f4870b07eb5538810f5ecc6a94f121a1d",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[420]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "CellRangeAddressList"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[4923]/reference-ref[1]",
+      "sourceXmlSha256": "1fd5cf1fb9bd432ace116a9a5873e77bed2a3af5f2ba6cab8547ecf11f643bbd",
+      "sourceBlockId": "ODF-1.1/spec/B06032",
+      "sourceBlockSha256": "d505f7fba62ab783b5183f1c71c0a71bb67dbd5be352ee5d01cfe793cbefd3b7",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[4923]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00202",
+      "family": "reference",
+      "name": "Table Visibility",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[387]/reference-mark[1]",
+          "sourceXmlSha256": "c4a3dec316178434cfe154b7cb982295b523ed9c1e8a66c44e66aae4dee4146a",
+          "sourceBlockId": "ODF-1.1/spec/B05786",
+          "sourceBlockSha256": "7448611d5f93aa8acac6a06d76c00b3f23d985bd7fbedbc771409a85ad4a23c5",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[387]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Table Visibility"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[5380]/reference-ref[1]",
+      "sourceXmlSha256": "80921c8a5273987f0e548abe114cbf664fa238a31bdcb46e3303d944e6e47e66",
+      "sourceBlockId": "ODF-1.1/spec/B06545",
+      "sourceBlockSha256": "7baad111610642ab8125584e730ce68c4c9b4cd46ff5508687a196d806cc84e3",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[5380]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00205",
+      "family": "reference",
+      "name": "protected table",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[379]/reference-mark[1]",
+          "sourceXmlSha256": "d92b6ebfc305564e8c77e9c43b51ddcebea007d1fce3291c2fb448051ca14a6e",
+          "sourceBlockId": "ODF-1.1/spec/B05707",
+          "sourceBlockSha256": "b0ed263373361b8ec0ea4f86a4a6970a2e44fb0a83bb60f4dde908bca272683e",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[379]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "protected table"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[5759]/reference-ref[1]",
+      "sourceXmlSha256": "e11e9796108e499f774e0e278c1fe36989abb359c94fae70b09157114b8682a8",
+      "sourceBlockId": "ODF-1.1/spec/B07015",
+      "sourceBlockSha256": "812606a3e572b41e3434d378687eac2c1b737e380b5581f6c29d8016bbeb93db",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[5759]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00210",
+      "family": "reference",
+      "name": "Cell address",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[418]/reference-mark[1]",
+          "sourceXmlSha256": "485c6356a61ba842c6a2c83dda5e72745f291995d12d7e3eff17fd326a170a86",
+          "sourceBlockId": "ODF-1.1/spec/B06351",
+          "sourceBlockSha256": "b2bf50d62f51ec36dcfae634246c3ff1398c1bddba77bb35028756c4eb20db40",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[418]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Cell address"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[5809]/reference-ref[1]",
+      "sourceXmlSha256": "e11e9796108e499f774e0e278c1fe36989abb359c94fae70b09157114b8682a8",
+      "sourceBlockId": "ODF-1.1/spec/B07070",
+      "sourceBlockSha256": "afaec833914c86d99ea6125c7ce473aa0053536e9ac7aa6d707b448f00a70cec",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[5809]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00211",
+      "family": "reference",
+      "name": "Cell address",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[418]/reference-mark[1]",
+          "sourceXmlSha256": "485c6356a61ba842c6a2c83dda5e72745f291995d12d7e3eff17fd326a170a86",
+          "sourceBlockId": "ODF-1.1/spec/B06351",
+          "sourceBlockSha256": "b2bf50d62f51ec36dcfae634246c3ff1398c1bddba77bb35028756c4eb20db40",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[418]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Cell address"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[6197]/reference-ref[1]",
+      "sourceXmlSha256": "c3c51abd22e2153a7bb4ce18bd2127605d89f56f9fa4c4014f154cb7c689f5f6",
+      "sourceBlockId": "ODF-1.1/spec/B07497",
+      "sourceBlockSha256": "a0ac521f9b621d51b09a945a2605f350814262cc83d80bc72cde5b4526bcd167",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[6197]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00214",
+      "family": "reference",
+      "name": "data type",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[512]/reference-mark[1]",
+          "sourceXmlSha256": "c390b0e4ae31bce08228d3e4f7c8a47d95552a6e71cedd5c18cad88abcc134be",
+          "sourceBlockId": "ODF-1.1/spec/B07421",
+          "sourceBlockSha256": "68cd154732021d9684d0dcad6276e99d675f962c9b08774f23f5de9398e19290",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[512]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "data type"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[6210]/reference-ref[1]",
+      "sourceXmlSha256": "7c10826fe77726f523ffd576d605508a5cea1fc1214866589ea8cbfb4e0200c0",
+      "sourceBlockId": "ODF-1.1/spec/B07511",
+      "sourceBlockSha256": "88a2e038b41d3bbc8a57606f39e5e263fe2fa8ce734949f30f4ec38cb7f615af",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[6210]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00215",
+      "family": "reference",
+      "name": "Order",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[513]/reference-mark[1]",
+          "sourceXmlSha256": "decc0ca6a6e9fb5c1ce39476f9065e95c205c887d0d2069ddf2080f0e6aa921a",
+          "sourceBlockId": "ODF-1.1/spec/B07435",
+          "sourceBlockSha256": "6be090825c9971035aee21d9ac0fc9c32f279b921e956026460e4cc1eb611dd6",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[513]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Order"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[211]/list-item[3]/p[1]/reference-ref[1]",
+      "sourceXmlSha256": "de65af86a64ae81464904218fa793d15e921a3e73fe1b95d4789d8ca91a71bdb",
+      "sourceBlockId": "ODF-1.1/spec/B10237",
+      "sourceBlockSha256": "c3ca3f791ed4d5b6ebc640f5a4b19f5fb6047120d3f9dd10af2eb1290eb88fc3",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[211]/list-item[3]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00358",
+      "family": "reference",
+      "name": "Presentation Class",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[877]/reference-mark-start[1]",
+          "sourceXmlSha256": "39ad3f828179e1c9882b5f2d094ac73962c46d0044f1129ffc5f65853a396582",
+          "sourceBlockId": "ODF-1.1/spec/B12574",
+          "sourceBlockSha256": "4f3a9bd003974a5ed8c9ad65d4aeda3b8a0db6fd903e36e83a3a950624b09bbd",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[877]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Presentation Class"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[8925]/reference-ref[1]",
+      "sourceXmlSha256": "d11f2150e30404f51c937067dd551ce087ac75ec92a5b8198846c1d5f0713abc",
+      "sourceBlockId": "ODF-1.1/spec/B10952",
+      "sourceBlockSha256": "1ab964e46433a03ec514d6e160433100861309e750cf9b3c5b4423e13f0e81ae",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[8925]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00387",
+      "family": "reference",
+      "name": "Image Data",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[752]/reference-mark[1]",
+          "sourceXmlSha256": "d52d17a656ee54869b134558e3900a003f371ef8c841b5ee3ddd6d03073c7c53",
+          "sourceBlockId": "ODF-1.1/spec/B10861",
+          "sourceBlockSha256": "b03e073822fdcf57575ac98af0492a75b618f46326af8b756aa735398c5fda99",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[752]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Image Data"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[8956]/reference-ref[1]",
+      "sourceXmlSha256": "d11f2150e30404f51c937067dd551ce087ac75ec92a5b8198846c1d5f0713abc",
+      "sourceBlockId": "ODF-1.1/spec/B10993",
+      "sourceBlockSha256": "640c7e18cf92445761cfa5bd504cf4a2da5b9d85c2e1a7e42f86c0df39bcada2",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[8956]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00390",
+      "family": "reference",
+      "name": "Image Data",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[752]/reference-mark[1]",
+          "sourceXmlSha256": "d52d17a656ee54869b134558e3900a003f371ef8c841b5ee3ddd6d03073c7c53",
+          "sourceBlockId": "ODF-1.1/spec/B10861",
+          "sourceBlockSha256": "b03e073822fdcf57575ac98af0492a75b618f46326af8b756aa735398c5fda99",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[752]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Image Data"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[9003]/reference-ref[1]",
+      "sourceXmlSha256": "d11f2150e30404f51c937067dd551ce087ac75ec92a5b8198846c1d5f0713abc",
+      "sourceBlockId": "ODF-1.1/spec/B11052",
+      "sourceBlockSha256": "2e89ce75129e5810e0a5b84e1483badfa96ac30d7fc76c8f335e8c67fae42d10",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[9003]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00393",
+      "family": "reference",
+      "name": "Image Data",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[752]/reference-mark[1]",
+          "sourceXmlSha256": "d52d17a656ee54869b134558e3900a003f371ef8c841b5ee3ddd6d03073c7c53",
+          "sourceBlockId": "ODF-1.1/spec/B10861",
+          "sourceBlockSha256": "b03e073822fdcf57575ac98af0492a75b618f46326af8b756aa735398c5fda99",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[752]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Image Data"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[9033]/reference-ref[1]",
+      "sourceXmlSha256": "d11f2150e30404f51c937067dd551ce087ac75ec92a5b8198846c1d5f0713abc",
+      "sourceBlockId": "ODF-1.1/spec/B11091",
+      "sourceBlockSha256": "7168140218f2f9e002f6b8c5852b5a7bcbc1545268450ed4b3dac2d68748aa72",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[9033]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00395",
+      "family": "reference",
+      "name": "Image Data",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[752]/reference-mark[1]",
+          "sourceXmlSha256": "d52d17a656ee54869b134558e3900a003f371ef8c841b5ee3ddd6d03073c7c53",
+          "sourceBlockId": "ODF-1.1/spec/B10861",
+          "sourceBlockSha256": "b03e073822fdcf57575ac98af0492a75b618f46326af8b756aa735398c5fda99",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[752]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Image Data"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[9157]/reference-ref[1]",
+      "sourceXmlSha256": "dbb695ea0c068b91908b94b1ccc2789bda0ef8825c7900cf71eb7f0cea712ae5",
+      "sourceBlockId": "ODF-1.1/spec/B11247",
+      "sourceBlockSha256": "f7d1979c0996a311dca6c1cb6eae5d7a8c49313255026da91f82afd0df3db959",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[9157]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00398",
+      "family": "reference",
+      "name": "Common Image Map Attributes and Elements",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[785]/reference-mark-start[1]",
+          "sourceXmlSha256": "cb08a5abe71f0a0b2ebbca7b9b03bde772ea95881494d66e6194bd3d94306f1f",
+          "sourceBlockId": "ODF-1.1/spec/B11339",
+          "sourceBlockSha256": "628ca0f02f7beebbbf634caa1513dc09ce2c6d825a651931e3aeacfc5edf5a21",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[785]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Common Image Map Attributes and Elements"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[9157]/reference-ref[2]",
+      "sourceXmlSha256": "e428ae95c70146f9fbf015de0a0c19fe285a047f8b1e122d86e4ea864a572535",
+      "sourceBlockId": "ODF-1.1/spec/B11247",
+      "sourceBlockSha256": "f7d1979c0996a311dca6c1cb6eae5d7a8c49313255026da91f82afd0df3db959",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[9157]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00399",
+      "family": "reference",
+      "name": "Common Image Map Attributes and Elements",
+      "format": "text",
+      "cachedText": "Common Image Map Attributes and Elements",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[785]/reference-mark-start[1]",
+          "sourceXmlSha256": "cb08a5abe71f0a0b2ebbca7b9b03bde772ea95881494d66e6194bd3d94306f1f",
+          "sourceBlockId": "ODF-1.1/spec/B11339",
+          "sourceBlockSha256": "628ca0f02f7beebbbf634caa1513dc09ce2c6d825a651931e3aeacfc5edf5a21",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[785]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Common Image Map Attributes and Elements"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[9186]/reference-ref[1]",
+      "sourceXmlSha256": "dbb695ea0c068b91908b94b1ccc2789bda0ef8825c7900cf71eb7f0cea712ae5",
+      "sourceBlockId": "ODF-1.1/spec/B11277",
+      "sourceBlockSha256": "a205a26436892bd73d7bd26bc9b2c2ee80520235eef12c68a3833f29c7541cde",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[9186]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00400",
+      "family": "reference",
+      "name": "Common Image Map Attributes and Elements",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[785]/reference-mark-start[1]",
+          "sourceXmlSha256": "cb08a5abe71f0a0b2ebbca7b9b03bde772ea95881494d66e6194bd3d94306f1f",
+          "sourceBlockId": "ODF-1.1/spec/B11339",
+          "sourceBlockSha256": "628ca0f02f7beebbbf634caa1513dc09ce2c6d825a651931e3aeacfc5edf5a21",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[785]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Common Image Map Attributes and Elements"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[9186]/reference-ref[2]",
+      "sourceXmlSha256": "71381eec3672a36c8b114e0247e4cc5bfd95030b63b29b942db021c2eb656f1a",
+      "sourceBlockId": "ODF-1.1/spec/B11277",
+      "sourceBlockSha256": "a205a26436892bd73d7bd26bc9b2c2ee80520235eef12c68a3833f29c7541cde",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[9186]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00401",
+      "family": "reference",
+      "name": "Common Image Map Attributes and Elements",
+      "format": "text",
+      "cachedText": "Common Image Map Attributes and Elements",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[785]/reference-mark-start[1]",
+          "sourceXmlSha256": "cb08a5abe71f0a0b2ebbca7b9b03bde772ea95881494d66e6194bd3d94306f1f",
+          "sourceBlockId": "ODF-1.1/spec/B11339",
+          "sourceBlockSha256": "628ca0f02f7beebbbf634caa1513dc09ce2c6d825a651931e3aeacfc5edf5a21",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[785]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Common Image Map Attributes and Elements"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[9212]/reference-ref[1]",
+      "sourceXmlSha256": "dbb695ea0c068b91908b94b1ccc2789bda0ef8825c7900cf71eb7f0cea712ae5",
+      "sourceBlockId": "ODF-1.1/spec/B11307",
+      "sourceBlockSha256": "5679d6a3dc71c152eb1a15869f59618936f523d481b704a9a91c619f5ab93c9a",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[9212]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00403",
+      "family": "reference",
+      "name": "Common Image Map Attributes and Elements",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[785]/reference-mark-start[1]",
+          "sourceXmlSha256": "cb08a5abe71f0a0b2ebbca7b9b03bde772ea95881494d66e6194bd3d94306f1f",
+          "sourceBlockId": "ODF-1.1/spec/B11339",
+          "sourceBlockSha256": "628ca0f02f7beebbbf634caa1513dc09ce2c6d825a651931e3aeacfc5edf5a21",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[785]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Common Image Map Attributes and Elements"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[9212]/reference-ref[2]",
+      "sourceXmlSha256": "71381eec3672a36c8b114e0247e4cc5bfd95030b63b29b942db021c2eb656f1a",
+      "sourceBlockId": "ODF-1.1/spec/B11307",
+      "sourceBlockSha256": "5679d6a3dc71c152eb1a15869f59618936f523d481b704a9a91c619f5ab93c9a",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[9212]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00404",
+      "family": "reference",
+      "name": "Common Image Map Attributes and Elements",
+      "format": "text",
+      "cachedText": "Common Image Map Attributes and Elements",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[785]/reference-mark-start[1]",
+          "sourceXmlSha256": "cb08a5abe71f0a0b2ebbca7b9b03bde772ea95881494d66e6194bd3d94306f1f",
+          "sourceBlockId": "ODF-1.1/spec/B11339",
+          "sourceBlockSha256": "628ca0f02f7beebbbf634caa1513dc09ce2c6d825a651931e3aeacfc5edf5a21",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[785]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Common Image Map Attributes and Elements"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[249]/list-item[2]/p[1]/reference-ref[1]",
+      "sourceXmlSha256": "b24241507ce94a71537ef0f77a3df11cd70cbccff2330ea81391a30759174c60",
+      "sourceBlockId": "ODF-1.1/spec/B11689",
+      "sourceBlockSha256": "2bd84bbac4d4ef510e64f956cc9abe17ac0f66ca49a6a7582173c49fb0798fba",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[249]/list-item[2]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00425",
+      "family": "reference",
+      "name": "Path Data",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[686]/reference-mark-start[1]",
+          "sourceXmlSha256": "eb45d2a5e83316dedebe057f65628bac4194aec5a02499caea541ff86534fe0f",
+          "sourceBlockId": "ODF-1.1/spec/B09779",
+          "sourceBlockSha256": "de124575c3a7f17971c2ffa7f6893c4fe5870da45e95d546d28b1cc547dc0ac6",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[686]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Path Data"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[250]/list-item[2]/p[1]/span[2]/reference-ref[1]",
+      "sourceXmlSha256": "b24241507ce94a71537ef0f77a3df11cd70cbccff2330ea81391a30759174c60",
+      "sourceBlockId": "ODF-1.1/spec/B11706",
+      "sourceBlockSha256": "2bd84bbac4d4ef510e64f956cc9abe17ac0f66ca49a6a7582173c49fb0798fba",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[250]/list-item[2]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00431",
+      "family": "reference",
+      "name": "Path Data",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[686]/reference-mark-start[1]",
+          "sourceXmlSha256": "eb45d2a5e83316dedebe057f65628bac4194aec5a02499caea541ff86534fe0f",
+          "sourceBlockId": "ODF-1.1/spec/B09779",
+          "sourceBlockSha256": "de124575c3a7f17971c2ffa7f6893c4fe5870da45e95d546d28b1cc547dc0ac6",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[686]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Path Data"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[10183]/reference-ref[1]",
+      "sourceXmlSha256": "0ec49771765ea1cf3c2e771ee76510ca30a2f0c5a95ce4bd01176d770d1de751",
+      "sourceBlockId": "ODF-1.1/spec/B12573",
+      "sourceBlockSha256": "b3a0e9c1c35e037f316f19b52c7fa3e62750f6bece9dac69e5b92702d0a25eeb",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[10183]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00455",
+      "family": "reference",
+      "name": "Shape Style",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[723]/reference-mark-start[1]",
+          "sourceXmlSha256": "d6e25dd77b19b5c3435a1affa84ee016b825dd705be803554c1a4863f7a14646",
+          "sourceBlockId": "ODF-1.1/spec/B10379",
+          "sourceBlockSha256": "7e744141b40ea5501412e42c8b40fd0b05f1608aa2e4073944ccccbd82f24ee8",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[723]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Shape Style"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[10612]/reference-ref[1]",
+      "sourceXmlSha256": "67425b5424dc14041307a04d6b88a3e3057d9e14e23bf7ddbcb82465d5d5122a",
+      "sourceBlockId": "ODF-1.1/spec/B13147",
+      "sourceBlockSha256": "58d77c433eefdddce38c4787c34c0b42ed1cde802c6f0c2dee16aa799410bdf3",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[10612]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00474",
+      "family": "reference",
+      "name": "Event Name",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[1146]/reference-mark[1]",
+          "sourceXmlSha256": "3e281421768fa47487c2168ffb691129fbdce1bfb75d0dffa84ba8aacdb6d0d2",
+          "sourceBlockId": "ODF-1.1/spec/B16308",
+          "sourceBlockSha256": "61d517c594dafab0c3c08aca777ea2324f3ed6f84bef984719b0384627d413dd",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[1146]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Event Name"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[10707]/reference-ref[1]",
+      "sourceXmlSha256": "0276b8463b2d9f2753247b4f2eb0dd50fd48af9b7f5186ce8bb8b60705d867ee",
+      "sourceBlockId": "ODF-1.1/spec/B13263",
+      "sourceBlockSha256": "ed93eae3f0f258480a69a33cbf3cce3b2a91102ed241309669f72eb56b0527da",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[10707]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00479",
+      "family": "reference",
+      "name": "Header field decl",
+      "format": "chapter",
+      "cachedText": "9.11.2",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[933]/reference-mark[1]",
+          "sourceXmlSha256": "d13e7db678488d9e5dcb55d41a90383b1e880f876c8401888de721e4e7e2b658",
+          "sourceBlockId": "ODF-1.1/spec/B13294",
+          "sourceBlockSha256": "ef13f11f40514e2caab806bfe2b7111bd6845a6c4ee672268afbcd5ab1e09d04",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[933]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Header field decl"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[10707]/reference-ref[2]",
+      "sourceXmlSha256": "e8e146d88b837c1243467bd7ec7983808f8cd8182e54f8251071ec3ae58592c1",
+      "sourceBlockId": "ODF-1.1/spec/B13263",
+      "sourceBlockSha256": "ed93eae3f0f258480a69a33cbf3cce3b2a91102ed241309669f72eb56b0527da",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[10707]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00480",
+      "family": "reference",
+      "name": "Presentation Class",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[877]/reference-mark-start[1]",
+          "sourceXmlSha256": "39ad3f828179e1c9882b5f2d094ac73962c46d0044f1129ffc5f65853a396582",
+          "sourceBlockId": "ODF-1.1/spec/B12574",
+          "sourceBlockSha256": "4f3a9bd003974a5ed8c9ad65d4aeda3b8a0db6fd903e36e83a3a950624b09bbd",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[877]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Presentation Class"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[10707]/reference-ref[3]",
+      "sourceXmlSha256": "77686807aba41f74c8ad5c9bb56f3278a357e590e181f315caabddf293110f26",
+      "sourceBlockId": "ODF-1.1/spec/B13263",
+      "sourceBlockSha256": "ed93eae3f0f258480a69a33cbf3cce3b2a91102ed241309669f72eb56b0527da",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[10707]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00481",
+      "family": "reference",
+      "name": "Drawing Pages",
+      "format": "chapter",
+      "cachedText": "9.1.4",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[661]/reference-mark-start[1]",
+          "sourceXmlSha256": "e27229b2db65c09fe64e2a215eda3f89d847ed607f58ec7279b55a4d90bc2f34",
+          "sourceBlockId": "ODF-1.1/spec/B09319",
+          "sourceBlockSha256": "fdc6698d0c06e8844243b51496dd10b870e8c96e3ef0b8fe374f334d34613823",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[661]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Drawing Pages"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[10714]/reference-ref[1]",
+      "sourceXmlSha256": "fda984bd7f08f673cd806542f77c78dace298f6cbca055a51a4d013b05261865",
+      "sourceBlockId": "ODF-1.1/spec/B13271",
+      "sourceBlockSha256": "d413ded6fc68be3e9e0524ec224d0d0cfd3253d2332a9b4d28b31d16cd6a01c3",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[10714]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00482",
+      "family": "reference",
+      "name": "Footer field decl",
+      "format": "chapter",
+      "cachedText": "9.11.3",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[935]/reference-mark[1]",
+          "sourceXmlSha256": "3f509c82796092f046680ba17f045e9584877ccd8b29dd3d0d0e49fc527b855c",
+          "sourceBlockId": "ODF-1.1/spec/B13309",
+          "sourceBlockSha256": "cc98973294c019bc92caa9bc6e9ead03a0046f4e858f906fb5d50e29b748ab84",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[935]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Footer field decl"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[10714]/reference-ref[2]",
+      "sourceXmlSha256": "e8e146d88b837c1243467bd7ec7983808f8cd8182e54f8251071ec3ae58592c1",
+      "sourceBlockId": "ODF-1.1/spec/B13271",
+      "sourceBlockSha256": "d413ded6fc68be3e9e0524ec224d0d0cfd3253d2332a9b4d28b31d16cd6a01c3",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[10714]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00483",
+      "family": "reference",
+      "name": "Presentation Class",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[877]/reference-mark-start[1]",
+          "sourceXmlSha256": "39ad3f828179e1c9882b5f2d094ac73962c46d0044f1129ffc5f65853a396582",
+          "sourceBlockId": "ODF-1.1/spec/B12574",
+          "sourceBlockSha256": "4f3a9bd003974a5ed8c9ad65d4aeda3b8a0db6fd903e36e83a3a950624b09bbd",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[877]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Presentation Class"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[10714]/reference-ref[3]",
+      "sourceXmlSha256": "77686807aba41f74c8ad5c9bb56f3278a357e590e181f315caabddf293110f26",
+      "sourceBlockId": "ODF-1.1/spec/B13271",
+      "sourceBlockSha256": "d413ded6fc68be3e9e0524ec224d0d0cfd3253d2332a9b4d28b31d16cd6a01c3",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[10714]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00484",
+      "family": "reference",
+      "name": "Drawing Pages",
+      "format": "chapter",
+      "cachedText": "9.1.4",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[661]/reference-mark-start[1]",
+          "sourceXmlSha256": "e27229b2db65c09fe64e2a215eda3f89d847ed607f58ec7279b55a4d90bc2f34",
+          "sourceBlockId": "ODF-1.1/spec/B09319",
+          "sourceBlockSha256": "fdc6698d0c06e8844243b51496dd10b870e8c96e3ef0b8fe374f334d34613823",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[661]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Drawing Pages"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[10721]/reference-ref[1]",
+      "sourceXmlSha256": "f82e4bc664b842b154d83afcd24bd696d650b17260471da734de3fe7581a8de5",
+      "sourceBlockId": "ODF-1.1/spec/B13279",
+      "sourceBlockSha256": "6d88639d5b4a8b893940eb6f9d9847f555505235d692a121233d237f6380392c",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[10721]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00485",
+      "family": "reference",
+      "name": "Pres date time field decl",
+      "format": "chapter",
+      "cachedText": "9.11.4",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[937]/reference-mark[1]",
+          "sourceXmlSha256": "4795af475beef9b0fe34d44529f9e84603688e626db93486580f5507230378ba",
+          "sourceBlockId": "ODF-1.1/spec/B13324",
+          "sourceBlockSha256": "4c8f0b615cb60485089bf287ea064935a6dabc499365c2291bb7054241c6cf3c",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[937]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Pres date time field decl"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[10721]/reference-ref[2]",
+      "sourceXmlSha256": "e8e146d88b837c1243467bd7ec7983808f8cd8182e54f8251071ec3ae58592c1",
+      "sourceBlockId": "ODF-1.1/spec/B13279",
+      "sourceBlockSha256": "6d88639d5b4a8b893940eb6f9d9847f555505235d692a121233d237f6380392c",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[10721]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00486",
+      "family": "reference",
+      "name": "Presentation Class",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[877]/reference-mark-start[1]",
+          "sourceXmlSha256": "39ad3f828179e1c9882b5f2d094ac73962c46d0044f1129ffc5f65853a396582",
+          "sourceBlockId": "ODF-1.1/spec/B12574",
+          "sourceBlockSha256": "4f3a9bd003974a5ed8c9ad65d4aeda3b8a0db6fd903e36e83a3a950624b09bbd",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[877]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Presentation Class"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[10721]/reference-ref[3]",
+      "sourceXmlSha256": "77686807aba41f74c8ad5c9bb56f3278a357e590e181f315caabddf293110f26",
+      "sourceBlockId": "ODF-1.1/spec/B13279",
+      "sourceBlockSha256": "6d88639d5b4a8b893940eb6f9d9847f555505235d692a121233d237f6380392c",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[10721]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00487",
+      "family": "reference",
+      "name": "Drawing Pages",
+      "format": "chapter",
+      "cachedText": "9.1.4",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[661]/reference-mark-start[1]",
+          "sourceXmlSha256": "e27229b2db65c09fe64e2a215eda3f89d847ed607f58ec7279b55a4d90bc2f34",
+          "sourceBlockId": "ODF-1.1/spec/B09319",
+          "sourceBlockSha256": "fdc6698d0c06e8844243b51496dd10b870e8c96e3ef0b8fe374f334d34613823",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[661]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Drawing Pages"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[12808]/reference-ref[1]",
+      "sourceXmlSha256": "66048091e0705785d5665ba279308d0b0888868bb702c06e7d5b60bbd93cb6d2",
+      "sourceBlockId": "ODF-1.1/spec/B15918",
+      "sourceBlockSha256": "5aeec9266365825bf781a78535326c157b330d984ac2b4cf51bd4eef5b13f336",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[12808]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00594",
+      "family": "reference",
+      "name": "Event Name",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[1146]/reference-mark[1]",
+          "sourceXmlSha256": "3e281421768fa47487c2168ffb691129fbdce1bfb75d0dffa84ba8aacdb6d0d2",
+          "sourceBlockId": "ODF-1.1/spec/B16308",
+          "sourceBlockSha256": "61d517c594dafab0c3c08aca777ea2324f3ed6f84bef984719b0384627d413dd",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[1146]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Event Name"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[13095]/reference-ref[1]",
+      "sourceXmlSha256": "14525207f276cddf03e8f0e0b5dad9d17c51a8e15051ffbc7a27f86956016b6f",
+      "sourceBlockId": "ODF-1.1/spec/B16354",
+      "sourceBlockSha256": "4a1ec5fe9cb7a622c5f56b62640fe9e8e6864caba0e383d23cde3eecad97a73f",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[13095]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00606",
+      "family": "reference",
+      "name": "Script Language",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[48]/reference-mark[1]",
+          "sourceXmlSha256": "c7f32b60aa43277d6b6bbaa686ccb794965bddade6e6cfa14c419a37e2bdbd18",
+          "sourceBlockId": "ODF-1.1/spec/B00840",
+          "sourceBlockSha256": "809bc2a23f5d2af4255cf564194ebc97241032e74e7afb739c401d7a8ee1ce13",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[48]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Script Language"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[367]/list-item[7]/p[1]/reference-ref[1]",
+      "sourceXmlSha256": "841d7a9851fe1b12e9565c9b768ee7f38e68712ae3121f78363da8047cd8bd47",
+      "sourceBlockId": "ODF-1.1/spec/B17316",
+      "sourceBlockSha256": "b5c6872bd0956dec0db44d53383c6c47e6dcf9476ade599d05779605e5315aee",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[367]/list-item[7]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00619",
+      "family": "reference",
+      "name": "Formula",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[393]/reference-mark[1]",
+          "sourceXmlSha256": "c165c8a01388bf58ad60e160354868af5fe87483eb3cc2f93a47237665341fb6",
+          "sourceBlockId": "ODF-1.1/spec/B05922",
+          "sourceBlockSha256": "d00bd4ec32e4e1cc45ddae0ad3fd34af28cefb4f236b0f8cc19ff7bfe70dda17",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[393]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Formula"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[15967]/reference-ref[1]",
+      "sourceXmlSha256": "5af86f08463be5f194a1ce4345b9a4c648bce24bae68820d5f88932e95ce9e1b",
+      "sourceBlockId": "ODF-1.1/spec/B19638",
+      "sourceBlockSha256": "9a8480bb449603e450c8e43ef2501fed6b2af3e0a7de2a2d2c539bb8ae1787be",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[15967]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00677",
+      "family": "reference",
+      "name": "Image Data",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[752]/reference-mark[1]",
+          "sourceXmlSha256": "d52d17a656ee54869b134558e3900a003f371ef8c841b5ee3ddd6d03073c7c53",
+          "sourceBlockId": "ODF-1.1/spec/B10861",
+          "sourceBlockSha256": "b03e073822fdcf57575ac98af0492a75b618f46326af8b756aa735398c5fda99",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[752]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Image Data"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[16024]/span[2]/reference-ref[1]",
+      "sourceXmlSha256": "eb47a0e1349e8df1d8c89cacb0dda3ec3228e3dec184e6a39d88fdcc8c9d85fd",
+      "sourceBlockId": "ODF-1.1/spec/B19717",
+      "sourceBlockSha256": "e411e6e559ffbd88170430b075e7ec058b354ba3c7a5734ac13bfaa736862d75",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[16024]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00680",
+      "family": "reference",
+      "name": "Display levels",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[1365]/reference-mark[1]",
+          "sourceXmlSha256": "33225dadee2c1fa2aec3af9dc1bc9bc70fe7a48f227e7957a3deda26fffc80b6",
+          "sourceBlockId": "ODF-1.1/spec/B19517",
+          "sourceBlockSha256": "91f28145a902a4a92fd99fa29eae9303e8b84b981350059e24e6c5c5030dae98",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[1365]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Display levels"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[16029]/span[4]/reference-ref[1]",
+      "sourceXmlSha256": "eb47a0e1349e8df1d8c89cacb0dda3ec3228e3dec184e6a39d88fdcc8c9d85fd",
+      "sourceBlockId": "ODF-1.1/spec/B19723",
+      "sourceBlockSha256": "ae603215e3863f68ea62c18ebc7e3135857fe955fac931237481a2c6c3b9b76e",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[16029]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00681",
+      "family": "reference",
+      "name": "Display levels",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[1365]/reference-mark[1]",
+          "sourceXmlSha256": "33225dadee2c1fa2aec3af9dc1bc9bc70fe7a48f227e7957a3deda26fffc80b6",
+          "sourceBlockId": "ODF-1.1/spec/B19517",
+          "sourceBlockSha256": "91f28145a902a4a92fd99fa29eae9303e8b84b981350059e24e6c5c5030dae98",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[1365]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Display levels"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[18307]/reference-ref[1]",
+      "sourceXmlSha256": "5af86f08463be5f194a1ce4345b9a4c648bce24bae68820d5f88932e95ce9e1b",
+      "sourceBlockId": "ODF-1.1/spec/B22255",
+      "sourceBlockSha256": "7408b179ba63e167b86a90a3194d5823b3f64720fb450a2c547171200827dbd5",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[18307]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00767",
+      "family": "reference",
+      "name": "Image Data",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[752]/reference-mark[1]",
+          "sourceXmlSha256": "d52d17a656ee54869b134558e3900a003f371ef8c841b5ee3ddd6d03073c7c53",
+          "sourceBlockId": "ODF-1.1/spec/B10861",
+          "sourceBlockSha256": "b03e073822fdcf57575ac98af0492a75b618f46326af8b756aa735398c5fda99",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[752]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Image Data"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[19263]/reference-ref[1]",
+      "sourceXmlSha256": "c79d8a604644006b08b1efc49594fe5627f67291369644080cf1c99a04edcb2f",
+      "sourceBlockId": "ODF-1.1/spec/B23311",
+      "sourceBlockSha256": "f67b83017c58106d531173d21931dc4d747e03eccb5b6a1172b4c3652d2a994f",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[19263]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00805",
+      "family": "reference",
+      "name": "protected table",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[379]/reference-mark[1]",
+          "sourceXmlSha256": "d92b6ebfc305564e8c77e9c43b51ddcebea007d1fce3291c2fb448051ca14a6e",
+          "sourceBlockId": "ODF-1.1/spec/B05707",
+          "sourceBlockSha256": "b0ed263373361b8ec0ea4f86a4a6970a2e44fb0a83bb60f4dde908bca272683e",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[379]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "protected table"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[20597]/reference-ref[1]",
+      "sourceXmlSha256": "db6289051efb8ec6a8292a0557c81c643acd73dff433957a59dc24b667d1497c",
+      "sourceBlockId": "ODF-1.1/spec/B24931",
+      "sourceBlockSha256": "373087a00ee4b4931ff032431a13d2388abf8d9f5897f62e4e901531763829b1",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[20597]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00836",
+      "family": "reference",
+      "name": "Text Anchor",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[731]/reference-mark[1]",
+          "sourceXmlSha256": "37041004ca4ee3999e6baba907746f97b6226ea22289d060c6e30a774374da72",
+          "sourceBlockId": "ODF-1.1/spec/B10479",
+          "sourceBlockSha256": "c3574f668ddb9d4ec0256ce2c0ea961659403c5486827f5c1f7347534290d488",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[731]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Text Anchor"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[21504]/reference-ref[1]",
+      "sourceXmlSha256": "850ea4ade6e1e3aecf8f5e69b38e14d9664c39abb1ef5740998386597b77cf59",
+      "sourceBlockId": "ODF-1.1/spec/B25978",
+      "sourceBlockSha256": "614034ed6196a0d0445b292563b2d1d11362434a2356a3fbce5cb67a9a17044e",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[21504]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00866",
+      "family": "reference",
+      "name": "Presentation Class",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[877]/reference-mark-start[1]",
+          "sourceXmlSha256": "39ad3f828179e1c9882b5f2d094ac73962c46d0044f1129ffc5f65853a396582",
+          "sourceBlockId": "ODF-1.1/spec/B12574",
+          "sourceBlockSha256": "4f3a9bd003974a5ed8c9ad65d4aeda3b8a0db6fd903e36e83a3a950624b09bbd",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[877]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Presentation Class"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[21512]/reference-ref[1]",
+      "sourceXmlSha256": "850ea4ade6e1e3aecf8f5e69b38e14d9664c39abb1ef5740998386597b77cf59",
+      "sourceBlockId": "ODF-1.1/spec/B25987",
+      "sourceBlockSha256": "b8caa66ca8716b85feaf7090f5792f330da8111c5288a4bb073153911e2ac898",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[21512]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00867",
+      "family": "reference",
+      "name": "Presentation Class",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[877]/reference-mark-start[1]",
+          "sourceXmlSha256": "39ad3f828179e1c9882b5f2d094ac73962c46d0044f1129ffc5f65853a396582",
+          "sourceBlockId": "ODF-1.1/spec/B12574",
+          "sourceBlockSha256": "4f3a9bd003974a5ed8c9ad65d4aeda3b8a0db6fd903e36e83a3a950624b09bbd",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[877]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Presentation Class"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[21520]/reference-ref[1]",
+      "sourceXmlSha256": "850ea4ade6e1e3aecf8f5e69b38e14d9664c39abb1ef5740998386597b77cf59",
+      "sourceBlockId": "ODF-1.1/spec/B25996",
+      "sourceBlockSha256": "0320f486923da4aa1ea6e18ab31e8de8cf5a56615b4d9894d291a6a77594ca88",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[21520]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00868",
+      "family": "reference",
+      "name": "Presentation Class",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[877]/reference-mark-start[1]",
+          "sourceXmlSha256": "39ad3f828179e1c9882b5f2d094ac73962c46d0044f1129ffc5f65853a396582",
+          "sourceBlockId": "ODF-1.1/spec/B12574",
+          "sourceBlockSha256": "4f3a9bd003974a5ed8c9ad65d4aeda3b8a0db6fd903e36e83a3a950624b09bbd",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[877]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Presentation Class"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[21528]/reference-ref[1]",
+      "sourceXmlSha256": "850ea4ade6e1e3aecf8f5e69b38e14d9664c39abb1ef5740998386597b77cf59",
+      "sourceBlockId": "ODF-1.1/spec/B26005",
+      "sourceBlockSha256": "889ca9008280e3fe6aa1d66703a22e5f3b9fef00b90898acde88cbb8b82037ad",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[21528]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00869",
+      "family": "reference",
+      "name": "Presentation Class",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[877]/reference-mark-start[1]",
+          "sourceXmlSha256": "39ad3f828179e1c9882b5f2d094ac73962c46d0044f1129ffc5f65853a396582",
+          "sourceBlockId": "ODF-1.1/spec/B12574",
+          "sourceBlockSha256": "4f3a9bd003974a5ed8c9ad65d4aeda3b8a0db6fd903e36e83a3a950624b09bbd",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[877]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Presentation Class"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/table[34]/table-row[15]/table-cell[3]/p[1]/reference-ref[1]",
+      "sourceXmlSha256": "06e61999d4556135764c01e06a4848ae29603583066fe92231d386df9c9163ec",
+      "sourceBlockId": "ODF-1.1/spec/B26698",
+      "sourceBlockSha256": "ba19890912c7d73eaefdd9caafe04e4897c8e44cce9cce7e2cf1359023b69092",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/table[34]/table-row[15]/table-cell[3]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00876",
+      "family": "reference",
+      "name": "Global text Document",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[21]/reference-mark[1]",
+          "sourceXmlSha256": "3f7461d25a95a4faa6f37eeebc515d6c85120190e5c2368d3f8cdbb68e670096",
+          "sourceBlockId": "ODF-1.1/spec/B00482",
+          "sourceBlockSha256": "f438d5b1de09f712b1f5f2d33f0802248bb0a0ddbf33feb831403567e690ef0e",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[21]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Global text Document"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[22024]/reference-ref[1]",
+      "sourceXmlSha256": "ca2e7e6943f3a8fe6db8c48500b2c5fce617cc9fab0ca747feb6bc4e6af6d5d1",
+      "sourceBlockId": "ODF-1.1/spec/B27246",
+      "sourceBlockSha256": "653d5d8197825a442cb79fa0eb4d1b334332fc083c384d05c85289ed5eb94b20",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[22024]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00877",
+      "family": "reference",
+      "name": "Alternative Text Element",
+      "format": "chapter",
+      "cachedText": "9.2.20",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[740]/reference-mark[1]",
+          "sourceXmlSha256": "087115955f284928fa55076175323e6546443e9c1dadea1b910f459f9c8aa120",
+          "sourceBlockId": "ODF-1.1/spec/B10619",
+          "sourceBlockSha256": "14b489ec448b11dd1374987eeac0cbae65659b6480c0d4b2fd706e403bdb96cf",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[740]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Alternative Text Element"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[22024]/reference-ref[2]",
+      "sourceXmlSha256": "8d8f129ef3d44a92097e968702addb0a950c59ebf9d982accaf41ff26bf2b569",
+      "sourceBlockId": "ODF-1.1/spec/B27246",
+      "sourceBlockSha256": "653d5d8197825a442cb79fa0eb4d1b334332fc083c384d05c85289ed5eb94b20",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[22024]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00878",
+      "family": "reference",
+      "name": "Caption ID",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[718]/reference-mark-start[1]",
+          "sourceXmlSha256": "db4b00789503eb3f1bd3010fece664b7a8b6aba38805a7cf479d6ef6c0f3629d",
+          "sourceBlockId": "ODF-1.1/spec/B10309",
+          "sourceBlockSha256": "c8e6fb8f366ac937e1f2056932d1db25d30dfa2f25f93acc722802f21187cd7c",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[718]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Caption ID"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[22024]/reference-ref[3]",
+      "sourceXmlSha256": "710b1d7f7bcdfbbc850cd4959a6f4bc926d3047c6c4414ceba8625fd3b5384fc",
+      "sourceBlockId": "ODF-1.1/spec/B27246",
+      "sourceBlockSha256": "653d5d8197825a442cb79fa0eb4d1b334332fc083c384d05c85289ed5eb94b20",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[22024]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00879",
+      "family": "reference",
+      "name": "Caption ID",
+      "format": "text",
+      "cachedText": "Caption-ID",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[718]/reference-mark-start[1]",
+          "sourceXmlSha256": "db4b00789503eb3f1bd3010fece664b7a8b6aba38805a7cf479d6ef6c0f3629d",
+          "sourceBlockId": "ODF-1.1/spec/B10309",
+          "sourceBlockSha256": "c8e6fb8f366ac937e1f2056932d1db25d30dfa2f25f93acc722802f21187cd7c",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[718]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Caption ID"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[490]/list-item[5]/p[1]/reference-ref[1]",
+      "sourceXmlSha256": "43f7f46c6841015ab2ffe84668c4276bc509560d9a6c6475dd1aaa884867a3bc",
+      "sourceBlockId": "ODF-1.1/spec/B27337",
+      "sourceBlockSha256": "eb77be8038ae21e176763e9b79c58e1f5e271279c8d0253dd026c5664e1deacf",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[490]/list-item[5]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00907",
+      "family": "reference",
+      "name": "Events section",
+      "format": "chapter",
+      "cachedText": "11.6",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[1121]/reference-mark-start[1]",
+          "sourceXmlSha256": "c8bca4775abefd1a82b6204c4b83523ee7e4820dde97b0bdd8caff08b248ef31",
+          "sourceBlockId": "ODF-1.1/spec/B15916",
+          "sourceBlockSha256": "e4c6c453eb87977c7fae652b199d08a89022014f58aafd4c5086df6ed7beeaca",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[1121]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Events section"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[490]/list-item[5]/p[1]/reference-ref[2]",
+      "sourceXmlSha256": "a7b07dc0cdbab273a01b72a7ba35c922e11fa888fff599bdcbd82d79b5a9872f",
+      "sourceBlockId": "ODF-1.1/spec/B27337",
+      "sourceBlockSha256": "eb77be8038ae21e176763e9b79c58e1f5e271279c8d0253dd026c5664e1deacf",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[490]/list-item[5]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00908",
+      "family": "reference",
+      "name": "Event Name",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[1146]/reference-mark[1]",
+          "sourceXmlSha256": "3e281421768fa47487c2168ffb691129fbdce1bfb75d0dffa84ba8aacdb6d0d2",
+          "sourceBlockId": "ODF-1.1/spec/B16308",
+          "sourceBlockSha256": "61d517c594dafab0c3c08aca777ea2324f3ed6f84bef984719b0384627d413dd",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[1146]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Event Name"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[1]/p[1]/reference-ref[1]",
+      "sourceXmlSha256": "469e92c2f2f6e4110f1a457c23476190c7284ac597e495185de09f1debb213ee",
+      "sourceBlockId": "ODF-1.1/spec/B27341",
+      "sourceBlockSha256": "7ded1355fd41615c1d85909593d6cc166990f918663cb36188efa4fd889206db",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[1]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00910",
+      "family": "reference",
+      "name": "Null Date",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[463]/reference-mark-start[1]",
+          "sourceXmlSha256": "e1d2978fa4196254648d14aa77e25a679e3b4c60d7dfbf1f60887a86e6a559b9",
+          "sourceBlockId": "ODF-1.1/spec/B06809",
+          "sourceBlockSha256": "ca36485025a3ca6e8983e57d921a414b437594e2490d5a8bccb84413c8a351b9",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[463]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Null Date"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[1]/p[1]/reference-ref[2]",
+      "sourceXmlSha256": "7f45cc050a6d4d563b87adc3ddef12c68b1d6fa456335dfbaa2cb4faca1017ac",
+      "sourceBlockId": "ODF-1.1/spec/B27341",
+      "sourceBlockSha256": "7ded1355fd41615c1d85909593d6cc166990f918663cb36188efa4fd889206db",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[1]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00911",
+      "family": "reference",
+      "name": "Null Date",
+      "format": "text",
+      "cachedText": "Null Date",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[463]/reference-mark-start[1]",
+          "sourceXmlSha256": "e1d2978fa4196254648d14aa77e25a679e3b4c60d7dfbf1f60887a86e6a559b9",
+          "sourceBlockId": "ODF-1.1/spec/B06809",
+          "sourceBlockSha256": "ca36485025a3ca6e8983e57d921a414b437594e2490d5a8bccb84413c8a351b9",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[463]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Null Date"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[2]/p[1]/reference-ref[1]",
+      "sourceXmlSha256": "e1ed086b7cc57ee4fcf69ba43f5757d99c34867bd7ceb658a073450f1ff15f68",
+      "sourceBlockId": "ODF-1.1/spec/B27342",
+      "sourceBlockSha256": "da1080ebd5884c0cbb4b8c3a5d292154658d877e25fd615e63d70f52d8ca335f",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[2]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00912",
+      "family": "reference",
+      "name": "Glue Point Align",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[738]/reference-mark-start[1]",
+          "sourceXmlSha256": "d013371c3207031123e68e2ac3ecaf51dc742699cb745904f03cc307d52e0ce7",
+          "sourceBlockId": "ODF-1.1/spec/B10586",
+          "sourceBlockSha256": "b1b1b4e5e8d796ce71667cf34f0aa7c824da30757b3ebd41c6aeb0645701d669",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[738]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Glue Point Align"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[2]/p[1]/reference-ref[2]",
+      "sourceXmlSha256": "ae056e6f2d291ed3941e013b6fe3c232541b75933a2186c04c7bf778542f2d77",
+      "sourceBlockId": "ODF-1.1/spec/B27342",
+      "sourceBlockSha256": "da1080ebd5884c0cbb4b8c3a5d292154658d877e25fd615e63d70f52d8ca335f",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[2]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00913",
+      "family": "reference",
+      "name": "Glue Point Align",
+      "format": "text",
+      "cachedText": "Align",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[738]/reference-mark-start[1]",
+          "sourceXmlSha256": "d013371c3207031123e68e2ac3ecaf51dc742699cb745904f03cc307d52e0ce7",
+          "sourceBlockId": "ODF-1.1/spec/B10586",
+          "sourceBlockSha256": "b1b1b4e5e8d796ce71667cf34f0aa7c824da30757b3ebd41c6aeb0645701d669",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[738]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Glue Point Align"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[4]/p[1]/reference-ref[1]",
+      "sourceXmlSha256": "c251054fbd6dc6599c0034b727ef0ec98c8dc400d4d71bc60d3979f0c525a966",
+      "sourceBlockId": "ODF-1.1/spec/B27344",
+      "sourceBlockSha256": "ca85729f9eff5b91a5c09471f12623163ec1480b067b4d9d2a6204e9f58cbdca",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[4]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00915",
+      "family": "reference",
+      "name": "Repeating Animation Elements",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[1202]/reference-mark-start[1]",
+          "sourceXmlSha256": "8f3112dc9dd56c830004bc431a89dfa951db85c4af4f64b2dfda4e028a6fac71",
+          "sourceBlockId": "ODF-1.1/spec/B16915",
+          "sourceBlockSha256": "913e9a5ffc047d7b3a33edd6c0936c535f7033685b3932bd7221514618092783",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[1202]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Repeating Animation Elements"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[4]/p[1]/reference-ref[2]",
+      "sourceXmlSha256": "aeec1001ad8a0d70cc4f4193c36e0add2ba95a2615c6b1068c65206bc7bfbc3b",
+      "sourceBlockId": "ODF-1.1/spec/B27344",
+      "sourceBlockSha256": "ca85729f9eff5b91a5c09471f12623163ec1480b067b4d9d2a6204e9f58cbdca",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[4]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00916",
+      "family": "reference",
+      "name": "Repeating Animation Elements",
+      "format": "text",
+      "cachedText": "Repeating Elements",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[1202]/reference-mark-start[1]",
+          "sourceXmlSha256": "8f3112dc9dd56c830004bc431a89dfa951db85c4af4f64b2dfda4e028a6fac71",
+          "sourceBlockId": "ODF-1.1/spec/B16915",
+          "sourceBlockSha256": "913e9a5ffc047d7b3a33edd6c0936c535f7033685b3932bd7221514618092783",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[1202]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Repeating Animation Elements"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[7]/p[1]/reference-ref[1]",
+      "sourceXmlSha256": "6cd108c6166780c382f6d329b401c6c4c62c8bdb10a2d745a2c9586c430d57de",
+      "sourceBlockId": "ODF-1.1/spec/B27347",
+      "sourceBlockSha256": "7a3b8d000df78f588213e34ad5fc64b1e5bae9298019fff645106f790205b35c",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[7]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00919",
+      "family": "reference",
+      "name": "Iterative Animation Target Element",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[1213]/reference-mark-start[1]",
+          "sourceXmlSha256": "4f695e04d82edd6bc20220545f3db0f3f81936a51c5e2a7cf60d6b039a1a2cd3",
+          "sourceBlockId": "ODF-1.1/spec/B17069",
+          "sourceBlockSha256": "4ac40e4d29caafba86fea51a79f7d16402a514e5df02adbfbbf9fd62fc9480c6",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[1213]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Iterative Animation Target Element"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[7]/p[1]/reference-ref[2]",
+      "sourceXmlSha256": "e12cf1aaa2871911b381e8380fb540dc3aefc967b38ff2ae01a2326092fefe25",
+      "sourceBlockId": "ODF-1.1/spec/B27347",
+      "sourceBlockSha256": "7a3b8d000df78f588213e34ad5fc64b1e5bae9298019fff645106f790205b35c",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[7]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00920",
+      "family": "reference",
+      "name": "Iterative Animation Target Element",
+      "format": "text",
+      "cachedText": "The Target Element",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[1213]/reference-mark-start[1]",
+          "sourceXmlSha256": "4f695e04d82edd6bc20220545f3db0f3f81936a51c5e2a7cf60d6b039a1a2cd3",
+          "sourceBlockId": "ODF-1.1/spec/B17069",
+          "sourceBlockSha256": "4ac40e4d29caafba86fea51a79f7d16402a514e5df02adbfbbf9fd62fc9480c6",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[1213]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Iterative Animation Target Element"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[11]/p[1]/reference-ref[1]",
+      "sourceXmlSha256": "e7f6da46b0f5a6aceb5e60f2f5766b31e4618bf508f2f7edec90100adc854e51",
+      "sourceBlockId": "ODF-1.1/spec/B27351",
+      "sourceBlockSha256": "705e36d866ba0c6f8fc184a4bf987644cc543d78836b7756edd4c0f4c22a73fa",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[11]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00923",
+      "family": "reference",
+      "name": "Line Number Config Position",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[1334]/reference-mark-start[1]",
+          "sourceXmlSha256": "4138f71444cb8373bf41aabef17cd004601fca80970b46787f5a2f91eeae0c27",
+          "sourceBlockId": "ODF-1.1/spec/B19119",
+          "sourceBlockSha256": "6d031af10da7a25e554bb21247f28f0e6cef77f1471175199e7fcc571964dc3d",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[1334]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Line Number Config Position"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[11]/p[1]/reference-ref[2]",
+      "sourceXmlSha256": "c7ef7d57933cf58421a37b788416668218f12690d1a867e4c88d2a4d856da98e",
+      "sourceBlockId": "ODF-1.1/spec/B27351",
+      "sourceBlockSha256": "705e36d866ba0c6f8fc184a4bf987644cc543d78836b7756edd4c0f4c22a73fa",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[490]/list-item[8]/list[1]/list-item[11]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00924",
+      "family": "reference",
+      "name": "Line Number Config Position",
+      "format": "text",
+      "cachedText": "Position ",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[1334]/reference-mark-start[1]",
+          "sourceXmlSha256": "4138f71444cb8373bf41aabef17cd004601fca80970b46787f5a2f91eeae0c27",
+          "sourceBlockId": "ODF-1.1/spec/B19119",
+          "sourceBlockSha256": "6d031af10da7a25e554bb21247f28f0e6cef77f1471175199e7fcc571964dc3d",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[1334]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Line Number Config Position"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[490]/list-item[18]/p[1]/reference-ref[1]",
+      "sourceXmlSha256": "3d8d134ef1924d38cffb07241a5071d10c06e6465346311dd0ba90dd1c7c26b2",
+      "sourceBlockId": "ODF-1.1/spec/B27369",
+      "sourceBlockSha256": "0c4f5a277def4616d6caf76a51aea727fbeb95b99b85433cf557396151bc385d",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[490]/list-item[18]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00943",
+      "family": "reference",
+      "name": "Row Default Cell Style",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[386]/reference-mark-start[1]",
+          "sourceXmlSha256": "b8c7b91b6708725d232fa175b2be6d01cefab4e9da2af2c031ba9e399e3e2436",
+          "sourceBlockId": "ODF-1.1/spec/B05776",
+          "sourceBlockSha256": "71197b7644ddc3d423bc28cb919843729cc35f5bb8a083b616247fee7ad56545",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[386]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Row Default Cell Style"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[490]/list-item[18]/p[1]/reference-ref[2]",
+      "sourceXmlSha256": "becc7b1b63face4848530f2d9a06b0340576adeb1f22c9093d1a08fd30765f81",
+      "sourceBlockId": "ODF-1.1/spec/B27369",
+      "sourceBlockSha256": "0c4f5a277def4616d6caf76a51aea727fbeb95b99b85433cf557396151bc385d",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[490]/list-item[18]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00944",
+      "family": "reference",
+      "name": "Row Default Cell Style",
+      "format": "text",
+      "cachedText": "Default Cell Style",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[386]/reference-mark-start[1]",
+          "sourceXmlSha256": "b8c7b91b6708725d232fa175b2be6d01cefab4e9da2af2c031ba9e399e3e2436",
+          "sourceBlockId": "ODF-1.1/spec/B05776",
+          "sourceBlockSha256": "71197b7644ddc3d423bc28cb919843729cc35f5bb8a083b616247fee7ad56545",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[386]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Row Default Cell Style"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[490]/list-item[18]/p[1]/reference-ref[3]",
+      "sourceXmlSha256": "13552e27b0a263fb05fb0f79cda20ec0e2db4b9d27b7fa89e79c4d3702aed497",
+      "sourceBlockId": "ODF-1.1/spec/B27369",
+      "sourceBlockSha256": "0c4f5a277def4616d6caf76a51aea727fbeb95b99b85433cf557396151bc385d",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[490]/list-item[18]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00945",
+      "family": "reference",
+      "name": "Column Default Cell Style",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[408]/reference-mark-start[1]",
+          "sourceXmlSha256": "1f490ff16b74d2475ce36123482b1375add4ca205f7c7db4fb23663424f17aa2",
+          "sourceBlockId": "ODF-1.1/spec/B06040",
+          "sourceBlockSha256": "71197b7644ddc3d423bc28cb919843729cc35f5bb8a083b616247fee7ad56545",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[408]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Column Default Cell Style"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[490]/list-item[18]/p[1]/reference-ref[4]",
+      "sourceXmlSha256": "fe4b60802af03fb1f8dbc317671ec2ca794905d8a1db297be424ebe4dc8b3e04",
+      "sourceBlockId": "ODF-1.1/spec/B27369",
+      "sourceBlockSha256": "0c4f5a277def4616d6caf76a51aea727fbeb95b99b85433cf557396151bc385d",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[490]/list-item[18]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.1/spec/R00946",
+      "family": "reference",
+      "name": "Column Default Cell Style",
+      "format": "text",
+      "cachedText": "Default Cell Style",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[408]/reference-mark-start[1]",
+          "sourceXmlSha256": "1f490ff16b74d2475ce36123482b1375add4ca205f7c7db4fb23663424f17aa2",
+          "sourceBlockId": "ODF-1.1/spec/B06040",
+          "sourceBlockSha256": "71197b7644ddc3d423bc28cb919843729cc35f5bb8a083b616247fee7ad56545",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[408]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Column Default Cell Style"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[196]/list-item[3]/p[1]/reference-ref[1]",
+      "sourceXmlSha256": "d7f2890cfcdaa97b95bc48a795fb69f6d405b583701131c91418e7402bc734c0",
+      "sourceBlockId": "ODF-1.2/schema/B07103",
+      "sourceBlockSha256": "a4821a6c42ad4a26f69c4e1970fab95eee5ebe4a8e197628d1fd50fdec4d748d",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[196]/list-item[3]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.2/schema/R09685",
+      "family": "reference",
+      "name": "data-aware",
+      "format": "text",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[594]/reference-mark[1]",
+          "sourceXmlSha256": "e5aa966cc174d8f644d37db4588ed40118bd44f7bb962f17834a6e26b3ae6467",
+          "sourceBlockId": "ODF-1.2/schema/B03232",
+          "sourceBlockSha256": "c910d474dcd724bff83ddedeb06bf1eceaf9fb3af7c76bb282be057f36e6dffa",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[594]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "data-aware"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[196]/list-item[3]/p[1]/reference-ref[2]",
+      "sourceXmlSha256": "d7f2890cfcdaa97b95bc48a795fb69f6d405b583701131c91418e7402bc734c0",
+      "sourceBlockId": "ODF-1.2/schema/B07103",
+      "sourceBlockSha256": "a4821a6c42ad4a26f69c4e1970fab95eee5ebe4a8e197628d1fd50fdec4d748d",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[196]/list-item[3]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.2/schema/R09686",
+      "family": "reference",
+      "name": "data-aware",
+      "format": "text",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[594]/reference-mark[1]",
+          "sourceXmlSha256": "e5aa966cc174d8f644d37db4588ed40118bd44f7bb962f17834a6e26b3ae6467",
+          "sourceBlockId": "ODF-1.2/schema/B03232",
+          "sourceBlockSha256": "c910d474dcd724bff83ddedeb06bf1eceaf9fb3af7c76bb282be057f36e6dffa",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[594]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "data-aware"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[196]/list-item[3]/p[1]/reference-ref[3]",
+      "sourceXmlSha256": "7324b15580364eb46acfc000d3da2b28be2ef8d429f9ed158748b8e5c822686a",
+      "sourceBlockId": "ODF-1.2/schema/B07103",
+      "sourceBlockSha256": "a4821a6c42ad4a26f69c4e1970fab95eee5ebe4a8e197628d1fd50fdec4d748d",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[196]/list-item[3]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.2/schema/R09687",
+      "family": "reference",
+      "name": "data-aware",
+      "format": "chapter",
+      "cachedText": "13.1",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[594]/reference-mark[1]",
+          "sourceXmlSha256": "e5aa966cc174d8f644d37db4588ed40118bd44f7bb962f17834a6e26b3ae6467",
+          "sourceBlockId": "ODF-1.2/schema/B03232",
+          "sourceBlockSha256": "c910d474dcd724bff83ddedeb06bf1eceaf9fb3af7c76bb282be057f36e6dffa",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[594]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "data-aware"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[88]/reference-ref[1]",
+      "sourceXmlSha256": "5ac7264f4b980d9c97e002c13c4d2d8f4e0a68f8d513eb1ffe30b4d522646157",
+      "sourceBlockId": "ODF-1.3/schema/B00096",
+      "sourceBlockSha256": "c6b13ce7854e04c9f1d505421d295074d2af50cc589412d8e3c295bf6c6765a5",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[88]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.3/schema/R00001",
+      "family": "reference",
+      "name": "AdditionalArtifacts",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/p[26]/reference-mark-start[1]",
+          "sourceXmlSha256": "fc618e79d702488fba68a84cd2b513df11821ca0fb4595fef9dff53e417d9695",
+          "sourceBlockId": "ODF-1.3/schema/B00025",
+          "sourceBlockSha256": "48cc881fff1b6a0347cf9ac75eae9e65f044b11dfc4c585c6be69c5ddeec4aa9",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/p[26]",
+          "sourceBlockKind": "paragraph",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "AdditionalArtifacts"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[89]/reference-ref[1]",
+      "sourceXmlSha256": "5ac7264f4b980d9c97e002c13c4d2d8f4e0a68f8d513eb1ffe30b4d522646157",
+      "sourceBlockId": "ODF-1.3/schema/B00097",
+      "sourceBlockSha256": "637c5479a35d3013efb2f6ac3c72f87c5a31a5cc3e7edc275080aba69d9406c7",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[89]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.3/schema/R00002",
+      "family": "reference",
+      "name": "AdditionalArtifacts",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/p[26]/reference-mark-start[1]",
+          "sourceXmlSha256": "fc618e79d702488fba68a84cd2b513df11821ca0fb4595fef9dff53e417d9695",
+          "sourceBlockId": "ODF-1.3/schema/B00025",
+          "sourceBlockSha256": "48cc881fff1b6a0347cf9ac75eae9e65f044b11dfc4c585c6be69c5ddeec4aa9",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/p[26]",
+          "sourceBlockKind": "paragraph",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "AdditionalArtifacts"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[1342]/reference-ref[1]",
+      "sourceXmlSha256": "d4af7304fe147f830f9e7895de85a94cf1535dae705d5f71c6b3075ce11cee47",
+      "sourceBlockId": "ODF-1.3/schema/B01969",
+      "sourceBlockSha256": "7bd3cfd62b35f89b6a0e16e6f391333ffe7134f27affb93a04bc75474cce9427",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[1342]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.3/schema/R03657",
+      "family": "reference",
+      "name": "AccessibilityGuidelines",
+      "format": "text",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/list[680]/list-item[1]/p[1]/reference-mark[1]",
+          "sourceXmlSha256": "b4c2fa7d35e416fd6b40686f7169df43f8ce5546f706470f57d4099a1aa08696",
+          "sourceBlockId": "ODF-1.3/schema/B16137",
+          "sourceBlockSha256": "fb5995e10641cfa21fab56778982a03c2db3c70c2f633e44c20c102cfb08ad02",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/list[680]/list-item[1]/p[1]",
+          "sourceBlockKind": "paragraph",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "AccessibilityGuidelines"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[1342]/reference-ref[2]",
+      "sourceXmlSha256": "d4af7304fe147f830f9e7895de85a94cf1535dae705d5f71c6b3075ce11cee47",
+      "sourceBlockId": "ODF-1.3/schema/B01969",
+      "sourceBlockSha256": "7bd3cfd62b35f89b6a0e16e6f391333ffe7134f27affb93a04bc75474cce9427",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[1342]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.3/schema/R03658",
+      "family": "reference",
+      "name": "AccessibilityGuidelines",
+      "format": "text",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/list[680]/list-item[1]/p[1]/reference-mark[1]",
+          "sourceXmlSha256": "b4c2fa7d35e416fd6b40686f7169df43f8ce5546f706470f57d4099a1aa08696",
+          "sourceBlockId": "ODF-1.3/schema/B16137",
+          "sourceBlockSha256": "fb5995e10641cfa21fab56778982a03c2db3c70c2f633e44c20c102cfb08ad02",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/list[680]/list-item[1]/p[1]",
+          "sourceBlockKind": "paragraph",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "AccessibilityGuidelines"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[1342]/span[5]/reference-ref[1]",
+      "sourceXmlSha256": "b694515df4a042cce8f9e2b13f14273d2c5b245faf8b948ef9890bb4fa3dbd98",
+      "sourceBlockId": "ODF-1.3/schema/B01969",
+      "sourceBlockSha256": "7bd3cfd62b35f89b6a0e16e6f391333ffe7134f27affb93a04bc75474cce9427",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[1342]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.3/schema/R03659",
+      "family": "reference",
+      "name": "element-draw:frame",
+      "format": "chapter",
+      "cachedText": "10.4.2",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[459]/reference-mark-start[1]",
+          "sourceXmlSha256": "35e83f3d905faa2257f9b20e7abfdd450a91e4eaed0a6678c9e682ca5b808c12",
+          "sourceBlockId": "ODF-1.3/schema/B02574",
+          "sourceBlockSha256": "72650a8723e3c9b12ccedc589aa9af26951b15b5a9bdb92f02f5da5d803e37f1",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[459]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "element-draw:frame"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[1342]/reference-ref[3]",
+      "sourceXmlSha256": "bd5e84e7fbe55193b49da2324e35c9f7a7606b46ac948e2214dceca3219fddf8",
+      "sourceBlockId": "ODF-1.3/schema/B01969",
+      "sourceBlockSha256": "7bd3cfd62b35f89b6a0e16e6f391333ffe7134f27affb93a04bc75474cce9427",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[1342]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.3/schema/R03660",
+      "family": "reference",
+      "name": "element-svg:desc",
+      "format": "chapter",
+      "cachedText": "10.3.18",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[455]/reference-mark-start[1]",
+          "sourceXmlSha256": "dfe1174c31c182475cb0d473682559c5ab7746666b0a85f2baf15981c39404e7",
+          "sourceBlockId": "ODF-1.3/schema/B02557",
+          "sourceBlockSha256": "b088d11ee44dae829f029110dda849f482fde7ee676b0628616c5b5e846d23b8",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[455]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "element-svg:desc"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[200]/list-item[3]/p[1]/reference-ref[1]",
+      "sourceXmlSha256": "d7f2890cfcdaa97b95bc48a795fb69f6d405b583701131c91418e7402bc734c0",
+      "sourceBlockId": "ODF-1.3/schema/B07178",
+      "sourceBlockSha256": "a4821a6c42ad4a26f69c4e1970fab95eee5ebe4a8e197628d1fd50fdec4d748d",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[200]/list-item[3]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.3/schema/R10443",
+      "family": "reference",
+      "name": "data-aware",
+      "format": "text",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[598]/reference-mark[1]",
+          "sourceXmlSha256": "e5aa966cc174d8f644d37db4588ed40118bd44f7bb962f17834a6e26b3ae6467",
+          "sourceBlockId": "ODF-1.3/schema/B03284",
+          "sourceBlockSha256": "c910d474dcd724bff83ddedeb06bf1eceaf9fb3af7c76bb282be057f36e6dffa",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[598]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "data-aware"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[200]/list-item[3]/p[1]/reference-ref[2]",
+      "sourceXmlSha256": "d7f2890cfcdaa97b95bc48a795fb69f6d405b583701131c91418e7402bc734c0",
+      "sourceBlockId": "ODF-1.3/schema/B07178",
+      "sourceBlockSha256": "a4821a6c42ad4a26f69c4e1970fab95eee5ebe4a8e197628d1fd50fdec4d748d",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[200]/list-item[3]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.3/schema/R10444",
+      "family": "reference",
+      "name": "data-aware",
+      "format": "text",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[598]/reference-mark[1]",
+          "sourceXmlSha256": "e5aa966cc174d8f644d37db4588ed40118bd44f7bb962f17834a6e26b3ae6467",
+          "sourceBlockId": "ODF-1.3/schema/B03284",
+          "sourceBlockSha256": "c910d474dcd724bff83ddedeb06bf1eceaf9fb3af7c76bb282be057f36e6dffa",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[598]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "data-aware"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[200]/list-item[3]/p[1]/reference-ref[3]",
+      "sourceXmlSha256": "7324b15580364eb46acfc000d3da2b28be2ef8d429f9ed158748b8e5c822686a",
+      "sourceBlockId": "ODF-1.3/schema/B07178",
+      "sourceBlockSha256": "a4821a6c42ad4a26f69c4e1970fab95eee5ebe4a8e197628d1fd50fdec4d748d",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[200]/list-item[3]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.3/schema/R10445",
+      "family": "reference",
+      "name": "data-aware",
+      "format": "chapter",
+      "cachedText": "13.1",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[598]/reference-mark[1]",
+          "sourceXmlSha256": "e5aa966cc174d8f644d37db4588ed40118bd44f7bb962f17834a6e26b3ae6467",
+          "sourceBlockId": "ODF-1.3/schema/B03284",
+          "sourceBlockSha256": "c910d474dcd724bff83ddedeb06bf1eceaf9fb3af7c76bb282be057f36e6dffa",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[598]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "data-aware"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[127]/reference-ref[1]",
+      "sourceXmlSha256": "1c3f992ad36851f30a5af9299abb61d925ed9408c84ddaa3f47029de88d349b9",
+      "sourceBlockId": "ODF-1.3/formula/B00260",
+      "sourceBlockSha256": "965c5b3ec5148ffea8e79bdf0ba209da1e2743f2c5cc0b8bfc61da1e2d1c1bfe",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[127]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.3/formula/R00475",
+      "family": "reference",
+      "name": "LogicalBoolean",
+      "format": "text",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[39]/reference-mark[1]",
+          "sourceXmlSha256": "841ee829386e5014d743f4d6037b6f79286a4a6ccb6a3b842c9e0789ce6b9556",
+          "sourceBlockId": "ODF-1.3/formula/B00268",
+          "sourceBlockSha256": "e52fd560d8ff25cb0318bbdc415a52495951c812301bf531abc0754865ce27d9",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[39]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "LogicalBoolean"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[127]/reference-ref[2]",
+      "sourceXmlSha256": "900e711a164dfb10ae418149d52d43af51de0737d202df87c1d11f464b8dce0d",
+      "sourceBlockId": "ODF-1.3/formula/B00260",
+      "sourceBlockSha256": "965c5b3ec5148ffea8e79bdf0ba209da1e2743f2c5cc0b8bfc61da1e2d1c1bfe",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[127]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.3/formula/R00476",
+      "family": "reference",
+      "name": "LogicalBoolean",
+      "format": "chapter",
+      "cachedText": "4.5",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[39]/reference-mark[1]",
+          "sourceXmlSha256": "841ee829386e5014d743f4d6037b6f79286a4a6ccb6a3b842c9e0789ce6b9556",
+          "sourceBlockId": "ODF-1.3/formula/B00268",
+          "sourceBlockSha256": "e52fd560d8ff25cb0318bbdc415a52495951c812301bf531abc0754865ce27d9",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[39]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "LogicalBoolean"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[127]/reference-ref[3]",
+      "sourceXmlSha256": "7b24832ab92e6ed0d5063b5d42ece9a58bb3d170f33f2423fbb3d420b4a95c8e",
+      "sourceBlockId": "ODF-1.3/formula/B00260",
+      "sourceBlockSha256": "965c5b3ec5148ffea8e79bdf0ba209da1e2743f2c5cc0b8bfc61da1e2d1c1bfe",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[127]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.3/formula/R00477",
+      "family": "reference",
+      "name": "Distinct_Logical",
+      "format": "chapter",
+      "cachedText": "8.2",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[558]/reference-mark-start[1]",
+          "sourceXmlSha256": "89af310ba1e8a52c30d1fa7d63d00119a8343470976bb433ff99743626f0156a",
+          "sourceBlockId": "ODF-1.3/formula/B05680",
+          "sourceBlockSha256": "1c5a0a1f32e5b3864794ef9bae47b6efc1d88adbb7bf70751dd596e8e0ec9696",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[558]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "Distinct_Logical"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[90]/reference-ref[1]",
+      "sourceXmlSha256": "5ac7264f4b980d9c97e002c13c4d2d8f4e0a68f8d513eb1ffe30b4d522646157",
+      "sourceBlockId": "ODF-1.4/schema/B00098",
+      "sourceBlockSha256": "de953498291226cfff7c0dfd95efa00a942d150e44c8741b45a65dba21275a4a",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[90]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.4/schema/R00001",
+      "family": "reference",
+      "name": "AdditionalArtifacts",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/p[26]/reference-mark-start[1]",
+          "sourceXmlSha256": "fc618e79d702488fba68a84cd2b513df11821ca0fb4595fef9dff53e417d9695",
+          "sourceBlockId": "ODF-1.4/schema/B00025",
+          "sourceBlockSha256": "48cc881fff1b6a0347cf9ac75eae9e65f044b11dfc4c585c6be69c5ddeec4aa9",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/p[26]",
+          "sourceBlockKind": "paragraph",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "AdditionalArtifacts"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[91]/reference-ref[1]",
+      "sourceXmlSha256": "5ac7264f4b980d9c97e002c13c4d2d8f4e0a68f8d513eb1ffe30b4d522646157",
+      "sourceBlockId": "ODF-1.4/schema/B00099",
+      "sourceBlockSha256": "32bb3501ae1296cd9fe5729222271c19e612b7de8e03ed4d1e7e41afbe30a40c",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[91]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.4/schema/R00002",
+      "family": "reference",
+      "name": "AdditionalArtifacts",
+      "format": "chapter",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/p[26]/reference-mark-start[1]",
+          "sourceXmlSha256": "fc618e79d702488fba68a84cd2b513df11821ca0fb4595fef9dff53e417d9695",
+          "sourceBlockId": "ODF-1.4/schema/B00025",
+          "sourceBlockSha256": "48cc881fff1b6a0347cf9ac75eae9e65f044b11dfc4c585c6be69c5ddeec4aa9",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/p[26]",
+          "sourceBlockKind": "paragraph",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "AdditionalArtifacts"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[1346]/reference-ref[1]",
+      "sourceXmlSha256": "d4af7304fe147f830f9e7895de85a94cf1535dae705d5f71c6b3075ce11cee47",
+      "sourceBlockId": "ODF-1.4/schema/B01973",
+      "sourceBlockSha256": "7bd3cfd62b35f89b6a0e16e6f391333ffe7134f27affb93a04bc75474cce9427",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[1346]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.4/schema/R03672",
+      "family": "reference",
+      "name": "AccessibilityGuidelines",
+      "format": "text",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/list[694]/list-item[1]/p[1]/reference-mark[1]",
+          "sourceXmlSha256": "b4c2fa7d35e416fd6b40686f7169df43f8ce5546f706470f57d4099a1aa08696",
+          "sourceBlockId": "ODF-1.4/schema/B16472",
+          "sourceBlockSha256": "fb5995e10641cfa21fab56778982a03c2db3c70c2f633e44c20c102cfb08ad02",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/list[694]/list-item[1]/p[1]",
+          "sourceBlockKind": "paragraph",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "AccessibilityGuidelines"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[1346]/reference-ref[2]",
+      "sourceXmlSha256": "d4af7304fe147f830f9e7895de85a94cf1535dae705d5f71c6b3075ce11cee47",
+      "sourceBlockId": "ODF-1.4/schema/B01973",
+      "sourceBlockSha256": "7bd3cfd62b35f89b6a0e16e6f391333ffe7134f27affb93a04bc75474cce9427",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[1346]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.4/schema/R03673",
+      "family": "reference",
+      "name": "AccessibilityGuidelines",
+      "format": "text",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/list[694]/list-item[1]/p[1]/reference-mark[1]",
+          "sourceXmlSha256": "b4c2fa7d35e416fd6b40686f7169df43f8ce5546f706470f57d4099a1aa08696",
+          "sourceBlockId": "ODF-1.4/schema/B16472",
+          "sourceBlockSha256": "fb5995e10641cfa21fab56778982a03c2db3c70c2f633e44c20c102cfb08ad02",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/list[694]/list-item[1]/p[1]",
+          "sourceBlockKind": "paragraph",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "AccessibilityGuidelines"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[1346]/reference-ref[3]",
+      "sourceXmlSha256": "b694515df4a042cce8f9e2b13f14273d2c5b245faf8b948ef9890bb4fa3dbd98",
+      "sourceBlockId": "ODF-1.4/schema/B01973",
+      "sourceBlockSha256": "7bd3cfd62b35f89b6a0e16e6f391333ffe7134f27affb93a04bc75474cce9427",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[1346]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.4/schema/R03674",
+      "family": "reference",
+      "name": "element-draw:frame",
+      "format": "chapter",
+      "cachedText": "10.4.2",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[459]/reference-mark-start[1]",
+          "sourceXmlSha256": "35e83f3d905faa2257f9b20e7abfdd450a91e4eaed0a6678c9e682ca5b808c12",
+          "sourceBlockId": "ODF-1.4/schema/B02596",
+          "sourceBlockSha256": "72650a8723e3c9b12ccedc589aa9af26951b15b5a9bdb92f02f5da5d803e37f1",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[459]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "element-draw:frame"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/p[1346]/reference-ref[4]",
+      "sourceXmlSha256": "bd5e84e7fbe55193b49da2324e35c9f7a7606b46ac948e2214dceca3219fddf8",
+      "sourceBlockId": "ODF-1.4/schema/B01973",
+      "sourceBlockSha256": "7bd3cfd62b35f89b6a0e16e6f391333ffe7134f27affb93a04bc75474cce9427",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/p[1346]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.4/schema/R03675",
+      "family": "reference",
+      "name": "element-svg:desc",
+      "format": "chapter",
+      "cachedText": "10.3.18",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[455]/reference-mark-start[1]",
+          "sourceXmlSha256": "dfe1174c31c182475cb0d473682559c5ab7746666b0a85f2baf15981c39404e7",
+          "sourceBlockId": "ODF-1.4/schema/B02579",
+          "sourceBlockSha256": "b088d11ee44dae829f029110dda849f482fde7ee676b0628616c5b5e846d23b8",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[455]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "element-svg:desc"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[201]/list-item[3]/p[1]/reference-ref[1]",
+      "sourceXmlSha256": "d7f2890cfcdaa97b95bc48a795fb69f6d405b583701131c91418e7402bc734c0",
+      "sourceBlockId": "ODF-1.4/schema/B07307",
+      "sourceBlockSha256": "a4821a6c42ad4a26f69c4e1970fab95eee5ebe4a8e197628d1fd50fdec4d748d",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[201]/list-item[3]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.4/schema/R10583",
+      "family": "reference",
+      "name": "data-aware",
+      "format": "text",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[599]/reference-mark[1]",
+          "sourceXmlSha256": "e5aa966cc174d8f644d37db4588ed40118bd44f7bb962f17834a6e26b3ae6467",
+          "sourceBlockId": "ODF-1.4/schema/B03352",
+          "sourceBlockSha256": "c910d474dcd724bff83ddedeb06bf1eceaf9fb3af7c76bb282be057f36e6dffa",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[599]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "data-aware"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[201]/list-item[3]/p[1]/reference-ref[2]",
+      "sourceXmlSha256": "d7f2890cfcdaa97b95bc48a795fb69f6d405b583701131c91418e7402bc734c0",
+      "sourceBlockId": "ODF-1.4/schema/B07307",
+      "sourceBlockSha256": "a4821a6c42ad4a26f69c4e1970fab95eee5ebe4a8e197628d1fd50fdec4d748d",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[201]/list-item[3]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.4/schema/R10584",
+      "family": "reference",
+      "name": "data-aware",
+      "format": "text",
+      "cachedText": "",
+      "cachedTextEmpty": true,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[599]/reference-mark[1]",
+          "sourceXmlSha256": "e5aa966cc174d8f644d37db4588ed40118bd44f7bb962f17834a6e26b3ae6467",
+          "sourceBlockId": "ODF-1.4/schema/B03352",
+          "sourceBlockSha256": "c910d474dcd724bff83ddedeb06bf1eceaf9fb3af7c76bb282be057f36e6dffa",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[599]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "data-aware"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    },
+    {
+      "locator": "/office:document-content/office:body/office:text/list[201]/list-item[3]/p[1]/reference-ref[3]",
+      "sourceXmlSha256": "7324b15580364eb46acfc000d3da2b28be2ef8d429f9ed158748b8e5c822686a",
+      "sourceBlockId": "ODF-1.4/schema/B07307",
+      "sourceBlockSha256": "a4821a6c42ad4a26f69c4e1970fab95eee5ebe4a8e197628d1fd50fdec4d748d",
+      "sourceBlockLocator": "/office:document-content/office:body/office:text/list[201]/list-item[3]/p[1]",
+      "sourceBlockKind": "paragraph",
+      "editorialReviewRequired": false,
+      "referenceId": "ODF-1.4/schema/R10585",
+      "family": "reference",
+      "name": "data-aware",
+      "format": "chapter",
+      "cachedText": "13.1",
+      "cachedTextEmpty": false,
+      "targets": [
+        {
+          "locator": "/office:document-content/office:body/office:text/h[599]/reference-mark[1]",
+          "sourceXmlSha256": "e5aa966cc174d8f644d37db4588ed40118bd44f7bb962f17834a6e26b3ae6467",
+          "sourceBlockId": "ODF-1.4/schema/B03352",
+          "sourceBlockSha256": "c910d474dcd724bff83ddedeb06bf1eceaf9fb3af7c76bb282be057f36e6dffa",
+          "sourceBlockLocator": "/office:document-content/office:body/office:text/h[599]",
+          "sourceBlockKind": "heading",
+          "editorialReviewRequired": false,
+          "family": "reference",
+          "name": "data-aware"
+        }
+      ],
+      "resolution": "unique-target-addressed"
+    }
+  ]
+}

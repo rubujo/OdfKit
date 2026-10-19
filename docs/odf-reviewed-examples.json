@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "informativeContexts": [
+    {
+      "first": {
+        "id": "ODF-1.1/spec/B17280",
+        "title": "Example: OpenDocument representation of the “Text body” paragraph style",
+        "textSha256": "1f69802e7a878fc9b9c56010eb9405a96531aa056a6d4542a4f4d1b7d9ba705a",
+        "kind": "paragraph"
+      },
+      "afterLast": {
+        "id": "ODF-1.1/spec/B17286",
+        "title": "Style Mappings",
+        "textSha256": "0c679c28f9166e104f024bc557d61446d59f5ab6174d951986bbe1ba1ffa1307",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d",
+      "assessment": "僅明示Example段落及緊接的完整示範XML，不延伸至下一條正文或將示範值當必填。"
+    },
+    {
+      "first": {
+        "id": "ODF-1.1/spec/B16449",
+        "title": "Example: The OpenOffice.org software interprets the DDE topic as the name of the file.",
+        "textSha256": "554f4750184cedb4712a0bcb4597fb6cedb61ecdd641c91871ca44a56e22b2f1",
+        "kind": "paragraph"
+      },
+      "afterLast": {
+        "id": "ODF-1.1/spec/B16450",
+        "title": "Target Item",
+        "textSha256": "b99b7fc4dd3e233362ef0bf1955ceac5e6b7c053254cfdd75f2e17b0c643c444",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d",
+      "assessment": "僅明示Example段落及緊接的完整示範XML，不延伸至下一條正文或將示範值當必填。"
+    }
+  ]
+}

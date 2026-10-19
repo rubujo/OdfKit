@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "sourceSha256": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d",
+  "basis": {
+    "blockId": "ODF-1.1/spec/B00030",
+    "textSha256": "2e948a9829ba2138f2d32f428f95f3e82a3acdbe80fb0c4dc1fd3dc2074c0b0b",
+    "assessment": "本版 abstract 明示 change markings 標示核准勘誤的整合；逐一核對下列來源內紅色刪除線樣式的刪除片段。此規則只適用該固定官方來源，不把一般 ODF 刪除線排版當作編輯刪除。"
+  },
+  "editorialDeletionStyles": [
+    {
+      "family": "paragraph",
+      "name": "P23",
+      "styleSha256": "a45d2530b1218d4a8134955f1af826826b47ffa683678a05babc9ca6f668e483"
+    },
+    {
+      "family": "paragraph",
+      "name": "P35",
+      "styleSha256": "bf70665af414c5e99eb0b37e24f52f370289293b21deada7bad69724f0b682ef"
+    },
+    {
+      "family": "paragraph",
+      "name": "P96",
+      "styleSha256": "33643ded52ac252f0737ce7d3cbbb5b4914ef6c6486613c4e784596ad3ecebbe"
+    },
+    {
+      "family": "paragraph",
+      "name": "P120",
+      "styleSha256": "04d5d77dcc43ec4f95ff122dba96ca35e82c3f3731261570e79ebb5fec4870a5"
+    },
+    {
+      "family": "text",
+      "name": "T99",
+      "styleSha256": "aa8d1345749e7ca322958eb2cfe4aed2b7384f778b528557e45a33c13b63507a"
+    },
+    {
+      "family": "text",
+      "name": "T100",
+      "styleSha256": "90aaefd0406d481ce1a19d1e8a1585242b717d8df43d2421116e51888a765957"
+    },
+    {
+      "family": "text",
+      "name": "T101",
+      "styleSha256": "5ff616a29921f711732192b7a693e2c475dc2e452849fa66cec6f0e2d53106c8"
+    },
+    {
+      "family": "text",
+      "name": "T102",
+      "styleSha256": "a9f2d2b1b62f193dce236909b629b33c085f2a8f8e5611fae733085848c9d138"
+    },
+    {
+      "family": "text",
+      "name": "T103",
+      "styleSha256": "86411585a3f1fddd72171cb1fff69610fdb5ef83b67fd48a79f5a90079ac453a"
+    },
+    {
+      "family": "text",
+      "name": "T104",
+      "styleSha256": "64cfdf627dd29395b9d29704f69c9686d3cb3b8fcc70aee1c994df7fa966ae58"
+    },
+    {
+      "family": "text",
+      "name": "T105",
+      "styleSha256": "424b883ebb52e175e4f163a52b9e2b2768502b62829d6aff7f18da5195f4fa14"
+    },
+    {
+      "family": "text",
+      "name": "T106",
+      "styleSha256": "201ee7ff085163b8a7202a972e15dc2fa4c5a7ba3cbfc72d9876652eef40f635"
+    },
+    {
+      "family": "text",
+      "name": "T107",
+      "styleSha256": "a51dbc1ab28f618b01cc59111fd77bf400bd2d40fd0f67a829a544e12e60ece6"
+    },
+    {
+      "family": "text",
+      "name": "T108",
+      "styleSha256": "d235d94b97109844e367740599101a8187e32552335b4bb90f26c4aa6bbce710"
+    },
+    {
+      "family": "text",
+      "name": "T109",
+      "styleSha256": "a566e055aff15ac776b9de801e978fec243698cf283b73dcc6bb2c6bdd54d4c2"
+    },
+    {
+      "family": "text",
+      "name": "T110",
+      "styleSha256": "36332c145090d282d76ddbc6564ed4a8c127b941318b7d104d6b8ac07925efa5"
+    },
+    {
+      "family": "text",
+      "name": "T111",
+      "styleSha256": "b4e2c4dd178ac55f0f73447012b48a1708cc8a7bbdb2543aa1569ce7094ce7c4"
+    },
+    {
+      "family": "text",
+      "name": "T112",
+      "styleSha256": "c90dcb6c405df991090c9098e4a0cbb95b3828b3aa641451cecd23ef6a80e195"
+    },
+    {
+      "family": "text",
+      "name": "T113",
+      "styleSha256": "b4f2485942a86c31a91ebd3d9be0317876954e84355ed79b0f9a9630557f8284"
+    },
+    {
+      "family": "text",
+      "name": "T114",
+      "styleSha256": "7341a2fd4a4c3a4d8180805f1861d6b8321879457abf1c0a6db9a6f4e81fc49f"
+    },
+    {
+      "family": "text",
+      "name": "T115",
+      "styleSha256": "61da2c1fb33fd221d37df934d91c7a2c2f8f78c97b081e523b3735e57d68efdc"
+    },
+    {
+      "family": "text",
+      "name": "T116",
+      "styleSha256": "8431fb8e0da4adad6ba0f0020378fd714c7999417c16819c43294fce6ef06b28"
+    },
+    {
+      "family": "text",
+      "name": "T117",
+      "styleSha256": "5b5cfad7b9f9203635c898085a072436c9e95257c699600379296d93213f44f7"
+    },
+    {
+      "family": "text",
+      "name": "T118",
+      "styleSha256": "50c835b8fe25e8258e49a2c4d80d0ba25293c13dcbe1533927da0d9572221fb0"
+    },
+    {
+      "family": "text",
+      "name": "T119",
+      "styleSha256": "33c18067f30f8354b2e06f3405ab3749c114e5971174c0e0604c873c7e9983dd"
+    },
+    {
+      "family": "text",
+      "name": "T120",
+      "styleSha256": "6504321eed9a410cfa4b4d050ec2ba18bcc2cf4145acb343c0052b3807d4e276"
+    },
+    {
+      "family": "text",
+      "name": "T121",
+      "styleSha256": "eb59a6af7f9c5084ebeca0583b0f837f2636d088f2ef0445488bc3c42c465bea"
+    },
+    {
+      "family": "text",
+      "name": "T122",
+      "styleSha256": "7cc21309e6a14a6dd5e6dd3969d07059686545686d513d0b797cf47a4314d785"
+    },
+    {
+      "family": "text",
+      "name": "T123",
+      "styleSha256": "2704bdbb913fea121d32271cb7f25f7ad9307b3b513d2b63abf93f28c41b815b"
+    },
+    {
+      "family": "text",
+      "name": "T124",
+      "styleSha256": "03b10f80c9413cb374c2fc2d3e59b9af8ab37886dfda02cd8fa90087b5a09813"
+    },
+    {
+      "family": "text",
+      "name": "T170",
+      "styleSha256": "4e24387cd178d93d83e6adac27591e8c5c0e2b3585b8441a00a8ecf15b397ea5"
+    }
+  ],
+  "ordinaryStrikethroughPolicy": "preserve",
+  "originalInventoryPolicy": "preserve-original-identifiers-and-hashes",
+  "opaqueObjectPolicy": "requires-separate-adjudication"
+}

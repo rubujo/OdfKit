@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "informativeContexts": [
+    {
+      "first": {
+        "id": "ODF-1.1/spec/B02108",
+        "title": "Note: The text:tab-ref attribute is only a hint to help non-layout oriented processors to determine the tab/tab-stop association. Layout oriented processors should determine the tab positions solely based on the style information.",
+        "textSha256": "3ca523ca386daa186125f9dcac08907a17576cb84e24449b3a8ff21ffb1397d2",
+        "kind": "paragraph",
+        "label": "Note:"
+      },
+      "afterLast": {
+        "id": "ODF-1.1/spec/B02109",
+        "title": "Line Breaks",
+        "textSha256": "07896c77549cf61799896e5912dbcd5049cb1d67c7ca4a6dd65cd57d5eea71ad",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d",
+      "assessment": "已核對明示單段Note與下一實際章節界線，只排除此區域的說明/範例值，不延伸至正文、grammar或其他組要求。"
+    },
+    {
+      "first": {
+        "id": "ODF-1.1/spec/B02155",
+        "title": "Example: Text style in OpenDocument documents:",
+        "textSha256": "b967f84c2c7137c331a9ebde8e974a99f8c5d372a5b9842a8885339a27281d93",
+        "kind": "paragraph"
+      },
+      "afterLast": {
+        "id": "ODF-1.1/spec/B02160",
+        "title": "Hyperlinks",
+        "textSha256": "730cff27e545cf8de97fa3ee4090ce3a7ffafa648cc2ca09c6e4b3e5c64f111a",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d",
+      "assessment": "已核對明示範例標記及其完整連續示範內容與下一實際章節界線，只排除此區域的說明/範例值，不延伸至正文、grammar或其他組要求。"
+    },
+    {
+      "first": {
+        "id": "ODF-1.1/spec/B02281",
+        "title": "Example: Bookmarks",
+        "textSha256": "740fa204ba98f86037425945e8e11afe189be46c8e6b7edb76abc45983ff2d11",
+        "kind": "paragraph"
+      },
+      "afterLast": {
+        "id": "ODF-1.1/spec/B02293",
+        "title": "References",
+        "textSha256": "69824d3b0e70ca6aaa0da1613b65fd914c442bf1f7ad1bb22bcdfbdfe1a05e39",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d",
+      "assessment": "已核對明示範例標記及其完整連續示範內容與下一實際章節界線，只排除此區域的說明/範例值，不延伸至正文、grammar或其他組要求。"
+    },
+    {
+      "first": {
+        "id": "ODF-1.1/spec/B02386",
+        "title": "Footnote example",
+        "textSha256": "297924be69d81b910450b09615a2a6eac576cb12492a90b0aff2873a54d1bb08",
+        "kind": "heading"
+      },
+      "afterLast": {
+        "id": "ODF-1.1/spec/B02411",
+        "title": "Ruby",
+        "textSha256": "108040ac289a13952927ac14f658a0b06cf24612c43375801b63f87be11191f7",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d",
+      "assessment": "已核對明示範例標記及其完整連續示範內容與下一實際章節界線，只排除此區域的說明/範例值，不延伸至正文、grammar或其他組要求。"
+    }
+  ]
+}

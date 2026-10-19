@@ -1,0 +1,4412 @@
+{
+  "schemaVersion": 1,
+  "version": "1.1",
+  "part": "spec",
+  "sourceSha256": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d",
+  "projectorSha256": "7b5c7fe1478d9674a356fbd180bab72b8c7d3c565ba4276a254b9caf915ec5d3",
+  "policySha256": "14b0b669ffcfd3bef5b0fbdcf95a4f2ee774e8722ce39c5807df06e80f5f3582",
+  "sourceBlockCount": 27434,
+  "changedBlockCount": 162,
+  "originalSourceIdsPreserved": true,
+  "fullNormativeAdjudication": false,
+  "fullConformanceClaim": false,
+  "opaqueObjectAdjudication": "pending",
+  "blocks": [
+    {
+      "blockId": "ODF-1.1/spec/B00004",
+      "locator": "/office:document-content/office:body/office:text/p[4]",
+      "sourceBlockSha256": "44c5f18a4bff418daf38beb57903411f6b2072c030cf82dc29cddeda41f37f38",
+      "effectiveBlockSha256": "5f0f88d0b77701aefeb9f9736280dd849d9877cd7676bf52b4e0a06175804f49",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 22,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 12,
+          "rawCharacterEnd": 22,
+          "textSha256": "0ed1cb1331ebf4dcc6b9045510d7a4e67483a82ffa3d6888741f64c4140855cf",
+          "editorialStyles": [
+            "text:T170"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00080",
+      "locator": "/office:document-content/office:body/office:text/table[1]/table-row[6]/table-cell[1]/p[1]",
+      "sourceBlockSha256": "27f3282691613a41f159fe0fb8f3791f3b99fa00fc62df29edeeafe496eb0fdd",
+      "effectiveBlockSha256": "50f7becde477bb509c7704de62c349247fb3499c03a95e4bce20151cd552dea5",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 7,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 4,
+          "rawCharacterEnd": 7,
+          "textSha256": "91af7d847f80f22c5ef0d11588ce9bb5d10d9ba7e8f83f380f807ab3066eb289",
+          "editorialStyles": [
+            "text:T100"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00198",
+      "locator": "/office:document-content/office:body/office:text/h[7]",
+      "sourceBlockSha256": "8015d5921228692403fb9de892fcaa7c7f286955f0a519e916124e6ac6833f26",
+      "effectiveBlockSha256": "faa6ff1cc27d97278bfbbf29e5b0589cf2eb70804948f0def59ff72fb5b6f0f3",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 39,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 22,
+          "rawCharacterEnd": 39,
+          "textSha256": "88b9acec6f54b101ab84c0b09b37190d6811852721dd92854026303bf7d313bf",
+          "editorialStyles": [
+            "text:T105"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00199",
+      "locator": "/office:document-content/office:body/office:text/p[123]",
+      "sourceBlockSha256": "c63229df671d2148137bcc41ad799635e83cf554c7e08d486b03efba93f17bb6",
+      "effectiveBlockSha256": "eb75f773ed6e0b13e3383ba5e0b175c5044950dfc3572d48fb762655da174b9c",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 137,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 81,
+          "rawCharacterEnd": 105,
+          "textSha256": "975f3170355b800995e0b979cc2bc80c0dca7391381ccfc5dd1eb043aa97eccb",
+          "editorialStyles": [
+            "text:T106"
+          ]
+        },
+        {
+          "rawCharacterStart": 105,
+          "rawCharacterEnd": 108,
+          "textSha256": "777ae8e1fd6d241119cd248017f858924a01ee77712588dab6659d10ddb17843",
+          "editorialStyles": [
+            "text:T109"
+          ]
+        },
+        {
+          "rawCharacterStart": 108,
+          "rawCharacterEnd": 127,
+          "textSha256": "5ee3086dd8ce78ec81e314e4f4f36799a96e46a394d179f22ee4d5c0c36672ce",
+          "editorialStyles": [
+            "text:T106"
+          ]
+        },
+        {
+          "rawCharacterStart": 136,
+          "rawCharacterEnd": 137,
+          "textSha256": "d03502c43d74a30b936740a9517dc4ea2b2ad7168caa0a774cefe793ce0b33e7",
+          "editorialStyles": [
+            "text:T106"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00200",
+      "locator": "/office:document-content/office:body/office:text/p[124]",
+      "sourceBlockSha256": "bb0b8c6f0236a52fa7b58c82552f1d39c8f75e33df98e606d11351976483018a",
+      "effectiveBlockSha256": "15339ad72b914adf1a7ede838d9bf6b871400e91c4d413f50c79ddd36fe22a36",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 713,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 463,
+          "rawCharacterEnd": 472,
+          "textSha256": "c589cb2bcc2e2082099d000c8a11b88b09a6f190de3a722415ae3ea28295bf49",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 472,
+          "rawCharacterEnd": 494,
+          "textSha256": "423d0b5a6e7082d0778ee703a658af75d839940204f28d890f35d5a7e21638c6",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 494,
+          "rawCharacterEnd": 673,
+          "textSha256": "ed46427cad204406115c12eb6b7007d7bb71497f04dd167d0950c1a1d999879d",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 673,
+          "rawCharacterEnd": 685,
+          "textSha256": "d289eb9bf88ea4e1f2f71389f4f420fbfcb5d01002e6f2734689cd529635859a",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 685,
+          "rawCharacterEnd": 686,
+          "textSha256": "32ebb1abcc1c601ceb9c4e3c4faba0caa5b85bb98c4f1e6612c40faa528a91c9",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 686,
+          "rawCharacterEnd": 689,
+          "textSha256": "154af8055f10b4b513db1b6d4d939f5644edc2307263cbeab07566c81ef4ce09",
+          "editorialStyles": [
+            "text:T112"
+          ]
+        },
+        {
+          "rawCharacterStart": 689,
+          "rawCharacterEnd": 691,
+          "textSha256": "daac4fe11107edcf95bf1a410cad0818298b73a5a936de3ac1da954c4fdd8ffd",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 691,
+          "rawCharacterEnd": 700,
+          "textSha256": "59ca829367296274fd876927e34bc58fc4a85639390435883cb46f236e28d1f8",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 700,
+          "rawCharacterEnd": 713,
+          "textSha256": "3a73c13dacf4a96e82b071b7771e2fcdc27e962ed00383c1f94748aafcb42e92",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00201",
+      "locator": "/office:document-content/office:body/office:text/list[4]/list-item[1]/p[1]",
+      "sourceBlockSha256": "d30a9aca4835708325916954c079a199da845ac4bc903a1aecd1349494810d5e",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 30,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 30,
+          "textSha256": "d30a9aca4835708325916954c079a199da845ac4bc903a1aecd1349494810d5e",
+          "editorialStyles": [
+            "paragraph:P120"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00202",
+      "locator": "/office:document-content/office:body/office:text/list[4]/list-item[2]/p[1]",
+      "sourceBlockSha256": "edce2987add090f45eda97d80ef1cbe845fdc488250eafc304adfd6105313892",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 18,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 18,
+          "textSha256": "edce2987add090f45eda97d80ef1cbe845fdc488250eafc304adfd6105313892",
+          "editorialStyles": [
+            "paragraph:P120"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00203",
+      "locator": "/office:document-content/office:body/office:text/list[4]/list-item[3]/p[1]",
+      "sourceBlockSha256": "d1152eeda2003cbf172e8ef4292dedb2643b2433bf20befb932e461e20720120",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 24,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 24,
+          "textSha256": "d1152eeda2003cbf172e8ef4292dedb2643b2433bf20befb932e461e20720120",
+          "editorialStyles": [
+            "paragraph:P120"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00204",
+      "locator": "/office:document-content/office:body/office:text/list[4]/list-item[4]/p[1]",
+      "sourceBlockSha256": "9529859ff21ce5efa710134d88f0b32d57f59021c70f12e95afea9719ed2e600",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 14,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 14,
+          "textSha256": "9529859ff21ce5efa710134d88f0b32d57f59021c70f12e95afea9719ed2e600",
+          "editorialStyles": [
+            "paragraph:P120"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00205",
+      "locator": "/office:document-content/office:body/office:text/p[125]",
+      "sourceBlockSha256": "7c9cdcc24089b3a04824ae52bcbda603db157c8efce98804501140cbca72bcde",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 264,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 264,
+          "textSha256": "7c9cdcc24089b3a04824ae52bcbda603db157c8efce98804501140cbca72bcde",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00206",
+      "locator": "/office:document-content/office:body/office:text/p[126]",
+      "sourceBlockSha256": "1a635934d74458e5eea3d74a64e134ceb41411be2fcbaab41d78bf27f7945da0",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 155,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 155,
+          "textSha256": "1a635934d74458e5eea3d74a64e134ceb41411be2fcbaab41d78bf27f7945da0",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00207",
+      "locator": "/office:document-content/office:body/office:text/p[127]",
+      "sourceBlockSha256": "b465b6dde780845d197f4c344e1196efc2f5350663ac0324e5ab66cff871047a",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 68,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 68,
+          "textSha256": "db088bb8ad7810d156000a404c01a99f73a4f7cf71ad4ac07b6377bfb3db1033",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00208",
+      "locator": "/office:document-content/office:body/office:text/list[5]/list-item[1]/p[1]",
+      "sourceBlockSha256": "4e05ff9fe211f589048f485bed7ca526e79d847924fce5a38a6548947fc00d87",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 9,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 9,
+          "textSha256": "4e05ff9fe211f589048f485bed7ca526e79d847924fce5a38a6548947fc00d87",
+          "editorialStyles": [
+            "paragraph:P120"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00209",
+      "locator": "/office:document-content/office:body/office:text/list[5]/list-item[2]/p[1]",
+      "sourceBlockSha256": "cd174d91d86e88189195502c65e44f3559b45173a2fc94ae877cad2a7095ec56",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 16,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 16,
+          "textSha256": "18e7cdb51a0ccd58c5b7e629c676edebcd34035fb66484c868b30f2f464856fd",
+          "editorialStyles": [
+            "paragraph:P120"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00210",
+      "locator": "/office:document-content/office:body/office:text/list[5]/list-item[3]/p[1]",
+      "sourceBlockSha256": "79d266132f9b7c425ac74ecca95ed4f6e1874c83c55288a3a4a5dfcb3db2edb3",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 61,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 61,
+          "textSha256": "609bce10a608f87b3b25fe007584b1957fcdbb31d098016518045e48d2eafff6",
+          "editorialStyles": [
+            "paragraph:P120"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00211",
+      "locator": "/office:document-content/office:body/office:text/p[128]",
+      "sourceBlockSha256": "8d0be0ff1307deb9bcef31c64a8633b7a04ef6005abbcdd5bff4f87c0434287f",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 111,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 111,
+          "textSha256": "8d0be0ff1307deb9bcef31c64a8633b7a04ef6005abbcdd5bff4f87c0434287f",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00212",
+      "locator": "/office:document-content/office:body/office:text/p[129]",
+      "sourceBlockSha256": "edcad7cce7382eb5225d73967a4835ba1a3e4acebfe6b744fdfe257950a28222",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 341,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 218,
+          "textSha256": "a0a1b9193327e690649f57a981469e89d8a9f38f48f99a940c772c539a9c1f7e",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 218,
+          "rawCharacterEnd": 224,
+          "textSha256": "35cf2d5361edfffb58ba77b22ec2ddedd14067e1635820c36f7c504c39df7251",
+          "editorialStyles": [
+            "text:T113"
+          ]
+        },
+        {
+          "rawCharacterStart": 224,
+          "rawCharacterEnd": 341,
+          "textSha256": "86a1ddbaa38969940dda9c865bde065fcf170cbdcb9f51c48314b00869cf3df4",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00255",
+      "locator": "/office:document-content/office:body/office:text/p[148]",
+      "sourceBlockSha256": "240c0f8b55894a272f31e11a95b94894ece8312947787a9f1f3fdc503afa04e9",
+      "effectiveBlockSha256": "5a5ee477b4095fb839c2b9e21a7fa9e41e98647516bbd78556c4e7aa7b227b83",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 371,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 162,
+          "rawCharacterEnd": 173,
+          "textSha256": "401aa1316692f347b15fcc1d06cb2d3c66830c8c42ff459f23ca89061fa1f97d",
+          "editorialStyles": [
+            "text:T100"
+          ]
+        },
+        {
+          "rawCharacterStart": 205,
+          "rawCharacterEnd": 252,
+          "textSha256": "8189387d4eac940ebe9a68e57032b16e131756c33928600bd79bb327dbf313ff",
+          "editorialStyles": [
+            "text:T100"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B00339",
+      "locator": "/office:document-content/office:body/office:text/p[198]",
+      "sourceBlockSha256": "8600ec00c0f0f8030f824fed133ebc2aabebb93e7d774f83338638914305f0b2",
+      "effectiveBlockSha256": "6ec7438dc2ed8a7a098f76583e13ca283cf3afdb76afc6be9dfe0203c9edf455",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 349,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 175,
+          "rawCharacterEnd": 259,
+          "textSha256": "7cb927d312d63891ae36358791616575b1a385373604a1219aa52c18f8277523",
+          "editorialStyles": [
+            "text:T106"
+          ]
+        },
+        {
+          "rawCharacterStart": 259,
+          "rawCharacterEnd": 260,
+          "textSha256": "36a9e7f1c95b82ffb99743e0c5c4ce95d83c9a430aac59f84ef3cbfab6145068",
+          "editorialStyles": [
+            "text:T106"
+          ]
+        },
+        {
+          "rawCharacterStart": 260,
+          "rawCharacterEnd": 349,
+          "textSha256": "d7eb8c2e18ebcff09468f2add2c3c624e5b985f357178c2a67d161ed8748be65",
+          "editorialStyles": [
+            "text:T106"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B01212",
+      "locator": "/office:document-content/office:body/office:text/p[992]",
+      "sourceBlockSha256": "a95c31a1acea5d68b03beaf7614a445f8978de24689214025ae5d64d04cd07e4",
+      "effectiveBlockSha256": "92c2ae86b3d53f48192fff08bad0b5afce004ea7fb748f6a5bc90381d9b237b1",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 325,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 61,
+          "textSha256": "08cf32dfc451be7badcb39a999c87758c041c577d1dfedb0bba424931ca8de54",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 119,
+          "rawCharacterEnd": 128,
+          "textSha256": "4249a1a0ce3af7c42fd931a99da8d5ffe5eccee0cbd89a7573684fcb32f4b741",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 142,
+          "rawCharacterEnd": 325,
+          "textSha256": "d6a1297a5d76f5ce72e07718bc6650c204cd047072b0cdfd741dcfb71a9e78e4",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B01998",
+      "locator": "/office:document-content/office:body/office:text/p[1692]",
+      "sourceBlockSha256": "5226d9c8f6548f757347e25b8e12a37051c802cb6bf4f066553ca1ad151ccd49",
+      "effectiveBlockSha256": "a386340ceeba66c7053445ef570e54c4fd6c0b970f0704bba8c694c3219d6e2c",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 104,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 18,
+          "rawCharacterEnd": 24,
+          "textSha256": "fda992c5524dd6826cfb78b866f58a2a6ac488b8bf1455228e93de723addf556",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 44,
+          "rawCharacterEnd": 64,
+          "textSha256": "e3935f9d9a82d38cc705564c6531d2bf63c089920f347333ef105b02f6868e86",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B02079",
+      "locator": "/office:document-content/office:body/office:text/p[1745]",
+      "sourceBlockSha256": "f134782006570c54e4655039b61bd80992bc9e30394d8d4fd0f32d49a022f3a3",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 80,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 18,
+          "textSha256": "46b8d3a2f541dbd47c9d7df5442f17b9da6687a58bea2af6dad4ba31a09a6dbd",
+          "editorialStyles": [
+            "text:T102"
+          ]
+        },
+        {
+          "rawCharacterStart": 18,
+          "rawCharacterEnd": 25,
+          "textSha256": "9f5fdcd371b71291ce0111ea839c0d3ce324903e0f0874b8b6330c95b10f1c8b",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 25,
+          "rawCharacterEnd": 26,
+          "textSha256": "36a9e7f1c95b82ffb99743e0c5c4ce95d83c9a430aac59f84ef3cbfab6145068",
+          "editorialStyles": [
+            "text:T112"
+          ]
+        },
+        {
+          "rawCharacterStart": 26,
+          "rawCharacterEnd": 57,
+          "textSha256": "ddc8d04021adf7d6e6720e0b5b7aebda821bf09edeea8a0d619d2b124f1669eb",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 57,
+          "rawCharacterEnd": 64,
+          "textSha256": "72a164d367f37181e5f4ea456d5f3b3264d19a602b5912188e01eb4f26d29018",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 64,
+          "rawCharacterEnd": 80,
+          "textSha256": "90b7dc946a03259eb2e4d2dda0983f2eb523e3d41984873ef61bbaf170c69fbe",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B02909",
+      "locator": "/office:document-content/office:body/office:text/p[2409]",
+      "sourceBlockSha256": "19f9a8b745087f8902fc433ae090264de98e8b7625460b42619b805271476bb9",
+      "effectiveBlockSha256": "31f658ab504eca6ca7bb7d0ba7b85ab5f77332cdf4decf31890a18f9468d3742",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 493,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 13,
+          "rawCharacterEnd": 18,
+          "textSha256": "312d568373d9cc2842625ec867045024e87f85352193bdc4cc8601a77125bf7b",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 400,
+          "rawCharacterEnd": 408,
+          "textSha256": "bfab02385eb9bdb507be8d72e4526edd18e890bc981abba978f1f744f92a4e4b",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 408,
+          "rawCharacterEnd": 420,
+          "textSha256": "6b20f62b5fc63ab879888d08643e1b58f310ada76edf1ffc3352dc82e76b465f",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 420,
+          "rawCharacterEnd": 493,
+          "textSha256": "382c0491cbfa3445d38878b4a0c77b5560ab54b6a6db08a12665d8175edc6eb4",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B04119",
+      "locator": "/office:document-content/office:body/office:text/p[3313]",
+      "sourceBlockSha256": "64cc39593cf23d903b7305e6190a9f983f4899faf7a2790239ad24c31ba31b0c",
+      "effectiveBlockSha256": "ce67f3126924d066f574bfb9c68fb270bd75aee542446dbda1ca7b3569337036",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 414,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 88,
+          "rawCharacterEnd": 362,
+          "textSha256": "f8e826728188dcd525cf2f2a27cae3b286f4d4f62f900ae50887a0b2929543e8",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B04167",
+      "locator": "/office:document-content/office:body/office:text/list[92]/list-item[1]/p[1]",
+      "sourceBlockSha256": "f1eefb8706bf61f23c883e8fcf92ec5b89437ba80bf409720a9e615beadb2543",
+      "effectiveBlockSha256": "fe7b47d3323c816fd37b0262da19188c3dfba5b919d24f1a3eef96beda3581d4",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 205,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 49,
+          "rawCharacterEnd": 89,
+          "textSha256": "c7399e4eaa1c5dd6a850ebcda6cd97b1190633888c5db97944d3c09ce06759b6",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 89,
+          "rawCharacterEnd": 90,
+          "textSha256": "36a9e7f1c95b82ffb99743e0c5c4ce95d83c9a430aac59f84ef3cbfab6145068",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 90,
+          "rawCharacterEnd": 110,
+          "textSha256": "9040c42ec28ec6d9503607354aa9bfe5b4242a01a8f65bfc1bf101a8b301fb13",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 110,
+          "rawCharacterEnd": 122,
+          "textSha256": "f84a1503a0650e4a070f9a8ebea79d1da3d4c89dbf490ea11126663938f19370",
+          "editorialStyles": [
+            "text:T114"
+          ]
+        },
+        {
+          "rawCharacterStart": 122,
+          "rawCharacterEnd": 155,
+          "textSha256": "33c15bb0499ca80d57026e62fa69dca27e9f688b134879ab944efb1fd489f4e0",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 155,
+          "rawCharacterEnd": 160,
+          "textSha256": "cd42404d52ad55ccfa9aca4adc828aa5800ad9d385a0671fbcbf724118320619",
+          "editorialStyles": [
+            "text:T114"
+          ]
+        },
+        {
+          "rawCharacterStart": 160,
+          "rawCharacterEnd": 164,
+          "textSha256": "e1a3e78cb5c8858631bf81f94369a0be3fd2aebb9e852e66368b381c8feef91f",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 164,
+          "rawCharacterEnd": 168,
+          "textSha256": "140bedbf9c3f6d56a9846d2ba7088798683f4da0c248231336e6a05679e4fdfe",
+          "editorialStyles": [
+            "text:T114"
+          ]
+        },
+        {
+          "rawCharacterStart": 168,
+          "rawCharacterEnd": 174,
+          "textSha256": "0a63e3f63f232f0c18f3bfe678607aad0b9f7ac6c73e037f74c79c0b2ba103f8",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 174,
+          "rawCharacterEnd": 179,
+          "textSha256": "cd42404d52ad55ccfa9aca4adc828aa5800ad9d385a0671fbcbf724118320619",
+          "editorialStyles": [
+            "text:T114"
+          ]
+        },
+        {
+          "rawCharacterStart": 179,
+          "rawCharacterEnd": 183,
+          "textSha256": "e1a3e78cb5c8858631bf81f94369a0be3fd2aebb9e852e66368b381c8feef91f",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 183,
+          "rawCharacterEnd": 190,
+          "textSha256": "7374df08a7a6cf109af41565ca431fc53c9c1b9207294cd5f584cdc568b997ed",
+          "editorialStyles": [
+            "text:T114"
+          ]
+        },
+        {
+          "rawCharacterStart": 190,
+          "rawCharacterEnd": 205,
+          "textSha256": "5808ec45191cdfdf3394c839ebd7bac7e332402c489df00c0c4a2b0d88dc60b6",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B04168",
+      "locator": "/office:document-content/office:body/office:text/list[92]/list-item[2]/p[1]",
+      "sourceBlockSha256": "7c240d5ac736905fab0c3aae3c132e5fa506aecf83d54b6761bb0a796dc3aeac",
+      "effectiveBlockSha256": "1f326e963e5be0bdfa8355e661b5ea91e881a140bc26b62f30454db9787b5f81",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 299,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 91,
+          "rawCharacterEnd": 130,
+          "textSha256": "b2cefff148da34508af5713d1e816d40ac3e4a595b9aabd6fb02ec3e18f29ed1",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 130,
+          "rawCharacterEnd": 131,
+          "textSha256": "36a9e7f1c95b82ffb99743e0c5c4ce95d83c9a430aac59f84ef3cbfab6145068",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 131,
+          "rawCharacterEnd": 151,
+          "textSha256": "9040c42ec28ec6d9503607354aa9bfe5b4242a01a8f65bfc1bf101a8b301fb13",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 151,
+          "rawCharacterEnd": 163,
+          "textSha256": "f84a1503a0650e4a070f9a8ebea79d1da3d4c89dbf490ea11126663938f19370",
+          "editorialStyles": [
+            "text:T114"
+          ]
+        },
+        {
+          "rawCharacterStart": 163,
+          "rawCharacterEnd": 196,
+          "textSha256": "33c15bb0499ca80d57026e62fa69dca27e9f688b134879ab944efb1fd489f4e0",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 196,
+          "rawCharacterEnd": 201,
+          "textSha256": "cd42404d52ad55ccfa9aca4adc828aa5800ad9d385a0671fbcbf724118320619",
+          "editorialStyles": [
+            "text:T114"
+          ]
+        },
+        {
+          "rawCharacterStart": 201,
+          "rawCharacterEnd": 205,
+          "textSha256": "e1a3e78cb5c8858631bf81f94369a0be3fd2aebb9e852e66368b381c8feef91f",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 205,
+          "rawCharacterEnd": 209,
+          "textSha256": "140bedbf9c3f6d56a9846d2ba7088798683f4da0c248231336e6a05679e4fdfe",
+          "editorialStyles": [
+            "text:T114"
+          ]
+        },
+        {
+          "rawCharacterStart": 209,
+          "rawCharacterEnd": 215,
+          "textSha256": "0a63e3f63f232f0c18f3bfe678607aad0b9f7ac6c73e037f74c79c0b2ba103f8",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 215,
+          "rawCharacterEnd": 220,
+          "textSha256": "cd42404d52ad55ccfa9aca4adc828aa5800ad9d385a0671fbcbf724118320619",
+          "editorialStyles": [
+            "text:T114"
+          ]
+        },
+        {
+          "rawCharacterStart": 220,
+          "rawCharacterEnd": 224,
+          "textSha256": "e1a3e78cb5c8858631bf81f94369a0be3fd2aebb9e852e66368b381c8feef91f",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 224,
+          "rawCharacterEnd": 231,
+          "textSha256": "7374df08a7a6cf109af41565ca431fc53c9c1b9207294cd5f584cdc568b997ed",
+          "editorialStyles": [
+            "text:T114"
+          ]
+        },
+        {
+          "rawCharacterStart": 231,
+          "rawCharacterEnd": 247,
+          "textSha256": "52e527062cfd0a6840e5f16e775981fdea1695d37905e0132c1d7fd2a347301e",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 247,
+          "rawCharacterEnd": 248,
+          "textSha256": "36a9e7f1c95b82ffb99743e0c5c4ce95d83c9a430aac59f84ef3cbfab6145068",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B04582",
+      "locator": "/office:document-content/office:body/office:text/p[3680]",
+      "sourceBlockSha256": "add761486c1796fb7d75fec268c5b09fab493fe4224e0af76ad302925614f32d",
+      "effectiveBlockSha256": "8c6e7d93f5c93460fe3639ff8fe472582cd0da2901ec8704cae3e355c945aabd",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 329,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 276,
+          "rawCharacterEnd": 289,
+          "textSha256": "714127ad0df891ae73bc163826e5dd5b75cbab63ee99cd1446a0dbec57a81159",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 289,
+          "rawCharacterEnd": 292,
+          "textSha256": "772444a00dc21159ebfb1b6487a9a00977d12a9da5bdcb06a872f0faa9cc0a95",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 292,
+          "rawCharacterEnd": 329,
+          "textSha256": "7e1b3cd5d5f5fcd0d939106ce946efe98613d40e85b69eb581c1b5f30527463c",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B04609",
+      "locator": "/office:document-content/office:body/office:text/p[3704]",
+      "sourceBlockSha256": "87f7dc9d0c5906128708065dea3969f8c2b794a1c43a525cb3cd7665db6192db",
+      "effectiveBlockSha256": "259e4c1c1ec51ad3d7544c98bf2408085ab2802baa227d09c49c865ec85aa4ef",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 393,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 31,
+          "rawCharacterEnd": 140,
+          "textSha256": "512b01046186d595418aae454ce343085c04f1c78883b998bbe5431df19e052e",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B04630",
+      "locator": "/office:document-content/office:body/office:text/p[3723]",
+      "sourceBlockSha256": "7518db3db9b781cb9b9b945868b53c218cb4088fd5b5907232bb85fad8ff5568",
+      "effectiveBlockSha256": "b929902ad613965b5257456cb282024d9e4e96ec128ac53ffe50d143c410a5bb",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 225,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 212,
+          "rawCharacterEnd": 218,
+          "textSha256": "33ed91c549b359f9c0a1e99e949fa381147ff7d1eba845e3404e1dff7c91d88a",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 218,
+          "rawCharacterEnd": 223,
+          "textSha256": "8ada24bf6bf3139273899fed85010be710367bbd1f8a176f19da97a62bc3bc65",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 223,
+          "rawCharacterEnd": 225,
+          "textSha256": "d84e727959ff7628e4773ef6c40b9ae207850fa6863ae4b69bd4eb5757b70c2c",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B04733",
+      "locator": "/office:document-content/office:body/office:text/p[3806]",
+      "sourceBlockSha256": "0bda1d1c9e42b9348fbc83710bac7238c82956aa629927a8824a0b0b33783266",
+      "effectiveBlockSha256": "e03608c7377d87c8c8e6c7117135101b611204ceca12662320705778c27b7c6a",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 287,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 177,
+          "textSha256": "35697a297f124ed3983b3357e9d158ec6211730bb841035d1cf877581915ad2f",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B04993",
+      "locator": "/office:document-content/office:body/office:text/p[4021]",
+      "sourceBlockSha256": "c764441f0c96e3e0c9049b185655b89ff3a8dd4f9df7698357bd567b9900d0ff",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 50,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 35,
+          "textSha256": "79461d0edafdb3139dc9a66ff5a93a2a946acf84ac542941bc2870d4b4ef6057",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        },
+        {
+          "rawCharacterStart": 35,
+          "rawCharacterEnd": 39,
+          "textSha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        },
+        {
+          "rawCharacterStart": 39,
+          "rawCharacterEnd": 43,
+          "textSha256": "e1a3e78cb5c8858631bf81f94369a0be3fd2aebb9e852e66368b381c8feef91f",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        },
+        {
+          "rawCharacterStart": 43,
+          "rawCharacterEnd": 48,
+          "textSha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        },
+        {
+          "rawCharacterStart": 48,
+          "rawCharacterEnd": 50,
+          "textSha256": "8dccf256f6d5783e62bba717ef04a6cfcea41d9befffa5ade55235e0b6a0eeb0",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B04994",
+      "locator": "/office:document-content/office:body/office:text/p[4022]",
+      "sourceBlockSha256": "2b96cfd8aa9ff1949dae7be6749541a03e5e00c970b1df364921b924c4d8d9f5",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 111,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 16,
+          "textSha256": "920f8c537053912044709d02a041ec02013ed54f25a34226f6e01612f4482184",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 16,
+          "rawCharacterEnd": 20,
+          "textSha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 20,
+          "rawCharacterEnd": 111,
+          "textSha256": "a13420a00c181399b873bd31e5f83a91e6ad36e7de0dc4ccd2061dcc0f1a523d",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B04995",
+      "locator": "/office:document-content/office:body/office:text/p[4023]",
+      "sourceBlockSha256": "21b1219d22f2005aa141b5c4e069d576cec838d7214af62ab0b28687e5f1eaaf",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 185,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 16,
+          "textSha256": "920f8c537053912044709d02a041ec02013ed54f25a34226f6e01612f4482184",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 16,
+          "rawCharacterEnd": 21,
+          "textSha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 21,
+          "rawCharacterEnd": 185,
+          "textSha256": "16853515a33eea80bee120369785e22f0cd5cbae45502f403cb230b7bcc22c96",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B05340",
+      "locator": "/office:document-content/office:body/office:text/p[4306]",
+      "sourceBlockSha256": "0eff3b6db17dafc173fb91e9218aee5d8aa1a1b7268eaa8f7ec880a25fbb6c13",
+      "effectiveBlockSha256": "8d1dcf54833948d0beecb7f8c8e5ded5cba2e7373f27ec853751aede46acd364",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 57,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 15,
+          "rawCharacterEnd": 20,
+          "textSha256": "c195d2d8756234367242ba7616c5c60369bc25ced2dcb5b92808d31b58ef217a",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 41,
+          "rawCharacterEnd": 44,
+          "textSha256": "388f91ea04d6eaeb65084976447777b5f11177ab1995c89b19cccbf93e97265d",
+          "editorialStyles": [
+            "text:T108"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B05708",
+      "locator": "/office:document-content/office:body/office:text/p[4651]",
+      "sourceBlockSha256": "2960d9b9d29d6684cef5695c41ac56b7910670fe6db8ac9a0ec2ae059ffddb21",
+      "effectiveBlockSha256": "b3e2df9b93c325735b57a57751b8516b82f5414f92556596321d0dcc62d8817c",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 418,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 304,
+          "rawCharacterEnd": 326,
+          "textSha256": "eb8dd9cb1c6d87908795c509d4c4273873e094ca7f7261f53c303784d351c579",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 370,
+          "rawCharacterEnd": 374,
+          "textSha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "editorialStyles": [
+            "text:T115"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B05777",
+      "locator": "/office:document-content/office:body/office:text/p[4713]",
+      "sourceBlockSha256": "5ce0309fd59f0d3b6c8e68d21b07c1c186f3f1310d173606d8d444c0c5fc2dcd",
+      "effectiveBlockSha256": "6f73e63680d85ddd18037b871b89463cd237b1d622cbccb24db32889ca7b452b",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 186,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 137,
+          "rawCharacterEnd": 142,
+          "textSha256": "cb86eb2d914d37df6857c3cfe4827b5f770b01a86578120618b0b21572160be8",
+          "editorialStyles": [
+            "text:T114"
+          ]
+        },
+        {
+          "rawCharacterStart": 142,
+          "rawCharacterEnd": 147,
+          "textSha256": "fbfa2d9f9e228e6abbdd9ec6da200534707d6db8f16a794c3799527399a0b142",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B05787",
+      "locator": "/office:document-content/office:body/office:text/p[4722]",
+      "sourceBlockSha256": "1819977cc6cc494be76a618d61af16edae8ba6bf4b4b94fa5d5be41c3c71c071",
+      "effectiveBlockSha256": "59241548d794348b5b56b3ccccfce0e3d62a4e204cd1c686983ecb3f1f1aa528",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 402,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 41,
+          "rawCharacterEnd": 316,
+          "textSha256": "ca422ad6c0f197fa35b83af1fbdfe33dadbecd10230fc32ad33eb397f494e03b",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B05921",
+      "locator": "/office:document-content/office:body/office:text/p[4847]",
+      "sourceBlockSha256": "f61c0da50052536e7e1b6a51e6be09a9b768d4ac921fdeaff2a3d2fabf7e2c3e",
+      "effectiveBlockSha256": "a3b9525791581fb6882b465f4117446cd529299f32a5c2b55037a178c3d23a69",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 114,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 81,
+          "rawCharacterEnd": 86,
+          "textSha256": "d98a5bc9fbbe35c9a1d8bb5c874f304a7abf379d1ff88de83502b4376df935c9",
+          "editorialStyles": [
+            "text:T114"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B05967",
+      "locator": "/office:document-content/office:body/office:text/p[4878]",
+      "sourceBlockSha256": "b103443671bafcc61dd37191514f0f6cd3d0b3e0f158c307ad7c0ccc366b312b",
+      "effectiveBlockSha256": "4e6ffa6a8f649105d0e284ec73b6a033d890c73e543d1c39694dc8af92add6b2",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 135,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 4,
+          "rawCharacterEnd": 9,
+          "textSha256": "0d4fc4a78d3706edccafb665a8b2fdd9309e82c78625bb0f2b8e7bb9e1c4d21c",
+          "editorialStyles": [
+            "text:T116"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B05979",
+      "locator": "/office:document-content/office:body/office:text/p[4884]",
+      "sourceBlockSha256": "725712e7eba913ab966ff2c07a086bfd81722963fe2754fd6847879c16c78006",
+      "effectiveBlockSha256": "8215ff72a40418287e028678c2e198f7ae4266c4a81c05a919c4fe8aa5a6c809",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 249,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 92,
+          "rawCharacterEnd": 154,
+          "textSha256": "0eb999cda1f12a7e458252023441e7e7f87b1fc5b73513a5b6b0c687b023273f",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B05984",
+      "locator": "/office:document-content/office:body/office:text/p[4885]",
+      "sourceBlockSha256": "329ffa452520854ff6db11b1048a38d2ef8271c39397dba13f4d12180d6b83b0",
+      "effectiveBlockSha256": "eb7fe6fb427adc1a140ea13ad47035232d15e318c47a695f0210cabb4a107979",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 496,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 4,
+          "rawCharacterEnd": 9,
+          "textSha256": "0d4fc4a78d3706edccafb665a8b2fdd9309e82c78625bb0f2b8e7bb9e1c4d21c",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 45,
+          "rawCharacterEnd": 225,
+          "textSha256": "a1a25ddf9e40746ae861e05031495b0e19922c597f773d0084096a70fb8ac35f",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 225,
+          "rawCharacterEnd": 233,
+          "textSha256": "466e5b9cd57fa444cceaa8e5b053ddd58d05cbbcf162a54d6ccd08492ef36dfd",
+          "editorialStyles": [
+            "text:T113"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B05986",
+      "locator": "/office:document-content/office:body/office:text/p[4886]",
+      "sourceBlockSha256": "54c5345385f7094aeac2f34f731022034e1a026441e830e98cc113e7602dc485",
+      "effectiveBlockSha256": "1de3ee6537769f6e1065f895f1b3f8ebe49dfeab85cdb69678f72e09ed4184e3",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 194,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 107,
+          "rawCharacterEnd": 142,
+          "textSha256": "8a47207662fa6a7b53644c05a9a7f60a651fbe7f4bd5d46e571eee488378478f",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B05989",
+      "locator": "/office:document-content/office:body/office:text/p[4888]",
+      "sourceBlockSha256": "272ab92fbf6397c50fb5201c5ca6a81680049226461d85904146af842ba048ef",
+      "effectiveBlockSha256": "3040df881e626fa76b433d2411190b7e9c330a6fa8f2f3b15a2c9913c9e0ab2c",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 194,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 107,
+          "rawCharacterEnd": 142,
+          "textSha256": "8a47207662fa6a7b53644c05a9a7f60a651fbe7f4bd5d46e571eee488378478f",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B05991",
+      "locator": "/office:document-content/office:body/office:text/p[4889]",
+      "sourceBlockSha256": "6e3bad5cc7c619d5499a47b39bba520f6e10a2a7aa8dba96e3cae3d4764b0537",
+      "effectiveBlockSha256": "a937136edf4dbde37986e913e125dccfa2814c93ce64abefadb8c338e2554c92",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 203,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 113,
+          "rawCharacterEnd": 148,
+          "textSha256": "8a47207662fa6a7b53644c05a9a7f60a651fbe7f4bd5d46e571eee488378478f",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B05993",
+      "locator": "/office:document-content/office:body/office:text/p[4890]",
+      "sourceBlockSha256": "f7448a739138f9cb3f996620e094b10f21a41f58e10fb2bbe9f1d62136e07d21",
+      "effectiveBlockSha256": "99716dbb19737c85c5913b83ec15cec144ef1d69015d658418e5f5ba5cc66b87",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 206,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 95,
+          "rawCharacterEnd": 97,
+          "textSha256": "fa51fd49abf67705d6a35d18218c115ff5633aec1f9ebfdc9d5d4956416f57f6",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 117,
+          "rawCharacterEnd": 152,
+          "textSha256": "8a47207662fa6a7b53644c05a9a7f60a651fbe7f4bd5d46e571eee488378478f",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B05995",
+      "locator": "/office:document-content/office:body/office:text/p[4891]",
+      "sourceBlockSha256": "73e05176e7acb528a11806aa9c5d06307773537ea80b8614efabed8ba415ba0a",
+      "effectiveBlockSha256": "66160e7f48d1320401f20372bca837194aadb7371ccfaa9bb943143ff059de39",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 126,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 17,
+          "rawCharacterEnd": 19,
+          "textSha256": "9c1623f0d38e28e9594f2ef31a7ec909291c4fdb05a777dccd2e936a7f406011",
+          "editorialStyles": [
+            "text:T120"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06003",
+      "locator": "/office:document-content/office:body/office:text/p[4899]",
+      "sourceBlockSha256": "5d7786a5d0cc01e33f907deb5d7db592871bb0b52098dddcdf29a270e3a86aec",
+      "effectiveBlockSha256": "f2d9e903391d5e5a4613a99595ffd0ad66d35f8ef5889ac604965a8416a483bb",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 189,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 110,
+          "rawCharacterEnd": 115,
+          "textSha256": "0d4fc4a78d3706edccafb665a8b2fdd9309e82c78625bb0f2b8e7bb9e1c4d21c",
+          "editorialStyles": [
+            "text:T122"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06041",
+      "locator": "/office:document-content/office:body/office:text/p[4931]",
+      "sourceBlockSha256": "e15b63760fc3229ba063733863a74c1fe314e34c7eea9b9e3ab5b00b9cbbcf75",
+      "effectiveBlockSha256": "f01ea5445cda6eef3f10d586646d0cef90f6086fd78657845395b32a8db044fb",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 227,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 118,
+          "rawCharacterEnd": 123,
+          "textSha256": "cb86eb2d914d37df6857c3cfe4827b5f770b01a86578120618b0b21572160be8",
+          "editorialStyles": [
+            "text:T114"
+          ]
+        },
+        {
+          "rawCharacterStart": 123,
+          "rawCharacterEnd": 128,
+          "textSha256": "fbfa2d9f9e228e6abbdd9ec6da200534707d6db8f16a794c3799527399a0b142",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06554",
+      "locator": "/office:document-content/office:body/office:text/p[5388]",
+      "sourceBlockSha256": "1a24a1b3dfa7c1df930e651c679710b68d7950c003a2d5da584a69e778b8710d",
+      "effectiveBlockSha256": "52a0e696e2e079331d6b1baefab4e63a1f1b9d6ac1fff9f221ad59c3abd28e20",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 296,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 40,
+          "rawCharacterEnd": 109,
+          "textSha256": "0a975dc5b778f074baad7b0152122c2638821986f21b8da404c6a8c0ef8c4e97",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06600",
+      "locator": "/office:document-content/office:body/office:text/p[5421]",
+      "sourceBlockSha256": "626075a19b44bc264123437cc9266d08fb3b2527600159247091f3c85d569f76",
+      "effectiveBlockSha256": "8aee7de094d4ac2edf846d985c02b74f3fb4cd64c59076c43df4c79cd2261b3e",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 516,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 163,
+          "rawCharacterEnd": 330,
+          "textSha256": "8306980aef1b3d0210046ab3ab5fadeb3975efad09502f8ed29a27019bc59ad9",
+          "editorialStyles": [
+            "text:T121"
+          ]
+        },
+        {
+          "rawCharacterStart": 330,
+          "rawCharacterEnd": 516,
+          "textSha256": "a75f31d520e67dad20d02fc8e2fa5f4196f1a8d00e07632c3a7d1813acd1fee7",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06615",
+      "locator": "/office:document-content/office:body/office:text/p[5433]",
+      "sourceBlockSha256": "e6f08d95a1821dbe00d65c0886607ef101bc10237c27841fed71b85786b264d1",
+      "effectiveBlockSha256": "284b20496ffaafdd2701b64166a8f0258fff973e5c773045d40501ffaf767e11",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 1107,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 348,
+          "rawCharacterEnd": 1040,
+          "textSha256": "c7334c3dfaeb57f70556d8d07b24beece51dcecf79ebe69d1729d418608a6a83",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06625",
+      "locator": "/office:document-content/office:body/office:text/p[5440]",
+      "sourceBlockSha256": "1b018bb60872e063a7f2d5a505d34b98613f912ccc0bc971e7f15c7ec883bd4f",
+      "effectiveBlockSha256": "0b645df6d9ccfe910572280de391839b2169b96d9631e1c052a3962d889affe7",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 530,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 48,
+          "rawCharacterEnd": 51,
+          "textSha256": "b9776d7ddf459c9ad5b0e1d6ac61e27befb5e99fd62446677600d7cacef544d0",
+          "editorialStyles": [
+            "text:T119"
+          ]
+        },
+        {
+          "rawCharacterStart": 72,
+          "rawCharacterEnd": 84,
+          "textSha256": "c0fd033925ac38ceea51b7eb3a494e2be917569e4fe2c283afd69bab31bd50b5",
+          "editorialStyles": [
+            "text:T119"
+          ]
+        },
+        {
+          "rawCharacterStart": 84,
+          "rawCharacterEnd": 91,
+          "textSha256": "28b313b2c1ddf3449b91770997324da35ccb171a7b33dd0a75272a0902a09891",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 91,
+          "rawCharacterEnd": 108,
+          "textSha256": "71cd0d4e59e8123f579b0fa0f5bb6d3c059487da1bf83a743a78693c9892b0ff",
+          "editorialStyles": [
+            "text:T120"
+          ]
+        },
+        {
+          "rawCharacterStart": 108,
+          "rawCharacterEnd": 111,
+          "textSha256": "0b6b1c8460f39627e623a3e5697c4c37fd1d83b6a8e728b5f091491055d63a77",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 111,
+          "rawCharacterEnd": 128,
+          "textSha256": "d2a03d0376f0c2d47d147ccae2280bdd10c7c4fcec9ea392b2e6ff8bb7ef46e6",
+          "editorialStyles": [
+            "text:T120"
+          ]
+        },
+        {
+          "rawCharacterStart": 128,
+          "rawCharacterEnd": 130,
+          "textSha256": "0a07f659461970d8d8dcefe4fff96a1745599810dc7d47391e95c803b7b2072c",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 130,
+          "rawCharacterEnd": 146,
+          "textSha256": "8b7e937c993b9d85f8e1a2304e93b1be8f82c1c83fdfa98984c6d9f7e4d77efa",
+          "editorialStyles": [
+            "text:T120"
+          ]
+        },
+        {
+          "rawCharacterStart": 146,
+          "rawCharacterEnd": 148,
+          "textSha256": "0a07f659461970d8d8dcefe4fff96a1745599810dc7d47391e95c803b7b2072c",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 148,
+          "rawCharacterEnd": 165,
+          "textSha256": "07061dfd89fe3ffa49b06dc11a2584e594924b5b4ba9a2155070087f07cdcdd4",
+          "editorialStyles": [
+            "text:T120"
+          ]
+        },
+        {
+          "rawCharacterStart": 165,
+          "rawCharacterEnd": 169,
+          "textSha256": "2e5f769687c7731726bb738d6137d86e89691a3a164a80588c046c79ce99d749",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 169,
+          "rawCharacterEnd": 182,
+          "textSha256": "bc4c790ebfc1cb3981d6c64496a701512df96f16adb3732a621261e2fc9f091d",
+          "editorialStyles": [
+            "text:T120"
+          ]
+        },
+        {
+          "rawCharacterStart": 182,
+          "rawCharacterEnd": 184,
+          "textSha256": "8dccf256f6d5783e62bba717ef04a6cfcea41d9befffa5ade55235e0b6a0eeb0",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 184,
+          "rawCharacterEnd": 200,
+          "textSha256": "3eb6cde09ea2b206894f78223a459370d3b7572fc1746e22d77b9b61f4567a23",
+          "editorialStyles": [
+            "text:T120"
+          ]
+        },
+        {
+          "rawCharacterStart": 200,
+          "rawCharacterEnd": 205,
+          "textSha256": "e3ee915a8e8c7aa02d2fced443314522b20824abd2535d5959c41dc8ab8a09e4",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 205,
+          "rawCharacterEnd": 222,
+          "textSha256": "d2a03d0376f0c2d47d147ccae2280bdd10c7c4fcec9ea392b2e6ff8bb7ef46e6",
+          "editorialStyles": [
+            "text:T120"
+          ]
+        },
+        {
+          "rawCharacterStart": 222,
+          "rawCharacterEnd": 304,
+          "textSha256": "145dfa87790de099b2f6e28cdc4e22377ecd202e12ffa81983a8144e2c98dd13",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 304,
+          "rawCharacterEnd": 320,
+          "textSha256": "ae644805d128ed045f35bd89802ebfe7768a0d061a6dfc38bd65fd4aebc7e1d9",
+          "editorialStyles": [
+            "text:T120"
+          ]
+        },
+        {
+          "rawCharacterStart": 320,
+          "rawCharacterEnd": 325,
+          "textSha256": "e3ee915a8e8c7aa02d2fced443314522b20824abd2535d5959c41dc8ab8a09e4",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 325,
+          "rawCharacterEnd": 342,
+          "textSha256": "07061dfd89fe3ffa49b06dc11a2584e594924b5b4ba9a2155070087f07cdcdd4",
+          "editorialStyles": [
+            "text:T120"
+          ]
+        },
+        {
+          "rawCharacterStart": 342,
+          "rawCharacterEnd": 423,
+          "textSha256": "2e1a9171bd82290394c439d5845d0989ea12c450490448c94110bb2f9578a879",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 423,
+          "rawCharacterEnd": 435,
+          "textSha256": "f611efa0a39ecd34f3f8bca9b5f3f8e1128112370be118526903c66b92f54055",
+          "editorialStyles": [
+            "text:T120"
+          ]
+        },
+        {
+          "rawCharacterStart": 435,
+          "rawCharacterEnd": 530,
+          "textSha256": "129e0415d274aff2d40598fd7c848459024a7e285d4dc9efdff51939020a400a",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06764",
+      "locator": "/office:document-content/office:body/office:text/p[5550]",
+      "sourceBlockSha256": "8dd506ebafa679c04ca025f2231749c2985b28a514ff8294a24a336428d2c33b",
+      "effectiveBlockSha256": "9dc117e5e44866dec441e8c733a737a0eb2b388cf95ae1c3674e1435bd6c0cef",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 360,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 163,
+          "rawCharacterEnd": 281,
+          "textSha256": "95209cbbc24500613f7300ed0ec1ff65872891eabe5a68586c63ccfa89a4cb64",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06897",
+      "locator": "/office:document-content/office:body/office:text/p[5665]",
+      "sourceBlockSha256": "326c856c20cd70c347f9a959afd786c2d16b50cbc27cf3e89c87c416bfb4b47d",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 106,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 57,
+          "textSha256": "63fc8a8f54d7f93deafe4850cda42d63873aaff7e9b64eb5b76cdcc0107e3438",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        },
+        {
+          "rawCharacterStart": 57,
+          "rawCharacterEnd": 62,
+          "textSha256": "66790d210c0873de4279ac21b95f524cc6125aa3ec5e2e5c1c94ab108260b575",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        },
+        {
+          "rawCharacterStart": 62,
+          "rawCharacterEnd": 106,
+          "textSha256": "abd0b58f20560ab50a5ff8e865b8bbc8a35b2a1224af709e641d216d00929101",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06898",
+      "locator": "/office:document-content/office:body/office:text/list[151]/list-item[1]/p[1]",
+      "sourceBlockSha256": "a484c7bdffdf5f4f88eef7e23a3355efdf9e36ab64750d162d9618ab2c38ca34",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 70,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 70,
+          "textSha256": "a484c7bdffdf5f4f88eef7e23a3355efdf9e36ab64750d162d9618ab2c38ca34",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06899",
+      "locator": "/office:document-content/office:body/office:text/list[151]/list-item[2]/p[1]",
+      "sourceBlockSha256": "a4b0bc9dec100f91ea9e69a0e9cb22c31a2c3aada836f71e193bceab9af4431a",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 157,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 157,
+          "textSha256": "a4b0bc9dec100f91ea9e69a0e9cb22c31a2c3aada836f71e193bceab9af4431a",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06900",
+      "locator": "/office:document-content/office:body/office:text/list[151]/list-item[3]/p[1]",
+      "sourceBlockSha256": "3dff7c3be96634fc3684f88f821616f2dfd11aaf0aa9b85d534fffbbe543eac3",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 89,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 89,
+          "textSha256": "3dff7c3be96634fc3684f88f821616f2dfd11aaf0aa9b85d534fffbbe543eac3",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06901",
+      "locator": "/office:document-content/office:body/office:text/list[151]/list-item[4]/p[1]",
+      "sourceBlockSha256": "62d04c1eaa42eb6a03505c6d9e47ae0ca85c2f86821a1d024398934fa19593d9",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 61,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 61,
+          "textSha256": "62d04c1eaa42eb6a03505c6d9e47ae0ca85c2f86821a1d024398934fa19593d9",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06902",
+      "locator": "/office:document-content/office:body/office:text/list[151]/list-item[5]/p[1]",
+      "sourceBlockSha256": "bc2a48869ac467a52ed6690da72e3af1b628a190183a1a89114f51d4bd1006ac",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 97,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 97,
+          "textSha256": "bc2a48869ac467a52ed6690da72e3af1b628a190183a1a89114f51d4bd1006ac",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06903",
+      "locator": "/office:document-content/office:body/office:text/list[151]/list-item[6]/p[1]",
+      "sourceBlockSha256": "f335d0e8389fd26eaa01e53cac46fdb5716523d32a2312d934b0f62b6186b176",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 169,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 169,
+          "textSha256": "f335d0e8389fd26eaa01e53cac46fdb5716523d32a2312d934b0f62b6186b176",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06904",
+      "locator": "/office:document-content/office:body/office:text/list[151]/list-item[7]/p[1]",
+      "sourceBlockSha256": "b7472159561ddc7a88295db44e395cf8384026d58dac90b04b11e638fd9f41a3",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 49,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 49,
+          "textSha256": "b7472159561ddc7a88295db44e395cf8384026d58dac90b04b11e638fd9f41a3",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06905",
+      "locator": "/office:document-content/office:body/office:text/list[151]/list-item[8]/p[1]",
+      "sourceBlockSha256": "774aa132355abeab4e75d4614ed7c3583744cae50314fdbadc236fd10fd92f42",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 40,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 40,
+          "textSha256": "774aa132355abeab4e75d4614ed7c3583744cae50314fdbadc236fd10fd92f42",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06906",
+      "locator": "/office:document-content/office:body/office:text/list[151]/list-item[9]/p[1]",
+      "sourceBlockSha256": "47a2d3c8869b75ed44180a2159463a8cfba55decd1ab900d4f8ef87f21d00dae",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 45,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 45,
+          "textSha256": "47a2d3c8869b75ed44180a2159463a8cfba55decd1ab900d4f8ef87f21d00dae",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06907",
+      "locator": "/office:document-content/office:body/office:text/list[151]/list-item[10]/p[1]",
+      "sourceBlockSha256": "f71203fa00f9a9c548dec19db9c980a5d681bf226bd3caf6b7926dbc465c9575",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 108,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 2,
+          "textSha256": "7a7202fb1b53105f00a4308223160a22fd287678fcc8cf3681a36a57ee85e75a",
+          "editorialStyles": [
+            "paragraph:P96"
+          ]
+        },
+        {
+          "rawCharacterStart": 2,
+          "rawCharacterEnd": 9,
+          "textSha256": "d00bd4ec32e4e1cc45ddae0ad3fd34af28cefb4f236b0f8cc19ff7bfe70dda17",
+          "editorialStyles": [
+            "paragraph:P96"
+          ]
+        },
+        {
+          "rawCharacterStart": 9,
+          "rawCharacterEnd": 108,
+          "textSha256": "9e411a483f7404f8dd29bad2b19bfd74a09f152809ddcbf930f025c134221745",
+          "editorialStyles": [
+            "paragraph:P96"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06908",
+      "locator": "/office:document-content/office:body/office:text/list[151]/list-item[11]/p[1]",
+      "sourceBlockSha256": "bc3b60f599dfb83e8c5355991443951c483f3314db7b9a026130729103b256e3",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 72,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 2,
+          "textSha256": "7a7202fb1b53105f00a4308223160a22fd287678fcc8cf3681a36a57ee85e75a",
+          "editorialStyles": [
+            "paragraph:P96"
+          ]
+        },
+        {
+          "rawCharacterStart": 2,
+          "rawCharacterEnd": 8,
+          "textSha256": "b2ef230e7f4f315a28cdcc863028da31f7110f3209feb76e76fed0f37b3d8580",
+          "editorialStyles": [
+            "paragraph:P96"
+          ]
+        },
+        {
+          "rawCharacterStart": 8,
+          "rawCharacterEnd": 72,
+          "textSha256": "5d0c8117b6cc9614e7c949a7c95539a92eeef5827010ec7e23e3e524c2721ca5",
+          "editorialStyles": [
+            "paragraph:P96"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B06909",
+      "locator": "/office:document-content/office:body/office:text/list[151]/list-item[12]/p[1]",
+      "sourceBlockSha256": "f94a1f72c8800d4d95433969159613592a25dfdbdfe563b547329b45e366f5e3",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 112,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 2,
+          "textSha256": "7a7202fb1b53105f00a4308223160a22fd287678fcc8cf3681a36a57ee85e75a",
+          "editorialStyles": [
+            "paragraph:P96"
+          ]
+        },
+        {
+          "rawCharacterStart": 2,
+          "rawCharacterEnd": 13,
+          "textSha256": "4b2a26fc231451748d1041ccbcf7d2f1ff601daf93b3de4dcba5d1c3c0e42fd6",
+          "editorialStyles": [
+            "paragraph:P96"
+          ]
+        },
+        {
+          "rawCharacterStart": 13,
+          "rawCharacterEnd": 112,
+          "textSha256": "6e1c5c2185199145eb6280370a6b7ec8939475d3bb794b3f0281baac624a4dc2",
+          "editorialStyles": [
+            "paragraph:P96"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B07638",
+      "locator": "/office:document-content/office:body/office:text/table[15]/table-header-rows[1]/table-row[1]/table-cell[9]/p[1]",
+      "sourceBlockSha256": "a7770c6daaa4bdc22db60e2ad2d61f8a94b14b88e42865a93267469abb4cc365",
+      "effectiveBlockSha256": "44bd7ae60f478fae1061e11a7739f4b94d1daf917982d33b6fc8a01a63f89c21",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 2,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 1,
+          "textSha256": "333e0a1e27815d0ceee55c473fe3dc93d56c63e3bee2b3b4aee8eed6d70191a3",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B07778",
+      "locator": "/office:document-content/office:body/office:text/p[6423]",
+      "sourceBlockSha256": "449ae8c1cd51149fc9bae8227a096e1cbfb38c2ee8b85754c3460e132c558afc",
+      "effectiveBlockSha256": "4dcee158e6100f7ff11fe721f7705a8b1143f950414b39cc72b22bd7469a637d",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 380,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 18,
+          "rawCharacterEnd": 87,
+          "textSha256": "ed96e3f9699c094e3b5aa370f60add2f881aabdda9e28b357461518d3bb39509",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B08842",
+      "locator": "/office:document-content/office:body/office:text/p[7218]",
+      "sourceBlockSha256": "c16efb77a9505cb2826b81f0f4f41a9a1f81a3e98415960ea65d9528458826b0",
+      "effectiveBlockSha256": "bb6432ad3560ac95b185cbb43d7798499cbce6b9ac5e3a8c213e93fb1b02b85f",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 125,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 45,
+          "rawCharacterEnd": 46,
+          "textSha256": "18ac3e7343f016890c510e93f935261169d9e3f565436429830faf0934f4f8e4",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B08891",
+      "locator": "/office:document-content/office:body/office:text/p[7257]",
+      "sourceBlockSha256": "6778298998ae738ef5835c6730d8c40ec1a7701f36bfb14571d235a5534129af",
+      "effectiveBlockSha256": "c9ea5a9c142d874b777fe072907744f99c94f6526d51692b6b7eb28fbca73208",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 181,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 126,
+          "rawCharacterEnd": 127,
+          "textSha256": "a83dd0ccbffe39d071cc317ddf6e97f5c6b1c87af91919271f9fa140b0508c6c",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B09119",
+      "locator": "/office:document-content/office:body/office:text/p[7464]",
+      "sourceBlockSha256": "4c4a3580d64f8f3d0229e3d794c44161dda0300ac0eff84267c4a80b6359a867",
+      "effectiveBlockSha256": "b28b56504129e5881249b53144e0b9b7ad4a231f03ee82da5009da31b707b002",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 276,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 27,
+          "rawCharacterEnd": 28,
+          "textSha256": "043a718774c572bd8a25adbeb1bfcd5c0256ae11cecf9f9c3f925d0e52beaf89",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B09286",
+      "locator": "/office:document-content/office:body/office:text/p[7603]",
+      "sourceBlockSha256": "8c98a7b990e8be72798a7a8c470f8da7db7787ea0001192be0a89dd989018c0c",
+      "effectiveBlockSha256": "e0f5e448c1a8c42762ce53a8fba0aad115c1f0087fd4efb67d9ddfc8cebb037e",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 61,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 24,
+          "rawCharacterEnd": 25,
+          "textSha256": "62b67e1f685b7fef51102005dddd27774be3fee38c42965c53aab035d0b6b221",
+          "editorialStyles": [
+            "text:T114"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B09731",
+      "locator": "/office:document-content/office:body/office:text/p[7957]",
+      "sourceBlockSha256": "3e4c4b2706f16d638cb7c716cddfccfad70f79b7a06979183d44548c8226bc5e",
+      "effectiveBlockSha256": "badfe394e5160f629979e23834d71588e8b1160ab0c5121e71fd16d4d0bfebb0",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 467,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 437,
+          "rawCharacterEnd": 443,
+          "textSha256": "8187ccb4d451d4e3bb9cafb47ec872793fe34fed47332ebd9fae3f159e407c24",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B09781",
+      "locator": "/office:document-content/office:body/office:text/p[7992]",
+      "sourceBlockSha256": "b676d7e599d5308d0b3ecb12031f1d5ea6d8b1915c95f811f168c86119f9e48d",
+      "effectiveBlockSha256": "52e28bcce5bb9cf2e396b44f791d8ba45deb3adaabb1728de210e12d42cd68a7",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 174,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 37,
+          "rawCharacterEnd": 38,
+          "textSha256": "043a718774c572bd8a25adbeb1bfcd5c0256ae11cecf9f9c3f925d0e52beaf89",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B09839",
+      "locator": "/office:document-content/office:body/office:text/p[8035]",
+      "sourceBlockSha256": "fb02b6b185237397a2dbd1387f7f6d43df1e66ca482cc6f926733304bed1afce",
+      "effectiveBlockSha256": "1ae4937d74b0afc9fc88cf4da6aaee7409d8458905f748166a9cc78ec5ed4f8b",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 157,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 85,
+          "rawCharacterEnd": 88,
+          "textSha256": "ba78973ddcf98d4e5369f5e722d681d94f5106895e5d6cf6fa3ca8240fabdc14",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B09932",
+      "locator": "/office:document-content/office:body/office:text/p[8109]",
+      "sourceBlockSha256": "1e64ff93918055c5e8b67f9da7c9a00fbd7ed84fd6f568bb5cf503724c992697",
+      "effectiveBlockSha256": "5cae67b2c849abc91b14393ef47dc06da09d37da06ca0b716322c351dd3f14b9",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 200,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 42,
+          "rawCharacterEnd": 115,
+          "textSha256": "adeca0e052499bd371f8992f90b124246299895c737510b5adce32812892181b",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10210",
+      "locator": "/office:document-content/office:body/office:text/p[8328]",
+      "sourceBlockSha256": "75c5aa886acf2b2ac1a074396a50ab103841326129a0455740f233dda990d207",
+      "effectiveBlockSha256": "2097647dfdbccee5768fbbe18e4d689e94da2e9aff4de201736666d6cc795fa3",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 131,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 3,
+          "rawCharacterEnd": 14,
+          "textSha256": "e863712f81b27853a95ec57dfad8da50059d440af5eacff7fe86daaa958851c9",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10310",
+      "locator": "/office:document-content/office:body/office:text/p[8407]",
+      "sourceBlockSha256": "68fdfb2eb6214b0fcc9fd3a420ebb77663a09c167e11671ea1c293c65ffb6aa7",
+      "effectiveBlockSha256": "602722ec1db867fe6c0c002ade0688a2f8b5495b6828f6bc68615395118d324d",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 291,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 81,
+          "rawCharacterEnd": 82,
+          "textSha256": "043a718774c572bd8a25adbeb1bfcd5c0256ae11cecf9f9c3f925d0e52beaf89",
+          "editorialStyles": [
+            "text:T124"
+          ]
+        },
+        {
+          "rawCharacterStart": 142,
+          "rawCharacterEnd": 145,
+          "textSha256": "10c22bcf4c768b515be4e94bcafc71bf3e8fb5f70b2584bcc8c7533217f2e7f9",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10311",
+      "locator": "/office:document-content/office:body/office:text/p[8408]",
+      "sourceBlockSha256": "021d1ccb18aa284690c3e2c220ddb765f0aa52ff923e072637de19397cb5b8bf",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 538,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 199,
+          "textSha256": "ebb6b2b0c8d348705e6fd029eec44cb56df2d52bc54b8f9e979a8f50388de682",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        },
+        {
+          "rawCharacterStart": 199,
+          "rawCharacterEnd": 214,
+          "textSha256": "a7063b0b45efce9c9bc00d339a93572baf37e244b40e799526f2f0baff8f47a2",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        },
+        {
+          "rawCharacterStart": 214,
+          "rawCharacterEnd": 260,
+          "textSha256": "bdac64d1b0944b096aa1c3758ddc033fc0b0dc24d48a2d78aec7cde977365e09",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        },
+        {
+          "rawCharacterStart": 260,
+          "rawCharacterEnd": 275,
+          "textSha256": "f031a382a92fadfd03d240d480d01e75ea488d79d1d985153d49ecf8b1fff13b",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        },
+        {
+          "rawCharacterStart": 275,
+          "rawCharacterEnd": 473,
+          "textSha256": "b9c205ce1b061348e8506b633a7e16b3ba9751aff0a9868d986ccbf117516932",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        },
+        {
+          "rawCharacterStart": 473,
+          "rawCharacterEnd": 488,
+          "textSha256": "a7063b0b45efce9c9bc00d339a93572baf37e244b40e799526f2f0baff8f47a2",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        },
+        {
+          "rawCharacterStart": 488,
+          "rawCharacterEnd": 538,
+          "textSha256": "9252ab59872fa278c4743b1b88986d34a58f14b1ae61505803b2621d0786029e",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10312",
+      "locator": "/office:document-content/office:body/office:text/p[8409]",
+      "sourceBlockSha256": "3842f11a3acf2570e1578c93da54604dad7abaf7a8a9096bfee7922265e9d87f",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 184,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 55,
+          "textSha256": "c1ba1f43f281939e6f40f01e2f5aa07d065ecbd456aa29cbda2ab7e85b79a7eb",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        },
+        {
+          "rawCharacterStart": 55,
+          "rawCharacterEnd": 70,
+          "textSha256": "a7063b0b45efce9c9bc00d339a93572baf37e244b40e799526f2f0baff8f47a2",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        },
+        {
+          "rawCharacterStart": 70,
+          "rawCharacterEnd": 184,
+          "textSha256": "8cef189c89a918867435b498ed2ed81332e0b8bd990ec9acf1687b4d3870e750",
+          "editorialStyles": [
+            "paragraph:P35"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10313",
+      "locator": "/office:document-content/office:body/office:text/p[8410]",
+      "sourceBlockSha256": "51aa80a0a1f9deadad6955a88c129cbdb2f046178ef8f573b1591076ef1deb8f",
+      "effectiveBlockSha256": "96a002e37bfbecdf6d420a141a1299c89998a887ddabf19cf151f2ae88eedb83",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 109,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 30,
+          "rawCharacterEnd": 55,
+          "textSha256": "573d1f7083a587abac0ac4c99d9d23fd37cc3bf44929a92544b8738a6f69573e",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10540",
+      "locator": "/office:document-content/office:body/office:text/p[8594]",
+      "sourceBlockSha256": "4a34735d611fe224f214aa79a4691c9604f71d0a4150226d41cf0d34c4e2d7e6",
+      "effectiveBlockSha256": "80a618c9d9351c0f73d58a4aa6349b50e39cf8fa5e903a31fd2d9aa0b18487e7",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 92,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 71,
+          "rawCharacterEnd": 72,
+          "textSha256": "043a718774c572bd8a25adbeb1bfcd5c0256ae11cecf9f9c3f925d0e52beaf89",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10550",
+      "locator": "/office:document-content/office:body/office:text/p[8604]",
+      "sourceBlockSha256": "f742618569dcc67aa9f850e3ceb269cdc637b9c66a3ba3c88eb7967100d0f44d",
+      "effectiveBlockSha256": "72408c4e2317918c4918f214f25a3d28a5a6ff267b3fb6ae4e47c3baf0d33ded",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 89,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 71,
+          "rawCharacterEnd": 72,
+          "textSha256": "043a718774c572bd8a25adbeb1bfcd5c0256ae11cecf9f9c3f925d0e52beaf89",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10571",
+      "locator": "/office:document-content/office:body/office:text/p[8622]",
+      "sourceBlockSha256": "2c4d8541178fa7223890ce03713ca2c922f753d78214dc0b5fff2090def415cd",
+      "effectiveBlockSha256": "f4760c49cd7665d224a447063b7f33862458f885f3f0e5104c7cd88dc3a10699",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 295,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 38,
+          "rawCharacterEnd": 41,
+          "textSha256": "388f91ea04d6eaeb65084976447777b5f11177ab1995c89b19cccbf93e97265d",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10587",
+      "locator": "/office:document-content/office:body/office:text/p[8637]",
+      "sourceBlockSha256": "a8b86d3c769985e971ce82f49d4fe7b6eda3ff9936cbfdb58331e2ecceab50b2",
+      "effectiveBlockSha256": "39bcadb820da7f6bfab34affce931cec958c7ab8ee2d31009e37fc4ed7046c91",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 397,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 25,
+          "rawCharacterEnd": 170,
+          "textSha256": "09fa44571c1cb39212bd534b26155d8a26e9f1d0ddce668a05cca9ab8d3f0278",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10605",
+      "locator": "/office:document-content/office:body/office:text/p[8654]",
+      "sourceBlockSha256": "98c41b3d9a9d9ef08761a3d7426c485b456be11c55341b76dfeefc7de85642e3",
+      "effectiveBlockSha256": "c72bb5d863fcc4353c5d77c650ffab41a6acc2a69b32afbc98c8df1cbdc7c463",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 407,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 195,
+          "rawCharacterEnd": 198,
+          "textSha256": "b9776d7ddf459c9ad5b0e1d6ac61e27befb5e99fd62446677600d7cacef544d0",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10652",
+      "locator": "/office:document-content/office:body/office:text/p[8683]",
+      "sourceBlockSha256": "4dfd1961bd0e18e73f5024a3e045433a548c063bee20ed88967475b44f7df386",
+      "effectiveBlockSha256": "790592891c47953ad8018b78d049171dc563796d9514e741c9f43ef29f5192df",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 162,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 26,
+          "textSha256": "3a55d765dd6f7a4c7aa1f3b6df6ea2183a8d0a2466223cbdfa7cfe144546d238",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10656",
+      "locator": "/office:document-content/office:body/office:text/p[8685]",
+      "sourceBlockSha256": "a5f21a55a20215b00c11b9212215b5528d2cdb0a4e74a32ea261c6e43034f986",
+      "effectiveBlockSha256": "775605777f517dff47c2dc1ade37e48a2914c3263e87b329c702a1edca44cd8c",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 663,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 34,
+          "rawCharacterEnd": 40,
+          "textSha256": "c9ea42b1a1f30e37ed113a96fc8b56136bc2da7a3a7f55722c9dd118ac112774",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10727",
+      "locator": "/office:document-content/office:body/office:text/p[8739]",
+      "sourceBlockSha256": "b9b2ef0a82efac31b557407f6bf454a6c405b22e58a2e6280cf3e8f77592f254",
+      "effectiveBlockSha256": "0ad0e05ee68edec4cc0c3dda625eb117288a9bc163ad0cb413ee01f48019668d",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 251,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 225,
+          "rawCharacterEnd": 226,
+          "textSha256": "8a5edab282632443219e051e4ade2d1d5bbc671c781051bf1437897cbdfea0f1",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10751",
+      "locator": "/office:document-content/office:body/office:text/p[8762]",
+      "sourceBlockSha256": "e84432f6386bca12705fb2e4e462884c8eacc697bd57ec7e6a8cd3123fd24577",
+      "effectiveBlockSha256": "8c2178e9cdc11e5fbf8e6315ef5494aead956058c18288f1e0266d111f2d4e3c",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 309,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 118,
+          "rawCharacterEnd": 119,
+          "textSha256": "3f79bb7b435b05321651daefd374cdc681dc06faa65e374e38337b88ca046dea",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 162,
+          "rawCharacterEnd": 166,
+          "textSha256": "86e1de74820a9b252ba33b2eed445b0cd02c445b5f4b8007205aff1762d7301a",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10794",
+      "locator": "/office:document-content/office:body/office:text/p[8797]",
+      "sourceBlockSha256": "0876660f66de3121741724e83a15ef07f649c49d9ec794fce3c29658510e36b3",
+      "effectiveBlockSha256": "2d50ee3d27f611ad0b74fb4049dfd347cb584a6de8df483cc2af85fae5307854",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 618,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 74,
+          "rawCharacterEnd": 76,
+          "textSha256": "7175517a370b5cd2e664e3fd29c4ea9db5ce17058eb9772fe090a5485e49dad6",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 151,
+          "rawCharacterEnd": 153,
+          "textSha256": "7175517a370b5cd2e664e3fd29c4ea9db5ce17058eb9772fe090a5485e49dad6",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10916",
+      "locator": "/office:document-content/office:body/office:text/list[225]/list-item[2]/p[1]",
+      "sourceBlockSha256": "253667239e6353f6e542ff445f15c2e202ba33a620bcf764eff91ffe63acdd7e",
+      "effectiveBlockSha256": "dac743d4c76e083f9e7e15c2a77275b6fc0d5ae39008fc92f0dc13548f3ab6c4",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 211,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 96,
+          "rawCharacterEnd": 97,
+          "textSha256": "d03502c43d74a30b936740a9517dc4ea2b2ad7168caa0a774cefe793ce0b33e7",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 151,
+          "rawCharacterEnd": 198,
+          "textSha256": "2facdeb42c89ca029ccefff117f3ec7e1d495a41145da6dcaf46feabb5ac5c56",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B10945",
+      "locator": "/office:document-content/office:body/office:text/list[227]/list-item[1]/list[1]/list-item[1]/p[1]",
+      "sourceBlockSha256": "6c37eb1b08db9c49c09863690f20f97f4324ebb4077b64d81cff24e7def1921e",
+      "effectiveBlockSha256": "16e69d4816796ecc570bff1e623889c4147ffaf2ddd1d323984e1964a2b3fbcc",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 423,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 96,
+          "rawCharacterEnd": 192,
+          "textSha256": "7680bc8183ce12e7cfd72c4084ac908421bf24c6dac3338f5a463a7d0a20a688",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B11138",
+      "locator": "/office:document-content/office:body/office:text/p[9071]",
+      "sourceBlockSha256": "abb736fd417060cdcb0bdeecb739274af3304ee1318308317589545b4ce5d78a",
+      "effectiveBlockSha256": "ed7c5dac6219f4fdfa5fa1821373dac591db598d8c9a181c731559b5851b6d0b",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 172,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 97,
+          "rawCharacterEnd": 98,
+          "textSha256": "d03502c43d74a30b936740a9517dc4ea2b2ad7168caa0a774cefe793ce0b33e7",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B11179",
+      "locator": "/office:document-content/office:body/office:text/p[9100]",
+      "sourceBlockSha256": "65592c29794d76f642becc3e1569d2b0f4950ca5812d9bcd6e7670c41a22c630",
+      "effectiveBlockSha256": "dae989be749e689f8f68f097ec5d527d1fc7b24dd8da446b8898db23bebe663d",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 320,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 130,
+          "rawCharacterEnd": 134,
+          "textSha256": "fe0663fd13cdb08743dca3d2d5d1168762556ea36f77d8ab6009306d12a6f351",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 216,
+          "rawCharacterEnd": 220,
+          "textSha256": "fe0663fd13cdb08743dca3d2d5d1168762556ea36f77d8ab6009306d12a6f351",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B11554",
+      "locator": "/office:document-content/office:body/office:text/list[245]/list-item[6]/p[1]",
+      "sourceBlockSha256": "01164e2fc0b4442287b942508e386538f2ef94fff9733ab77b894cc603cf931d",
+      "effectiveBlockSha256": "68b18ffdf57f73cd9d328c25173c4072460012f064d362304ea0913df2f91980",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 99,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 91,
+          "rawCharacterEnd": 92,
+          "textSha256": "a1fce4363854ff888cff4b8e7875d600c2682390412a8cf79b37d0b11148b0fa",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B11674",
+      "locator": "/office:document-content/office:body/office:text/p[9514]",
+      "sourceBlockSha256": "b12088e8612b5a364e6e00ce998534c087df0fed903e01fe3f83a860e7cd92f5",
+      "effectiveBlockSha256": "166b7dfe9ceab9be18135650ff73d29d77fac25a81219e9a5b5a488ae5f641b3",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 776,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 83,
+          "rawCharacterEnd": 84,
+          "textSha256": "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B11691",
+      "locator": "/office:document-content/office:body/office:text/p[9528]",
+      "sourceBlockSha256": "79bf0d95ffac03828ee935809e7b45c50be0390d158e8f3088e67812fc1abaf8",
+      "effectiveBlockSha256": "652fe438c0b65773ee5444c90ad40cb7a00b18841dbc337255937854a53b876b",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 1074,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 81,
+          "rawCharacterEnd": 82,
+          "textSha256": "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B11708",
+      "locator": "/office:document-content/office:body/office:text/p[9542]",
+      "sourceBlockSha256": "07812082bb7ad44a0b776f7f66d993a0b9fc2fac00ed3c8240a713a3efc501ce",
+      "effectiveBlockSha256": "0aec4c93261973b0464b77c48a421c9fc4827e47a84c8642904da9dae89c8ae5",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 375,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 357,
+          "rawCharacterEnd": 361,
+          "textSha256": "fe0663fd13cdb08743dca3d2d5d1168762556ea36f77d8ab6009306d12a6f351",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B12124",
+      "locator": "/office:document-content/office:body/office:text/p[9898]",
+      "sourceBlockSha256": "99ead6dd0fc6e2e0e4dcdbfce875005e1bbf7e6281c8640602d43e51a4d05348",
+      "effectiveBlockSha256": "c5b49eeac5354c001d172225e678aa4ccdd5f5c263eb0188f8d40a634952b6e3",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 339,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 188,
+          "rawCharacterEnd": 216,
+          "textSha256": "de4f9cba68f349c19dc689875b1350b56b50c2ef63e48a785ff610dffe6245a8",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B12134",
+      "locator": "/office:document-content/office:body/office:text/list[256]/list-item[2]/p[1]",
+      "sourceBlockSha256": "40bfd3540e5d11617e687b318cf57510cb74c16044e66bb38b9827b8ee0529b7",
+      "effectiveBlockSha256": "a2656f6853fb6e3f5fe0ed3d3fcbdb8464aff94d5da68709303cc4f7a035593c",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 176,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 7,
+          "rawCharacterEnd": 21,
+          "textSha256": "6aabb1bb962ecd0cebcdc2dbdb6bb2d4f6ed0aa388a4d0f963185a505b1b3ded",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 58,
+          "rawCharacterEnd": 71,
+          "textSha256": "19b5c16385f8a174cbe7ebb27d416a3d7f31a76a8950514cd4ebbdd8b7830c0c",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 170,
+          "rawCharacterEnd": 175,
+          "textSha256": "5b53ac0643eeac4a2fa99dfde0416bdab819bedbc6a9bdd99a4560c76a62cc38",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B12189",
+      "locator": "/office:document-content/office:body/office:text/table[20]/table-row[10]/table-cell[4]/p[1]",
+      "sourceBlockSha256": "60e5e15c62fced57914ae8a9db5b288738fc462b488979c3a2e8268ffe5431cd",
+      "effectiveBlockSha256": "61c2997310f82550f1185bd8ce52ed0c7dc2b3f52b91a91e435f2289632f878b",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 277,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 22,
+          "rawCharacterEnd": 33,
+          "textSha256": "8fd9ed67f16f264269ce066104394143470ff87b3060236ba02db0d2013ddda8",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 270,
+          "rawCharacterEnd": 271,
+          "textSha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 274,
+          "rawCharacterEnd": 275,
+          "textSha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B12236",
+      "locator": "/office:document-content/office:body/office:text/p[9931]",
+      "sourceBlockSha256": "1ebeb5faed229f2f302e90f1c5ef137a885a087a696b2f13511404eba4f3e638",
+      "effectiveBlockSha256": "273acc5804241e5e4e2677a9b39da39dc649de655bb764737012d4a1d81a0010",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 280,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 90,
+          "rawCharacterEnd": 93,
+          "textSha256": "a8bdfde11f2443a17f53ad0c9eb033c86a916c4575fe9cbce4c6a0d5af432aed",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 150,
+          "rawCharacterEnd": 157,
+          "textSha256": "f34912a1d0fcc21b27e4c2a11adc67d4fa5de69b5f9d4f3aa5bcb2f405950fea",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 231,
+          "rawCharacterEnd": 240,
+          "textSha256": "ddd9818abacfde7afed60c93129175401439367a77e69ea93e0ddb3bb38e0bd9",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B12244",
+      "locator": "/office:document-content/office:body/office:text/list[258]/list-item[2]/p[1]",
+      "sourceBlockSha256": "40bfd3540e5d11617e687b318cf57510cb74c16044e66bb38b9827b8ee0529b7",
+      "effectiveBlockSha256": "a2656f6853fb6e3f5fe0ed3d3fcbdb8464aff94d5da68709303cc4f7a035593c",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 176,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 7,
+          "rawCharacterEnd": 21,
+          "textSha256": "6aabb1bb962ecd0cebcdc2dbdb6bb2d4f6ed0aa388a4d0f963185a505b1b3ded",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 58,
+          "rawCharacterEnd": 71,
+          "textSha256": "19b5c16385f8a174cbe7ebb27d416a3d7f31a76a8950514cd4ebbdd8b7830c0c",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 170,
+          "rawCharacterEnd": 175,
+          "textSha256": "5b53ac0643eeac4a2fa99dfde0416bdab819bedbc6a9bdd99a4560c76a62cc38",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B12254",
+      "locator": "/office:document-content/office:body/office:text/p[9946]",
+      "sourceBlockSha256": "d8676822d518b5453391fb7cf5da291ce4a1cc1250bc0d2d5ca0688aa13fed07",
+      "effectiveBlockSha256": "2775cd27e3eccdebe07a46ba564e4964517a45b66c34184a6c8f543b2abe7c5b",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 291,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 79,
+          "rawCharacterEnd": 98,
+          "textSha256": "cc7b4ab32ab9600c7ed2b45d194546dc57c1d5a54f26c8f3770da9379db384da",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 239,
+          "rawCharacterEnd": 250,
+          "textSha256": "ef1370ea94c41a0cf5c62e4eb83837f5e8661bb7eddb04b8d855e8b97df374fd",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B12259",
+      "locator": "/office:document-content/office:body/office:text/list[259]/list-item[2]/p[1]",
+      "sourceBlockSha256": "40bfd3540e5d11617e687b318cf57510cb74c16044e66bb38b9827b8ee0529b7",
+      "effectiveBlockSha256": "a2656f6853fb6e3f5fe0ed3d3fcbdb8464aff94d5da68709303cc4f7a035593c",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 176,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 7,
+          "rawCharacterEnd": 21,
+          "textSha256": "6aabb1bb962ecd0cebcdc2dbdb6bb2d4f6ed0aa388a4d0f963185a505b1b3ded",
+          "editorialStyles": [
+            "text:T101"
+          ]
+        },
+        {
+          "rawCharacterStart": 58,
+          "rawCharacterEnd": 71,
+          "textSha256": "19b5c16385f8a174cbe7ebb27d416a3d7f31a76a8950514cd4ebbdd8b7830c0c",
+          "editorialStyles": [
+            "text:T101"
+          ]
+        },
+        {
+          "rawCharacterStart": 170,
+          "rawCharacterEnd": 175,
+          "textSha256": "5b53ac0643eeac4a2fa99dfde0416bdab819bedbc6a9bdd99a4560c76a62cc38",
+          "editorialStyles": [
+            "text:T101"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B12260",
+      "locator": "/office:document-content/office:body/office:text/p[9950]",
+      "sourceBlockSha256": "0a1b2a90b6a264f5dfc6a71cbf537a252a29d22bd461db046667bc34d90c88bc",
+      "effectiveBlockSha256": "c4aae14497874b5c084d826f6541a5cec4b48623d91265ef5d13eb28be4b87af",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 163,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 141,
+          "rawCharacterEnd": 142,
+          "textSha256": "4b6b1bf3818d4e6c9c4358f2232f37dda97af9f651937ebc08864b2739fe29d9",
+          "editorialStyles": [
+            "text:T104"
+          ]
+        },
+        {
+          "rawCharacterStart": 162,
+          "rawCharacterEnd": 163,
+          "textSha256": "4b6b1bf3818d4e6c9c4358f2232f37dda97af9f651937ebc08864b2739fe29d9",
+          "editorialStyles": [
+            "text:T104"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B12285",
+      "locator": "/office:document-content/office:body/office:text/p[9970]",
+      "sourceBlockSha256": "49a0208b26d813c874385b155d248d2d7587f92c464f931745d52f8598ad87da",
+      "effectiveBlockSha256": "a78136e339ccea89de8cb20e5e5122f2f2619ffeab507c73c0ec2bf8d1577b8c",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 243,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 180,
+          "rawCharacterEnd": 186,
+          "textSha256": "58bafe48c4d140ed4b02b653a6497bba88cc23e857ad36675735834285d62cce",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B12369",
+      "locator": "/office:document-content/office:body/office:text/p[10039]",
+      "sourceBlockSha256": "7adffba5a49fe9f04d43a499141f370c131671ba5c8e4fe33e8bc15db5cf1a1c",
+      "effectiveBlockSha256": "a482519de2af012b6bc6e37c061bb5a9934c9205b4af3b4083c2852ec1ff7d72",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 188,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 161,
+          "rawCharacterEnd": 165,
+          "textSha256": "2e5f769687c7731726bb738d6137d86e89691a3a164a80588c046c79ce99d749",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B12396",
+      "locator": "/office:document-content/office:body/office:text/table[21]/table-row[1]/table-cell[1]/p[1]",
+      "sourceBlockSha256": "6745d87d85dac297e1abd419290474125b96d5a00d9939b2f432522b586fb328",
+      "effectiveBlockSha256": "9b10587f84a2c3749305f3421c8f2838ed88b0ab1e44326ff9eeb48083373144",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 11,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 1,
+          "rawCharacterEnd": 2,
+          "textSha256": "de7d1b721a1e0632b7cf04edf5032c8ecffa9f9a08492152b926f1a5a7e765d7",
+          "editorialStyles": [
+            "text:T110"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B12470",
+      "locator": "/office:document-content/office:body/office:text/list[263]/list-item[2]/p[1]",
+      "sourceBlockSha256": "40bfd3540e5d11617e687b318cf57510cb74c16044e66bb38b9827b8ee0529b7",
+      "effectiveBlockSha256": "a2656f6853fb6e3f5fe0ed3d3fcbdb8464aff94d5da68709303cc4f7a035593c",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 176,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 7,
+          "rawCharacterEnd": 21,
+          "textSha256": "6aabb1bb962ecd0cebcdc2dbdb6bb2d4f6ed0aa388a4d0f963185a505b1b3ded",
+          "editorialStyles": [
+            "text:T101"
+          ]
+        },
+        {
+          "rawCharacterStart": 58,
+          "rawCharacterEnd": 71,
+          "textSha256": "19b5c16385f8a174cbe7ebb27d416a3d7f31a76a8950514cd4ebbdd8b7830c0c",
+          "editorialStyles": [
+            "text:T101"
+          ]
+        },
+        {
+          "rawCharacterStart": 170,
+          "rawCharacterEnd": 175,
+          "textSha256": "5b53ac0643eeac4a2fa99dfde0416bdab819bedbc6a9bdd99a4560c76a62cc38",
+          "editorialStyles": [
+            "text:T101"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B12741",
+      "locator": "/office:document-content/office:body/office:text/list[268]/list-item[10]/p[1]",
+      "sourceBlockSha256": "ed8523bd5685d1cd834f9a6d5d22ff0900decf9b2af2146a3be04e987bcdc5ec",
+      "effectiveBlockSha256": "5f29720da39236f869f3a9c93d07e9ebc9ec2c77e0c439f5bbaa54cf4afdc621",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 131,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 31,
+          "rawCharacterEnd": 34,
+          "textSha256": "a6556e4852e2639053a38b26fb4b2fd4cd61a64010c80ab99bef06edaf41dc06",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B12957",
+      "locator": "/office:document-content/office:body/office:text/p[10492]",
+      "sourceBlockSha256": "ebaf864523245185b519ee09b10c290fc825902f745bdeb74f1947fa1714e722",
+      "effectiveBlockSha256": "a4dc177c50516848640d0f3ea2a0f31f938dee47569fa98278d79db65a4c9f98",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 462,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 433,
+          "rawCharacterEnd": 437,
+          "textSha256": "427a379ae3e6b749a8893bac35e20ab8dadb124ee64a5c615c3548f05ae44017",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B13043",
+      "locator": "/office:document-content/office:body/office:text/p[10537]",
+      "sourceBlockSha256": "cd1cbe7f7e6174de8010f537837ab4fb9a2c47e46e6bbccd5b19cae98f48e6ee",
+      "effectiveBlockSha256": "cb18d45a2a84fd5faae4c6f0b7ff40be579bad04128b2b4e11cc49a42ceea43c",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 139,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 31,
+          "rawCharacterEnd": 34,
+          "textSha256": "b344d80e24a3679999fa964450b34bc24d1578a35509f934c1418b0a20d21a67",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B13340",
+      "locator": "/office:document-content/office:body/office:text/p[10773]",
+      "sourceBlockSha256": "e6891dd26d7d723bfa04256a513c519390717422b71882df7f037846251085d4",
+      "effectiveBlockSha256": "0df080aecd6276d3a922a44e3e648ea92d23d4634aa403129f667935168963fd",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 137,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 101,
+          "rawCharacterEnd": 105,
+          "textSha256": "fe0663fd13cdb08743dca3d2d5d1168762556ea36f77d8ab6009306d12a6f351",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B13640",
+      "locator": "/office:document-content/office:body/office:text/p[11006]",
+      "sourceBlockSha256": "4ec63d121b72e3a1f84336205017d754ea904eb276400c13b0c25afba1c967a0",
+      "effectiveBlockSha256": "c5462daa91db50ea7906a3b67557433d1407f50d535a102555ffc5b1ec79ec88",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 474,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 124,
+          "rawCharacterEnd": 134,
+          "textSha256": "48ddf9700f83a0995c20ec97d62f84b699bec693fc7ae064ba3dbe3467ac5a7a",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 134,
+          "rawCharacterEnd": 154,
+          "textSha256": "e384e4a943f6fc790deabb75a98d56ea25fb0521a3a8a4ee7e737fdb34757017",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 154,
+          "rawCharacterEnd": 221,
+          "textSha256": "adaa7db622f281c0bf1c4de714666a819d3bb6af46988c367bceb2a2426a8923",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B15949",
+      "locator": "/office:document-content/office:body/office:text/table[24]/table-row[10]/table-cell[1]/p[1]",
+      "sourceBlockSha256": "3c1e99a2d1d9a779dacd3312853cab80d5c4368d22b640c37dd0fdbc40fe574f",
+      "effectiveBlockSha256": "99a8d1c850d93e14139435a642160394f5f20294e6e13113131748b429ff8a52",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 32,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 16,
+          "textSha256": "fa618fa098b57dfcb68adc9c88e49a50835587ed77b2a2121a9763378ef80d60",
+          "editorialStyles": [
+            "text:T114"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B16337",
+      "locator": "/office:document-content/office:body/office:text/table[25]/table-row[8]/table-cell[1]/p[1]",
+      "sourceBlockSha256": "97bf27d8dcce20f9015d10fc1bd6e13e4be4d167f819c28ef828019f16bcd3c5",
+      "effectiveBlockSha256": "0e7483ac87b10af0ca9a8fecab72a3f53b2019c0319a0f8734cc88acf8ce05a6",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 23,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 11,
+          "textSha256": "5780026ad59f42d7fc98bd635ecc7231534ce37fb0906da7dac965e06d86780e",
+          "editorialStyles": [
+            "text:T101"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B17790",
+      "locator": "/office:document-content/office:body/office:text/p[14374]",
+      "sourceBlockSha256": "ea4307485a567cc207e41e861af8187fb1857c083b747ab5171139c6cc510e1e",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 12,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 2,
+          "rawCharacterEnd": 12,
+          "textSha256": "ea4307485a567cc207e41e861af8187fb1857c083b747ab5171139c6cc510e1e",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B17792",
+      "locator": "/office:document-content/office:body/office:text/p[14376]",
+      "sourceBlockSha256": "655242f78b637be24833ff012cb9acf914c0b9e3f9dafbd95a4333004a1ffdc6",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 13,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 2,
+          "rawCharacterEnd": 13,
+          "textSha256": "655242f78b637be24833ff012cb9acf914c0b9e3f9dafbd95a4333004a1ffdc6",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B18834",
+      "locator": "/office:document-content/office:body/office:text/p[15328]",
+      "sourceBlockSha256": "516c9f049a75610b25ceb92d6d6511f3c98a6b52a0c2a6ca39071d39af42948c",
+      "effectiveBlockSha256": "285a058d130b2dc9bce9217b23a84cc2baedb55b68d34cd5f4ac173129537032",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 318,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 258,
+          "rawCharacterEnd": 266,
+          "textSha256": "a4ef304ba42a200bafd78b046e0869af9183f6eee5524aead5dcb3a5ab5f8f3f",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B21061",
+      "locator": "/office:document-content/office:body/office:text/p[17189]",
+      "sourceBlockSha256": "f26981810a2f10e58cbe49534d3dd091729937c45a5102a6f6974684dd12e0ca",
+      "effectiveBlockSha256": "ff8cb6d23300bb0be845334b61a1510404ca7ba328c17e611124927dc56fe85e",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 431,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 371,
+          "rawCharacterEnd": 383,
+          "textSha256": "ccef86c68ee05cd2dfa1a1ee3dd89646b02feb9035121fb7cafa4db3edab1141",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 383,
+          "rawCharacterEnd": 393,
+          "textSha256": "19b057a56982d8d907746a7dd3c08d5f9e862ecb1303a0ad4ff1103b4ad5d0ae",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 393,
+          "rawCharacterEnd": 406,
+          "textSha256": "660b9ff21702276c49fe124e3165b4a004310debce29e13a72fb1acff17ed59a",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B21070",
+      "locator": "/office:document-content/office:body/office:text/p[17197]",
+      "sourceBlockSha256": "f646eaa59d4c959e8a11d84d670cf748cd78381543a7225325ad576a10699bb8",
+      "effectiveBlockSha256": "6af761e68fe4dcd2da1bf77bbca7b5978d9606cfd9c2d1ba84a9e28ea44f5595",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 402,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 341,
+          "rawCharacterEnd": 353,
+          "textSha256": "797ebcad362d06c5c67723720d41e48a9644ebe1b41ddb1a03477b93b93821d6",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 353,
+          "rawCharacterEnd": 363,
+          "textSha256": "19b057a56982d8d907746a7dd3c08d5f9e862ecb1303a0ad4ff1103b4ad5d0ae",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 363,
+          "rawCharacterEnd": 377,
+          "textSha256": "98bbe84fa1224c8d19649b4413725195a3abe1714e9513194a6c0d9b8496850a",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B21284",
+      "locator": "/office:document-content/office:body/office:text/p[17403]",
+      "sourceBlockSha256": "cedf4432c2422640bc43f2d7bc937faf4180cf95a94b832467a43f6639eab579",
+      "effectiveBlockSha256": "25b27170572dbddf729dab5e438f68e8134e1b4a80d0c0f954769e7e609a20a8",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 437,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 26,
+          "rawCharacterEnd": 27,
+          "textSha256": "a1fce4363854ff888cff4b8e7875d600c2682390412a8cf79b37d0b11148b0fa",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 94,
+          "rawCharacterEnd": 95,
+          "textSha256": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B21478",
+      "locator": "/office:document-content/office:body/office:text/p[17590]",
+      "sourceBlockSha256": "d7c404336f505ec923e5774cebb1ed31010023c5cf9ea042ab8333fc93a076e6",
+      "effectiveBlockSha256": "41d073c068c145300d39abbbe86c7f0be29818dd59103b2703f6ddacb120fb59",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 500,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 465,
+          "rawCharacterEnd": 477,
+          "textSha256": "ccef86c68ee05cd2dfa1a1ee3dd89646b02feb9035121fb7cafa4db3edab1141",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 477,
+          "rawCharacterEnd": 487,
+          "textSha256": "19b057a56982d8d907746a7dd3c08d5f9e862ecb1303a0ad4ff1103b4ad5d0ae",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 487,
+          "rawCharacterEnd": 500,
+          "textSha256": "d9941ffb44d576e114737f5137b94e525be18152d2540177ecdd42bedf968c00",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B21499",
+      "locator": "/office:document-content/office:body/office:text/p[17611]",
+      "sourceBlockSha256": "d5b0dd50f4f35df22fb69a2b326e7eff45e6f70260e7a9e63bb3cbdbcb99106a",
+      "effectiveBlockSha256": "da4882f824bbe7217ae8eca128301f3ab22b2abb4da32ee33b99677c599d78ac",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 360,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 325,
+          "rawCharacterEnd": 337,
+          "textSha256": "797ebcad362d06c5c67723720d41e48a9644ebe1b41ddb1a03477b93b93821d6",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 337,
+          "rawCharacterEnd": 347,
+          "textSha256": "19b057a56982d8d907746a7dd3c08d5f9e862ecb1303a0ad4ff1103b4ad5d0ae",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 347,
+          "rawCharacterEnd": 360,
+          "textSha256": "d9941ffb44d576e114737f5137b94e525be18152d2540177ecdd42bedf968c00",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B21570",
+      "locator": "/office:document-content/office:body/office:text/p[17681]",
+      "sourceBlockSha256": "e4604d0cb2889c89a3555359da005ae3b9a36aa37460834659ccfdd3ad2f8e90",
+      "effectiveBlockSha256": "508fa751dc8c960a406c60d4f7772e756cd0e6f1f9db400cc39b9aee04588394",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 338,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 303,
+          "rawCharacterEnd": 315,
+          "textSha256": "397ebaaadbb2de78d3958f396ac2c039073358ed8f61f4cd1d1f5f6affcfeb1d",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 315,
+          "rawCharacterEnd": 325,
+          "textSha256": "19b057a56982d8d907746a7dd3c08d5f9e862ecb1303a0ad4ff1103b4ad5d0ae",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 325,
+          "rawCharacterEnd": 338,
+          "textSha256": "d9941ffb44d576e114737f5137b94e525be18152d2540177ecdd42bedf968c00",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B21585",
+      "locator": "/office:document-content/office:body/office:text/p[17696]",
+      "sourceBlockSha256": "a5d537a0b39bb96a235b1fc24fdddb52fa69729bfbf2d63b4c91e9c2be18837b",
+      "effectiveBlockSha256": "79e2ea39e299ba76074db92fdf7d6b52bee82b7467e02fd0b9c003cb182429a2",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 352,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 317,
+          "rawCharacterEnd": 329,
+          "textSha256": "397ebaaadbb2de78d3958f396ac2c039073358ed8f61f4cd1d1f5f6affcfeb1d",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 329,
+          "rawCharacterEnd": 339,
+          "textSha256": "19b057a56982d8d907746a7dd3c08d5f9e862ecb1303a0ad4ff1103b4ad5d0ae",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 339,
+          "rawCharacterEnd": 352,
+          "textSha256": "d9941ffb44d576e114737f5137b94e525be18152d2540177ecdd42bedf968c00",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B21618",
+      "locator": "/office:document-content/office:body/office:text/p[17725]",
+      "sourceBlockSha256": "3bef41787c19b488e7c84d8252ffdfd5d3a68e1538cdea4a31dadd36328ca1fb",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 102,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 4,
+          "textSha256": "bb33dbdb2f216aee5a554c4815864fbdc58f3db9546a15a2d4415154c69edaf8",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 4,
+          "rawCharacterEnd": 7,
+          "textSha256": "b9776d7ddf459c9ad5b0e1d6ac61e27befb5e99fd62446677600d7cacef544d0",
+          "editorialStyles": [
+            "text:T123"
+          ]
+        },
+        {
+          "rawCharacterStart": 7,
+          "rawCharacterEnd": 8,
+          "textSha256": "36a9e7f1c95b82ffb99743e0c5c4ce95d83c9a430aac59f84ef3cbfab6145068",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 8,
+          "rawCharacterEnd": 26,
+          "textSha256": "95e4ca5ed8c54d544ac8c14c52025f2b0427f63d7de646d112ac78d06c32b10a",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 26,
+          "rawCharacterEnd": 102,
+          "textSha256": "fb20548ace66593caae87f1ffd352277dfa68f4122c67cea0040df04385f5dad",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B21619",
+      "locator": "/office:document-content/office:body/office:text/p[17726]",
+      "sourceBlockSha256": "c1db45c6f3ee926c2daf962100cad0b027c815dd103d56e8445908d26a3c304c",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 59,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 35,
+          "textSha256": "c99e353af1002b05755ddf2803eda683d15f37c7ea3098da2adbcccad08e7525",
+          "editorialStyles": [
+            "paragraph:P23"
+          ]
+        },
+        {
+          "rawCharacterStart": 35,
+          "rawCharacterEnd": 39,
+          "textSha256": "140bedbf9c3f6d56a9846d2ba7088798683f4da0c248231336e6a05679e4fdfe",
+          "editorialStyles": [
+            "paragraph:P23"
+          ]
+        },
+        {
+          "rawCharacterStart": 39,
+          "rawCharacterEnd": 41,
+          "textSha256": "0a07f659461970d8d8dcefe4fff96a1745599810dc7d47391e95c803b7b2072c",
+          "editorialStyles": [
+            "paragraph:P23"
+          ]
+        },
+        {
+          "rawCharacterStart": 41,
+          "rawCharacterEnd": 48,
+          "textSha256": "7ad8dbe5dbed0dcda5e2fa713de5ddb5b6db23d8b7f4fc0ed2650b5b071107c7",
+          "editorialStyles": [
+            "paragraph:P23"
+          ]
+        },
+        {
+          "rawCharacterStart": 48,
+          "rawCharacterEnd": 52,
+          "textSha256": "e1a3e78cb5c8858631bf81f94369a0be3fd2aebb9e852e66368b381c8feef91f",
+          "editorialStyles": [
+            "paragraph:P23"
+          ]
+        },
+        {
+          "rawCharacterStart": 52,
+          "rawCharacterEnd": 57,
+          "textSha256": "5ea44c3961f16643e614435496b16115aa6d75458b5cc3fd5398aae291f3126b",
+          "editorialStyles": [
+            "paragraph:P23"
+          ]
+        },
+        {
+          "rawCharacterStart": 57,
+          "rawCharacterEnd": 59,
+          "textSha256": "8dccf256f6d5783e62bba717ef04a6cfcea41d9befffa5ade55235e0b6a0eeb0",
+          "editorialStyles": [
+            "paragraph:P23"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B21620",
+      "locator": "/office:document-content/office:body/office:text/p[17727]",
+      "sourceBlockSha256": "538c76403411f720a988b078d9d1696b2258d9a4492356563d7050b50fa3d135",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 241,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 16,
+          "textSha256": "920f8c537053912044709d02a041ec02013ed54f25a34226f6e01612f4482184",
+          "editorialStyles": [
+            "paragraph:P23"
+          ]
+        },
+        {
+          "rawCharacterStart": 16,
+          "rawCharacterEnd": 21,
+          "textSha256": "5ea44c3961f16643e614435496b16115aa6d75458b5cc3fd5398aae291f3126b",
+          "editorialStyles": [
+            "paragraph:P23"
+          ]
+        },
+        {
+          "rawCharacterStart": 21,
+          "rawCharacterEnd": 241,
+          "textSha256": "927c88950cf123c51c1ded9c0b5ebcf72dce891fca9bc384c58b8b602025f3cf",
+          "editorialStyles": [
+            "paragraph:P23"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B21621",
+      "locator": "/office:document-content/office:body/office:text/p[17728]",
+      "sourceBlockSha256": "838e594d7ab49831163363a8c07ef7a2b3976fe4f4693135a5bbca7eb50d90a8",
+      "effectiveBlockSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effectiveTextEmpty": true,
+      "rawCharacterLength": 145,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 33,
+          "textSha256": "ef96a8095636848a5b158ed9a82f51868fb695d71e9935bc3823f91bbb28461d",
+          "editorialStyles": [
+            "paragraph:P23"
+          ]
+        },
+        {
+          "rawCharacterStart": 33,
+          "rawCharacterEnd": 40,
+          "textSha256": "7ad8dbe5dbed0dcda5e2fa713de5ddb5b6db23d8b7f4fc0ed2650b5b071107c7",
+          "editorialStyles": [
+            "paragraph:P23"
+          ]
+        },
+        {
+          "rawCharacterStart": 40,
+          "rawCharacterEnd": 145,
+          "textSha256": "465e85fee735e51df110e56722bdd7ef3edd19024062f167f45fe9bcf2c158af",
+          "editorialStyles": [
+            "paragraph:P23"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B22173",
+      "locator": "/office:document-content/office:body/office:text/p[18225]",
+      "sourceBlockSha256": "958f303730436927eb197105e4e7a59ac0d9d6621bbf7b1ed569eacdbfbbbca7",
+      "effectiveBlockSha256": "80a8e5bfa64f6c1278a149737ce0347e68e4655b429bc600769c399438d0c9b2",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 356,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 211,
+          "rawCharacterEnd": 213,
+          "textSha256": "fa51fd49abf67705d6a35d18218c115ff5633aec1f9ebfdc9d5d4956416f57f6",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B22478",
+      "locator": "/office:document-content/office:body/office:text/p[18519]",
+      "sourceBlockSha256": "079729559ab8170d62691f2d2ca58b298ded7a351969553164d01dd9f2f762fe",
+      "effectiveBlockSha256": "338d0269bc05fca65b81abca2fad9d5441c03e1f8e85ca619bfb3bbf5d9d6d79",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 260,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 186,
+          "rawCharacterEnd": 190,
+          "textSha256": "1bab76de8ed843496828ec3c3d1517451bd2c245b7042e67ad963382a5ac91ec",
+          "editorialStyles": [
+            "text:T111"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B23087",
+      "locator": "/office:document-content/office:body/office:text/p[19068]",
+      "sourceBlockSha256": "644c8ba0f9088661a878de94cac15d767f39ca6796f7b8cbae50a19160a34b01",
+      "effectiveBlockSha256": "35269c9c0ee0dc94e5c0e28647a99b349f5210bba8927b67ed83c5e5922bac74",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 132,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 112,
+          "rawCharacterEnd": 117,
+          "textSha256": "992a93455c71fedd36ac9bbc439952c041cf61445958472af479269b8d873513",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B23251",
+      "locator": "/office:document-content/office:body/office:text/p[19217]",
+      "sourceBlockSha256": "28fe4b78ab4911ddc4d0f3d0d50723b11dc1b4dd6bda5e22a708b570e73c3f7f",
+      "effectiveBlockSha256": "07ee4c4665f36f084a3f36a17deb48c7da5c5d77edd96dd81f15066a81fe7371",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 307,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 236,
+          "rawCharacterEnd": 240,
+          "textSha256": "3660315a9af3df255d8f19ab077e4797822b41488a0e2a04bc6af71213c23274",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B23759",
+      "locator": "/office:document-content/office:body/office:text/p[19649]",
+      "sourceBlockSha256": "a757a7d8da18daeed7119c641bc4613a039faf9bbe5cf979cbcfdd15f8ba9aa0",
+      "effectiveBlockSha256": "041e2d1ff5ce779dd0286c5e9906a51a0bd8ff782795dad5a3f95ceefe1d9c8f",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 421,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 231,
+          "rawCharacterEnd": 236,
+          "textSha256": "f7a4b47d1b18ec95deb6fd0ae859007c38c0a5c8e413e2ae4a77277fe00e0e85",
+          "editorialStyles": [
+            "text:T113"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B24415",
+      "locator": "/office:document-content/office:body/office:text/p[20218]",
+      "sourceBlockSha256": "430e7d0cdb25f9acab6c42bd4ec5330774d31dbe480befec29ad7d05806906c2",
+      "effectiveBlockSha256": "a2718e52ac06c9e5f50289a2b396f81aeebbdf8cbbc13781b5c3a7d418ca6853",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 134,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 3,
+          "rawCharacterEnd": 13,
+          "textSha256": "b59931897b41377540ee47c3ce01976bd7d00ef0d4dd4e64fe4a402dc04eba35",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 96,
+          "rawCharacterEnd": 101,
+          "textSha256": "7f27fbfd9e241df13b7fa9d88c8db3208c836f783455238a5417553657061bf8",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B24446",
+      "locator": "/office:document-content/office:body/office:text/p[20246]",
+      "sourceBlockSha256": "46e203f77567700e705c525e3522539fb6b22ced905f1332de40ed75f786cd67",
+      "effectiveBlockSha256": "f456d732dc4d1361d0ed1f04624f0b33bd2728730ad4319e3059db508d9bd4e3",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 583,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 65,
+          "rawCharacterEnd": 70,
+          "textSha256": "7f27fbfd9e241df13b7fa9d88c8db3208c836f783455238a5417553657061bf8",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 121,
+          "rawCharacterEnd": 126,
+          "textSha256": "7f27fbfd9e241df13b7fa9d88c8db3208c836f783455238a5417553657061bf8",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 184,
+          "rawCharacterEnd": 192,
+          "textSha256": "79cacb955411862c278361f1db74667db0c84cd6511288381a0657bff41b43f3",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 246,
+          "rawCharacterEnd": 251,
+          "textSha256": "7f27fbfd9e241df13b7fa9d88c8db3208c836f783455238a5417553657061bf8",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 399,
+          "rawCharacterEnd": 406,
+          "textSha256": "f553add216eef9bcb17f0bd770c0c14dd4ee41b23c3ef83e02e11c726e39ad4e",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 456,
+          "rawCharacterEnd": 461,
+          "textSha256": "7f27fbfd9e241df13b7fa9d88c8db3208c836f783455238a5417553657061bf8",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B24456",
+      "locator": "/office:document-content/office:body/office:text/p[20255]",
+      "sourceBlockSha256": "6403baba697eef9b6e34817ca141573b70d6881bf79d7f375c52d376652b31f4",
+      "effectiveBlockSha256": "62f5f4ec95b273a159599640cb1c66134fb23c99400b8889ae67200e1374bf35",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 402,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 62,
+          "rawCharacterEnd": 70,
+          "textSha256": "5281609fe48508a1a506c5b6e0be676885de69e793acd841eff6a138c2f132be",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 84,
+          "rawCharacterEnd": 239,
+          "textSha256": "1b9d0bdab266f1bb038adf38e60e992cb7a1df05945b8e4e7f911af43e04f6ee",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B24465",
+      "locator": "/office:document-content/office:body/office:text/p[20263]",
+      "sourceBlockSha256": "70e27d655334f1e71fa8188bd02aaf0f9f9e97e5afbcafbfb613247fe4a4f0ad",
+      "effectiveBlockSha256": "7c4e0e6c8ceb19eca3d4ef0b86c94f7ef79c2fcd4299e1f7b888300de9c66e98",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 393,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 55,
+          "rawCharacterEnd": 63,
+          "textSha256": "5281609fe48508a1a506c5b6e0be676885de69e793acd841eff6a138c2f132be",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 77,
+          "rawCharacterEnd": 231,
+          "textSha256": "27df7b5bf08e1d42d1272905df903bf78ac8acd16c88ca0c1b600ef0f9febeb9",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B24569",
+      "locator": "/office:document-content/office:body/office:text/p[20352]",
+      "sourceBlockSha256": "11bcbeb1755185fc4483507fde26ee83401cbd40776dba352784f474ff8b9ffd",
+      "effectiveBlockSha256": "33b893c75061edd33de5c32b8bf33702baee0e86ae172cdc7bd463bf76ff1ee8",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 149,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 19,
+          "rawCharacterEnd": 36,
+          "textSha256": "9bb0d7319091cb6b10da8443b86d101b7ebe33dda8190c6c7f12b24a13d2d104",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B24981",
+      "locator": "/office:document-content/office:body/office:text/list[453]/list-item[3]/p[1]",
+      "sourceBlockSha256": "d4a44729b36492469d5d75461b9677ac36df2e87c26d8dc3a9025b6da1d160b7",
+      "effectiveBlockSha256": "7c68fb128fbfdcbbb105926c97f8e46292920cf7d287be1cc57920ba50928ced",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 68,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 37,
+          "rawCharacterEnd": 41,
+          "textSha256": "360f84035942243c6a36537ae2f8673485e6c04455a0a85a0db19690f2541480",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B25139",
+      "locator": "/office:document-content/office:body/office:text/p[20779]",
+      "sourceBlockSha256": "4898dada0f7468ddd267e39d17897ed1df1e666c46a9fd4f27554d74c929be6c",
+      "effectiveBlockSha256": "2a113224b343c1e3a491d6e543225169ee441925e09c0ed80eab8bffd61e6e83",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 360,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 288,
+          "rawCharacterEnd": 289,
+          "textSha256": "a1fce4363854ff888cff4b8e7875d600c2682390412a8cf79b37d0b11148b0fa",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B25140",
+      "locator": "/office:document-content/office:body/office:text/p[20780]",
+      "sourceBlockSha256": "830486fb7eb0b641855c1967cf146239f1a6448e623924f7f010b1e0616d252b",
+      "effectiveBlockSha256": "608613fd3b0a5364545b72657155cde7b25ef3471f29d109d5425ba3a13d4edd",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 353,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 328,
+          "rawCharacterEnd": 334,
+          "textSha256": "2958d416d08aa5a472d7b509036cb7eafd542add84527e66a145ea64cb4cdc75",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B25188",
+      "locator": "/office:document-content/office:body/office:text/p[20823]",
+      "sourceBlockSha256": "21b16a707385ef4409d416a4fbdc556bb2ef55f4b7eb36bea4240b50836127ce",
+      "effectiveBlockSha256": "381280389ccf5e2b6279ac6cf6143d88ceed3a439ca32f550e182774dfc239b8",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 123,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 47,
+          "rawCharacterEnd": 59,
+          "textSha256": "46655c3d072df1042a2de9be6e3c6fe2e8c5f032111fb4eba06f3c2d039c89db",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B25319",
+      "locator": "/office:document-content/office:body/office:text/p[20948]",
+      "sourceBlockSha256": "73e0a8a6a9e92e99661fd4c2bdb0d5719031f2e1c44e2b372ee8b87f77cf58cd",
+      "effectiveBlockSha256": "4bd10ea5efbb5bc6e9d0dfbbbdd86935ca652dd7ebd3ae95398fd943b4b9a160",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 117,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 109,
+          "rawCharacterEnd": 116,
+          "textSha256": "da6cbc9d5ec6d9971c43cffa9a8f7e0f67039bcc9082e2ab08a3c35bdc73c032",
+          "editorialStyles": [
+            "text:T103"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B25409",
+      "locator": "/office:document-content/office:body/office:text/p[21031]",
+      "sourceBlockSha256": "34738d9b5b2a0b7f4a55884a5b8728edecf4d02cf6b7eb944836897b3386d16a",
+      "effectiveBlockSha256": "7f54e48ad95610cca10fe9cd09e1636bf02d24ffe6b61ed3a8681d7b94953a2d",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 172,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 155,
+          "rawCharacterEnd": 162,
+          "textSha256": "bed81787019ce48dbda7bc57aeb11a91003fac4fb51b79a0c6871ed8be851431",
+          "editorialStyles": [
+            "text:T103"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B25457",
+      "locator": "/office:document-content/office:body/office:text/p[21074]",
+      "sourceBlockSha256": "ffd6b75891c0c1f9863b6f70f1f7ba3f54011032e3f847ec2c73ea072e635c7d",
+      "effectiveBlockSha256": "30bb98651aa8084bbc29a311e94fddc909ab37d7a99a1b5dd1d769807c2898fc",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 192,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 69,
+          "rawCharacterEnd": 74,
+          "textSha256": "29e61fd4f5dc971509368ede01e2d1050a0cef513975e695b614d94da680179a",
+          "editorialStyles": [
+            "text:T103"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B25466",
+      "locator": "/office:document-content/office:body/office:text/p[21082]",
+      "sourceBlockSha256": "e5f639ad6e1e1011ddb644b1bba9ae9dd18b08d72725bbf25c9950640b82ed48",
+      "effectiveBlockSha256": "4c21c2094993a37faf504cf2ed46774c40ed6f34e9e05dc2daeebb5368ccb9cb",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 249,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 206,
+          "rawCharacterEnd": 211,
+          "textSha256": "29e61fd4f5dc971509368ede01e2d1050a0cef513975e695b614d94da680179a",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B25467",
+      "locator": "/office:document-content/office:body/office:text/p[21083]",
+      "sourceBlockSha256": "5118365a21f892207b1e0675317579ad54cafedd8a09b14d6b9cb7783668fd2b",
+      "effectiveBlockSha256": "6671f21f33e24344ce9fde498fe190450d3e37c16c07cc3e5412709798c69de5",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 140,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 19,
+          "rawCharacterEnd": 24,
+          "textSha256": "29e61fd4f5dc971509368ede01e2d1050a0cef513975e695b614d94da680179a",
+          "editorialStyles": [
+            "text:T117"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B25507",
+      "locator": "/office:document-content/office:body/office:text/p[21122]",
+      "sourceBlockSha256": "5f8317fc9c001f64b290ba45d962fdb751f3599e0c62275a17b9966df8a9c540",
+      "effectiveBlockSha256": "dd2c1bb1916ba05496f71d1d26ad3b27b4bd00de8cc9a2976615b8ec4cb719d3",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 894,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 181,
+          "rawCharacterEnd": 186,
+          "textSha256": "29e61fd4f5dc971509368ede01e2d1050a0cef513975e695b614d94da680179a",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 252,
+          "rawCharacterEnd": 257,
+          "textSha256": "29e61fd4f5dc971509368ede01e2d1050a0cef513975e695b614d94da680179a",
+          "editorialStyles": [
+            "text:T99"
+          ]
+        },
+        {
+          "rawCharacterStart": 810,
+          "rawCharacterEnd": 820,
+          "textSha256": "96adb92452863058fa1616efcc89c6e7c92a0c49148dfbd3e127ce829a45406e",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B25914",
+      "locator": "/office:document-content/office:body/office:text/p[21446]",
+      "sourceBlockSha256": "972f9f48f31c47dc31c41e455699ed64760989f6c3a39bbc8e97005e37caa834",
+      "effectiveBlockSha256": "ef0449ebd606d6adc2ed9ddeeeb5cc741532730c7e08f439d82a2a1444fd82ae",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 214,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 27,
+          "rawCharacterEnd": 32,
+          "textSha256": "09108487a7f545597d41ebbdba81ecb20edcfc27b0e2fb7e875a206659e12758",
+          "editorialStyles": [
+            "text:T118"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B25937",
+      "locator": "/office:document-content/office:body/office:text/p[21467]",
+      "sourceBlockSha256": "4c67b576184c71d1b8a8eb4c570877128f6415e2b786d59e02399831bf274f0e",
+      "effectiveBlockSha256": "0cb3568fb4e0563cea1ddeb3dfe1fd09317220d86f786af9236aaf3f3b78f9ed",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 159,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 91,
+          "rawCharacterEnd": 119,
+          "textSha256": "934900a48a6d5207b96dac8df70678a5fee2535adebe7180f707557e1a30c17d",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 119,
+          "rawCharacterEnd": 150,
+          "textSha256": "a24a0be1643304c6a8c98c7d1dc49aa2bb51924ce76a645f49064746ca0b765f",
+          "editorialStyles": [
+            "text:T103"
+          ]
+        },
+        {
+          "rawCharacterStart": 150,
+          "rawCharacterEnd": 159,
+          "textSha256": "718b803f5f29d1fd12a8440adc2b91d48014f219a158b0ea5948a791c381e241",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B26090",
+      "locator": "/office:document-content/office:body/office:text/list[463]/list-item[1]/list[1]/list-item[8]/p[2]",
+      "sourceBlockSha256": "5abef13c720ad3ed38a7b43135759208e3276a3d19c2cce3a8b1b9ce6886e9d5",
+      "effectiveBlockSha256": "2b455018c90829bbb87be37b40a7e635bdb96c6ca0c5bb7a2023e0d9a920d25f",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 398,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 142,
+          "rawCharacterEnd": 143,
+          "textSha256": "e89a9e21ef45efcbd273bc22599888b919032dd170f24748b29b138d99d7589d",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 147,
+          "rawCharacterEnd": 148,
+          "textSha256": "45ca84540972d0c19cd6d5eac039033507694fc50152fa1cb83938155fae9903",
+          "editorialStyles": [
+            "text:T108"
+          ]
+        },
+        {
+          "rawCharacterStart": 150,
+          "rawCharacterEnd": 151,
+          "textSha256": "e89a9e21ef45efcbd273bc22599888b919032dd170f24748b29b138d99d7589d",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 155,
+          "rawCharacterEnd": 156,
+          "textSha256": "45ca84540972d0c19cd6d5eac039033507694fc50152fa1cb83938155fae9903",
+          "editorialStyles": [
+            "text:T108"
+          ]
+        },
+        {
+          "rawCharacterStart": 158,
+          "rawCharacterEnd": 159,
+          "textSha256": "e89a9e21ef45efcbd273bc22599888b919032dd170f24748b29b138d99d7589d",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 163,
+          "rawCharacterEnd": 164,
+          "textSha256": "45ca84540972d0c19cd6d5eac039033507694fc50152fa1cb83938155fae9903",
+          "editorialStyles": [
+            "text:T108"
+          ]
+        },
+        {
+          "rawCharacterStart": 166,
+          "rawCharacterEnd": 167,
+          "textSha256": "e89a9e21ef45efcbd273bc22599888b919032dd170f24748b29b138d99d7589d",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 171,
+          "rawCharacterEnd": 172,
+          "textSha256": "45ca84540972d0c19cd6d5eac039033507694fc50152fa1cb83938155fae9903",
+          "editorialStyles": [
+            "text:T108"
+          ]
+        },
+        {
+          "rawCharacterStart": 178,
+          "rawCharacterEnd": 179,
+          "textSha256": "e89a9e21ef45efcbd273bc22599888b919032dd170f24748b29b138d99d7589d",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 183,
+          "rawCharacterEnd": 184,
+          "textSha256": "45ca84540972d0c19cd6d5eac039033507694fc50152fa1cb83938155fae9903",
+          "editorialStyles": [
+            "text:T108"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B26117",
+      "locator": "/office:document-content/office:body/office:text/list[463]/list-item[1]/list[1]/list-item[21]/p[2]",
+      "sourceBlockSha256": "75a6312f5153a6da08b23438fba834ef1eac2436a9f6dd06af5c330c340b6150",
+      "effectiveBlockSha256": "7183f4a3c91ed325aaa0c3f97dc05006fcae84bfd962ff3140a887d2c2a3c72a",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 98,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 9,
+          "rawCharacterEnd": 21,
+          "textSha256": "cca5ff806223d0155c26f3d2c61266ac8e8ad573d0a4446aa9999609a1c35c39",
+          "editorialStyles": [
+            "text:T101"
+          ]
+        },
+        {
+          "rawCharacterStart": 43,
+          "rawCharacterEnd": 97,
+          "textSha256": "2b37a3b18f3e2a248ac19742e0a0010a7dec0a05328e9a62b54ce5ce729e9f70",
+          "editorialStyles": [
+            "text:T101"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B26333",
+      "locator": "/office:document-content/office:body/office:text/p[21764]",
+      "sourceBlockSha256": "bb3b2703ff11d9f8e52a72e77de44e809a3524d9994b986c437d8817b86807ae",
+      "effectiveBlockSha256": "bfb59b28d9165634eb5f3e68d151343e830e1059f1dbceff54321d9823a7279d",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 231,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 0,
+          "rawCharacterEnd": 85,
+          "textSha256": "dcbb7a55ea79e5377192cb8207eadab1a66eec5b18e4273ce62e221a0e655a4c",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 86,
+          "rawCharacterEnd": 87,
+          "textSha256": "e3b98a4da31a127d4bde6e43033f66ba274cab0eb7eb1c70ec41402bf6273dd8",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B26399",
+      "locator": "/office:document-content/office:body/office:text/p[21826]",
+      "sourceBlockSha256": "6ceac800e2dd17f483d76cd674298d306c37506d2b477107a0a2ba122d5a8f5e",
+      "effectiveBlockSha256": "c4c37feec4934dd4c9f085eca6bb089ac0b4432abd9e0715376993327c5dc770",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 291,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 115,
+          "rawCharacterEnd": 172,
+          "textSha256": "f482efa6ffa9caa8151bccdd5b31b8dfe638d84f69292aea2562734bd27f373d",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        },
+        {
+          "rawCharacterStart": 172,
+          "rawCharacterEnd": 183,
+          "textSha256": "0d82227f72a90356b452a7d2fd3ba99a7ee3803f3a797857b8ac9efc1bb9fb6d",
+          "editorialStyles": [
+            "text:T108"
+          ]
+        },
+        {
+          "rawCharacterStart": 228,
+          "rawCharacterEnd": 291,
+          "textSha256": "5fd850dd53f97590ba9520964a054b304cb265e988aee838b7b8aabeb447543b",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B26469",
+      "locator": "/office:document-content/office:body/office:text/p[21881]",
+      "sourceBlockSha256": "22b85d159644333f5f93638b79b6e02ec56402d93ac730633ca7cf340a9259ef",
+      "effectiveBlockSha256": "30b514e3343fe13ef3806d0a3b2880a5a61e1d899506cdebcc3fe09ba68cba98",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 238,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 112,
+          "rawCharacterEnd": 116,
+          "textSha256": "82a3537ff0dbce7eec35d69edc3a189ee6f17d82f353a553f9aa96cb0be3ce89",
+          "editorialStyles": [
+            "text:T107"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B26641",
+      "locator": "/office:document-content/office:body/office:text/bibliography[1]/index-body[1]/p[37]",
+      "sourceBlockSha256": "ccd8cad51b4b4a1e88b951b7dc97b60772f6059e519c99735a1ad3a8643f5d66",
+      "effectiveBlockSha256": "b6bc92f79c811093b98b825604f8897beb8e9fb8beb1e1f60bc17936fd6570ef",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 131,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 40,
+          "rawCharacterEnd": 74,
+          "textSha256": "f0a2d2e832ef547c215538487ff16d6e7617277a7b49d220f39143932a1fbfbd",
+          "editorialStyles": [
+            "text:T108"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B26942",
+      "locator": "/office:document-content/office:body/office:text/table[35]/table-row[52]/table-cell[2]/p[1]",
+      "sourceBlockSha256": "1077e3b4367c4aca6aaf59c25f5e670a91c2ccaca78e95344f4413d33adde9eb",
+      "effectiveBlockSha256": "b953d78018d87ffcd32a7280e12b4408050da5a3d05840520761894cc17560b7",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 36,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 13,
+          "rawCharacterEnd": 36,
+          "textSha256": "bc9feb3f077b6c5f53f9cd10b9917b9cb32b8c10b8af2444a8b6cc1407e021f5",
+          "editorialStyles": [
+            "text:T119"
+          ]
+        }
+      ]
+    },
+    {
+      "blockId": "ODF-1.1/spec/B27263",
+      "locator": "/office:document-content/office:body/office:text/p[22038]",
+      "sourceBlockSha256": "4f2b329c9efb2d0cd724fe7a5afdfc710b29dc96cb21b5856277b7a632f75066",
+      "effectiveBlockSha256": "f64a4e3a326f0c28ecb756d93ddad6ab60faad383a1b47a641e1f24ac6be849b",
+      "effectiveTextEmpty": false,
+      "rawCharacterLength": 358,
+      "deletionRuns": [
+        {
+          "rawCharacterStart": 122,
+          "rawCharacterEnd": 282,
+          "textSha256": "076c5c611ca370078af00197a857f225fbfdd5495e614cc5b38b7e91d055a1cd",
+          "editorialStyles": [
+            "text:T119"
+          ]
+        },
+        {
+          "rawCharacterStart": 282,
+          "rawCharacterEnd": 294,
+          "textSha256": "6b20f62b5fc63ab879888d08643e1b58f310ada76edf1ffc3352dc82e76b465f",
+          "editorialStyles": [
+            "text:T119"
+          ]
+        },
+        {
+          "rawCharacterStart": 294,
+          "rawCharacterEnd": 358,
+          "textSha256": "00f3b20c568de46370a48b3a378fb13762573467c9dbafe98ae2a9f0c57ba92d",
+          "editorialStyles": [
+            "text:T119"
+          ]
+        }
+      ]
+    }
+  ]
+}

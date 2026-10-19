@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "basis": "exact-source-boundaries-reviewed-against-locked-official-ODT",
+  "ranges": [
+    {
+      "version": "1.1",
+      "part": "spec",
+      "first": {
+        "id": "ODF-1.1/spec/B00217",
+        "title": "Document Structure",
+        "textSha256": "aefba26a06db7a66a1ff436b5e3b7173af56ff5b6dd1d46413d76cca3839ed4c"
+      },
+      "afterLast": {
+        "id": "ODF-1.1/spec/B26642",
+        "title": "MIME Types and File Name Extensions (Non Normative)",
+        "textSha256": "422624228541375c89764204cc1a69a06e0a87a10b28e871768c7e5e89e7bdb3"
+      },
+      "assessment": "僅在與核准勘誤生效文字對照確認沒有編輯刪除的群組內編譯；任何受 redline 或已更改祖先標題影響的組仍需人工裁決。",
+      "codeStyleRoots": {
+        "RelaxNG": {
+          "profile": "document-grammar",
+          "styleSha256": "01994646724c071cffc10ab6c5c98dbc90cd39e17df4f15e83934bc6c160f87b"
+        },
+        "RelaxNG_20_Manifest": {
+          "profile": "manifest-grammar",
+          "styleSha256": "ec19cd53d79bd12159e37c5602d1fe27e6d60792542b76ac7175279c90685c25"
+        },
+        "RelaxNG_20_Strict": {
+          "profile": "strict-schema-suffix",
+          "styleSha256": "38afadf210c219acc160ab82732e71f29f46063ec9d0de44140a2ffc40322173"
+        }
+      },
+      "grammarStyleBasis": [
+        {
+          "id": "ODF-1.1/spec/B00142",
+          "textSha256": "3407e67004a4fee718d2cc4293d92020afb00a612064cc3be99300266d216f1e"
+        },
+        {
+          "id": "ODF-1.1/spec/B00143",
+          "textSha256": "eb86e3636dddfc4094080aad01c20830008a5104af0c36e8118cca1002e7ce5c"
+        },
+        {
+          "id": "ODF-1.1/spec/B00144",
+          "textSha256": "e58325225031b99d84c07dde3357a56a4506050ca8aa006f98f656c2524c627a"
+        }
+      ]
+    },
+    {
+      "version": "1.2",
+      "part": "schema",
+      "first": {
+        "id": "ODF-1.2/schema/B00325",
+        "textSha256": "aefba26a06db7a66a1ff436b5e3b7173af56ff5b6dd1d46413d76cca3839ed4c",
+        "title": "Document Structure"
+      },
+      "afterLast": {
+        "id": "ODF-1.2/schema/B15821",
+        "textSha256": "95a10d8f2f13cdd377cf0843d3ad70c420c076f643e9e33c13e53fb8eaf99abf",
+        "title": "OpenDocument Relax NG Schema"
+      },
+      "assessment": "編譯範圍僅涵蓋 Document Structure 起至主要屬性章結束；範圍之外的 normative schema／ontology 附錄仍待另外審閱，不因未編譯而豁免。"
+    },
+    {
+      "version": "1.3",
+      "part": "schema",
+      "first": {
+        "id": "ODF-1.3/schema/B00339",
+        "textSha256": "aefba26a06db7a66a1ff436b5e3b7173af56ff5b6dd1d46413d76cca3839ed4c",
+        "title": "Document Structure"
+      },
+      "afterLast": {
+        "id": "ODF-1.3/schema/B16064",
+        "textSha256": "95a10d8f2f13cdd377cf0843d3ad70c420c076f643e9e33c13e53fb8eaf99abf",
+        "title": "OpenDocument Relax NG Schema"
+      },
+      "assessment": "編譯範圍僅涵蓋 Document Structure 起至主要屬性章結束；範圍之外的 normative schema／ontology 附錄仍待另外審閱，不因未編譯而豁免。"
+    },
+    {
+      "version": "1.4",
+      "part": "schema",
+      "first": {
+        "id": "ODF-1.4/schema/B00341",
+        "textSha256": "aefba26a06db7a66a1ff436b5e3b7173af56ff5b6dd1d46413d76cca3839ed4c",
+        "title": "Document Structure"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B16399",
+        "textSha256": "95a10d8f2f13cdd377cf0843d3ad70c420c076f643e9e33c13e53fb8eaf99abf",
+        "title": "OpenDocument Relax NG Schema"
+      },
+      "assessment": "編譯範圍僅涵蓋 Document Structure 起至主要屬性章結束；範圍之外的 normative schema／ontology 附錄仍待另外審閱，不因未編譯而豁免。"
+    }
+  ],
+  "informativeContexts": [
+    {
+      "first": {
+        "id": "ODF-1.4/schema/B16472",
+        "textSha256": "fb5995e10641cfa21fab56778982a03c2db3c70c2f633e44c20c102cfb08ad02",
+        "title": "Accessibility Guidelines (Non Normative)"
+      },
+      "afterLast": {
+        "id": "ODF-1.4/schema/B16494",
+        "textSha256": "bf6081745ea6b035e10a78e3be049c26c1521cca1c52f855981b8ee1679e4e92",
+        "title": "Bidirectional (BiDi) Scripts, Numeric Digits Presentation and Calendars (Non Normative)"
+      },
+      "assessment": "Accessibility Guidelines 明示 Non Normative；僅判定本附錄的規範地位，不豁免其他條款的資料保存及可及性要求。"
+    }
+  ]
+}

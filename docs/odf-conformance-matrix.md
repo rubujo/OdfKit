@@ -77,7 +77,7 @@ schema 名稱自動關聯也不證明 matcher 與 Jing 完全等價，更不涵�
 | P1／EXEMPT-002 | SDK office:formula 相容形狀與 Database 參照語意。 | Database 已使用官方 grammar，不再豁免；office:formula 非官方 body 分支，仍有明示相容限制，不能算成官方 Formula 合規。 |
 | P1／GAP-001 | IDREF、style/name、跨串流參照的目標解析與 scope。 | 重複 `xml:id` 已修正；沒有因此宣稱全部參照可解析。 |
 | P1／GAP-003 | QName／namespacedToken 的 namespace 與相等比較。 | data 節點已接入目前元素的 prefix binding 與 whitespace collapse；literal QName 的展開名稱相等比較及完整 facet 證據仍未完成。 |
-| P1／GAP-002 | XML Schema whitespace/value-space/facet／regex 與 RELAX NG 引擎的完整等價性。 | evidence-gap；已有局部缺陷修正，但需按官方實際 pattern 的正負 oracle 持續盤點，不能聲稱整個 matcher 已認證。 |
+| P1／GAP-002 | XML Schema whitespace/value-space/facet／regex 與 RELAX NG 引擎的完整等價性。 | evidence-gap；已修正屬性與子內容選擇不同 choice 分支的缺陷，但仍需按官方實際 pattern 的正負 oracle 持續盤點，不能聲稱整個 matcher 已認證。 |
 | P1／GAP-004 | RDF metadata 列舉、relative IRI 與 pkg ontology 關係。 | 有 RDF API，但缺 profile 層的完整條款證據；不能歸為沒有 RDF 功能。 |
 | P1／GAP-005 | package consumer 的完整 IRI 解析步驟。 | ZIP 路徑安全不等於 IRI consumer 合規；先盤點各 resolver，不以一律拒絕 `..` 取代規範。 |
 | P1／CRYPTO-001～002 | 簽章真實性、信任、撤銷及 encryption 的版本／profile 組合。 | 有專用 API、schema 與外部 corpus；profile grammar 通過不代表密碼學與所有組合合規。 |

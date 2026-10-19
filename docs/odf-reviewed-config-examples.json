@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "informativeContexts": [
+    {
+      "first": {
+        "id": "ODF-1.1/spec/B00717",
+        "title": "Example:",
+        "textSha256": "872887e563e75957ffc20b021332504f2ddd0a8f3964cb93070863bfaf13cdad",
+        "kind": "paragraph"
+      },
+      "afterLast": {
+        "id": "ODF-1.1/spec/B00725",
+        "title": "Base Settings",
+        "textSha256": "0eec5816cf8a1c3b3ff8463e2cfd17ab3c4ef81f4fdd7b87e9d779259bb79cb7",
+        "kind": "heading"
+      },
+      "sourceArchiveSha256": "688491db1bf9a817a839f30e3d0e5bcfbbc12492db9153d2fd61334cd885c22d",
+      "assessment": "逐段查看明示 Example: 及隨後完整 office:settings 範例；僅說明 view-settings、ViewAreaTop 與值 0，沒有規範性敘述混入。下一實際 heading Base Settings 即截止，不延伸至 config:name 正文或 grammar。"
+    }
+  ]
+}
