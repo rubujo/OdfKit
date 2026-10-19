@@ -132,9 +132,7 @@ public abstract partial class OdfDocument
         ctor = typeof(T).GetConstructor(new[] { typeof(OdfPackage) });
         if (ctor is not null)
         {
-            var doc = (T)ctor.Invoke(new object[] { package });
-            doc.SubPath = subPath;
-            return doc;
+            return OdfEmbeddedDocumentConstruction.Create(package, subPath, () => (T)ctor.Invoke(new object[] { package }));
         }
 
         throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfDocument_TypeCompatibleConstructor", typeof(T).Name));

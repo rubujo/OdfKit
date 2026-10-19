@@ -1363,8 +1363,7 @@ internal static class FormulaConformanceFunctionHandlers
             return OdfFormulaError.Value;
         if (arguments.Count == 1)
             return text;
-        object label = arguments[1].Evaluate(context);
-        return label is OdfFormulaError ? label : Convert.ToString(label, CultureInfo.InvariantCulture) ?? string.Empty;
+        return arguments[1].Evaluate(context);
     }
 
     private static object EvaluateInfo(List<AstNode> arguments, IEvaluationContext context)

@@ -1,20 +1,20 @@
 ﻿using System;
-using System.Globalization;
 
 using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
-/// 表示 ODF schema 中名為 <c>character</c> 的單一字元 lexical form。
+/// Represents the single XML character lexical form named <c>character</c> in ODF schemas.
+/// 表示 ODF schema 中名為 <c>character</c> 的單一 XML 字元詞法形式。
 /// </summary>
 public readonly struct OdfCharacter : IEquatable<OdfCharacter>
 {
     /// <summary>
-    /// Performs odf character.
-    /// 以單一字元 lexical form 建立 <see cref="OdfCharacter"/>。
+    /// Creates a single XML character value.
+    /// 建立單一 XML 字元值。
     /// </summary>
-    /// <param name="value">單一字元字串</param>
-    /// <exception cref="ArgumentException">當字串不是單一文字元素時擲回</exception>
+    /// <param name="value">One XML character, including a valid surrogate pair. / 單一 XML 字元，包含合法代理對。</param>
+    /// <exception cref="ArgumentException">The value is not one valid XML character. / 值不是單一合法 XML 字元。</exception>
     public OdfCharacter(string value)
     {
         if (!IsValid(value))
@@ -32,12 +32,12 @@ public readonly struct OdfCharacter : IEquatable<OdfCharacter>
     public string Value { get; }
 
     /// <summary>
-    /// Performs the TryParse operation.
-    /// 嘗試解析單一字元字串。
+    /// Parses one XML character while preserving its original lexical form.
+    /// 解析單一 XML 字元並保留原始詞法形式。
     /// </summary>
-    /// <param name="value">字元字串</param>
-    /// <param name="character">成功時傳回解析後的字元</param>
-    /// <returns>若字串是單一文字元素則為 <see langword="true"/></returns>
+    /// <param name="value">The character string. / 字元字串。</param>
+    /// <param name="character">The parsed character on success. / 成功時傳回解析後的字元。</param>
+    /// <returns>Whether the value is one XML character. / 值是否為單一 XML 字元。</returns>
     public static bool TryParse(string? value, out OdfCharacter character)
     {
         if (IsValid(value))
@@ -99,19 +99,15 @@ public readonly struct OdfCharacter : IEquatable<OdfCharacter>
 
     private static bool IsValid(string? value)
     {
-        if (value is null || value.Length == 0 || new StringInfo(value).LengthInTextElements != 1)
-        {
+        if (value is null)
             return false;
-        }
-
-        foreach (char ch in value)
+        if (value.Length == 1)
         {
-            if (char.IsControl(ch))
-            {
-                return false;
-            }
+            char character = value[0];
+            return character is '\t' or '\n' or '\r' ||
+                character >= '\u0020' && character <= '\uD7FF' ||
+                character >= '\uE000' && character <= '\uFFFD';
         }
-
-        return true;
+        return value.Length == 2 && char.IsSurrogatePair(value, 0);
     }
 }

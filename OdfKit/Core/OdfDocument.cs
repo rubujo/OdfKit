@@ -218,6 +218,8 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     {
         get
         {
+            if (SubPath.Length > 0)
+                return OdfEmbeddedMediaTypeResolver.Resolve(Package, SubPath);
             OdfDocumentKind mimeKind = OdfDocumentKindDetector.FromMimeType(Package.MimeType);
             return Package.IsFlatXml && mimeKind != OdfDocumentKind.Unknown
                 ? OdfDocumentKindDetector.ToFlatKind(mimeKind)
@@ -340,7 +342,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     protected OdfDocument(OdfPackage package, string subPath)
     {
         Package = package ?? throw new ArgumentNullException(nameof(package));
-        SubPath = subPath ?? string.Empty;
+        SubPath = OdfEmbeddedDocumentConstruction.ResolveSubPath(package, subPath ?? string.Empty);
         if (!string.IsNullOrEmpty(SubPath) && !global::OdfKit.Internal.OdfStringHelper.EndsWith(SubPath, '/'))
         {
             SubPath += "/";
@@ -567,7 +569,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// <returns>The default settings.xml string. / 預設 settings.xml 字串。</returns>
     protected virtual string GetDefaultSettingsXml()
     {
-        return "<office:document-settings xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" office:version=\"" + OdfVersionInfo.DefaultVersionString + "\"><office:settings><config:config-item-set config:name=\"ooo:view-settings\"><config:config-item config:name=\"VisibleAreaTop\" config:type=\"int\">0</config:config-item></config:config-item-set></office:settings></office:document-settings>";
+        return "<office:document-settings xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" xmlns:ooo=\"http://openoffice.org/2004/office\" office:version=\"" + OdfVersionInfo.DefaultVersionString + "\"><office:settings><config:config-item-set config:name=\"ooo:view-settings\"><config:config-item config:name=\"VisibleAreaTop\" config:type=\"int\">0</config:config-item></config:config-item-set></office:settings></office:document-settings>";
     }
 
 
@@ -646,6 +648,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// Gets or sets the document view zoom percentage.
     /// 取得或設定文件檢視縮放百分比。
     /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">The rounded zoom value is not representable as an XML Schema int. / 取整後的縮放值無法以 XML Schema int 表示。</exception>
     public double ZoomLevel
     {
         get => OdfDocumentSettingsEngine.GetZoomLevel(SettingsDom);

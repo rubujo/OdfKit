@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -78,6 +79,8 @@ internal static class TextDocumentNotesEngine
         string? key1,
         string? key2)
     {
+        if (key2 is not null && key1 is null)
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentNotesEngine_SecondaryIndexKeyRequiresPrimary"), nameof(key2));
         var markNode = OdfNodeFactory.CreateElement("alphabetical-index-mark", OdfNamespaces.Text, "text");
         markNode.SetAttribute("string-value", OdfNamespaces.Text, stringValue, "text");
         if (key1 is not null)
@@ -112,6 +115,9 @@ internal static class TextDocumentNotesEngine
     {
         var idxNode = OdfNodeFactory.CreateElement("table-index", OdfNamespaces.Text, "text");
         idxNode.SetAttribute("name", OdfNamespaces.Text, "Index of Tables", "text");
+        var sourceNode = OdfNodeFactory.CreateElement("table-index-source", OdfNamespaces.Text, "text");
+        sourceNode.SetAttribute("use-caption", OdfNamespaces.Text, "false", "text");
+        idxNode.AppendChild(sourceNode);
         var bodyNode = OdfNodeFactory.CreateElement("index-body", OdfNamespaces.Text, "text");
         idxNode.AppendChild(bodyNode);
         context.BodyTextRoot.AppendChild(idxNode);

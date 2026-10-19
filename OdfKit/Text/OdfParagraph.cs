@@ -576,8 +576,9 @@ public partial class OdfParagraph
     /// 在段落中新增字母索引標記。
     /// </summary>
     /// <param name="stringValue">The index string value. / 索引字串值。</param>
-    /// <param name="key1">The primary key. / 主要鍵值。</param>
+    /// <param name="key1">The primary key, required when a secondary key is supplied. / 主要鍵值；提供次要鍵值時不可省略。</param>
     /// <param name="key2">The secondary key. / 次要鍵值。</param>
+    /// <exception cref="ArgumentException">A secondary key is supplied without a primary key. / 提供次要鍵值但未提供主要鍵值。</exception>
     public OdfAlphabeticalIndexMark AddAlphabeticalIndexMark(string stringValue, string? key1, string? key2) => Doc.AddAlphabeticalIndexMark(this, stringValue, key1, key2);
 
 

@@ -75,7 +75,7 @@ public sealed class OdsSheetWriter
     /// <param name="value">The cell numeric value. / 儲存格數值。</param>
     public void WriteCell(double value)
     {
-        string text = value.ToString(CultureInfo.InvariantCulture);
+        string text = OdfCellValueParser.FormatNumber(value);
         WriteCellStart("float");
         _writer.WriteAttribute("office:value", text.AsSpan());
         _writer.WriteStartElement("text:p");

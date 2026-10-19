@@ -304,6 +304,8 @@ public static partial class OdfPackageValidator
             }
 
             List<string> missing = [];
+            if (info.PlaintextSize is null or < 0)
+                missing.Add("size");
             if (!info.HasChecksumType)
                 missing.Add("checksum-type");
             if (!info.HasChecksum || info.Checksum.Length == 0)

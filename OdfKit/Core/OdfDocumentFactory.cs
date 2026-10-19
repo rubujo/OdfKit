@@ -411,6 +411,7 @@ public static class OdfDocumentFactory
     {
         return "<office:document-settings" +
             CommonNamespaceAttributes +
+            " xmlns:ooo=\"" + OdfNamespaceDeclarations.OfficeConfigurationNamespace + "\"" +
             " office:version=\"" + version + "\"><office:settings><config:config-item-set config:name=\"ooo:view-settings\"><config:config-item config:name=\"VisibleAreaTop\" config:type=\"int\">0</config:config-item></config:config-item-set></office:settings></office:document-settings>";
     }
 

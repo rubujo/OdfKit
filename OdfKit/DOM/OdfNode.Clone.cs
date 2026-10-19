@@ -49,6 +49,7 @@ public partial class OdfNode
             clone._attributePrefixes[attrPrefix.Key] = attrPrefix.Value;
         }
 
+        OdfNamespaceDeclarations.Copy(this, clone, includeInherited: CloneRecursionDepth == 0);
         if (deep && TryCopyLazyXmlStateTo(clone))
         {
             return clone;
@@ -107,6 +108,7 @@ public partial class OdfNode
         clone._xmlByteRange = _xmlByteRange;
         clone._lazyMaxXmlCharactersInDocument = _lazyMaxXmlCharactersInDocument;
         clone._lazyStrictXmlParsing = _lazyStrictXmlParsing;
+        clone._lazyPreserveWhitespace = _lazyPreserveWhitespace;
         clone._lazyInScopeNamespaces = _lazyInScopeNamespaces;
         clone._sourceNamespacePrefixes = _sourceNamespacePrefixes is null
             ? null

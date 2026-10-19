@@ -137,6 +137,10 @@ public abstract partial class OdfDocument
     /// </summary>
     /// <param name="name">The custom property name. / 自訂屬性名稱。</param>
     /// <returns>The property value, or <see langword="null"/> when it does not exist. / 屬性值；若不存在則為 <see langword="null"/>。</returns>
+    /// <remarks>
+    /// Dates beyond DateTime parsing range or precision remain stored strings through this untyped API.
+    /// 超出 DateTime 解析範圍或精度的日期，會透過此未型別化 API 以原字串保留。
+    /// </remarks>
     public object? FindCustomProperty(string name)
         => OdfDocumentMetadataEngine.FindCustomProperty(MetaDom, name);
 
@@ -162,6 +166,10 @@ public abstract partial class OdfDocument
     /// 取得所有自訂中繼資料屬性的字典。
     /// </summary>
     /// <returns>A read-only dictionary keyed by property name. / 以屬性名稱為鍵的唯讀字典。</returns>
+    /// <remarks>
+    /// Date values follow the representation rules of <see cref="FindCustomProperty(string)"/>.
+    /// 日期值依 <see cref="FindCustomProperty(string)"/> 的表示規則回傳。
+    /// </remarks>
     public IReadOnlyDictionary<string, object?> GetAllCustomProperties()
         => OdfDocumentMetadataEngine.GetAllCustomProperties(MetaDom);
 

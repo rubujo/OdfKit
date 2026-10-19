@@ -16,7 +16,7 @@ public static partial class OdfSchemaPatternValidator
 {
     #region Data Types - Facets
 
-    private static bool MatchesDataParameters(IReadOnlyList<OdfSchemaDatatypeParameter> parameters, string value)
+    private static bool MatchesDataParameters(string dataType, IReadOnlyList<OdfSchemaDatatypeParameter> parameters, string value)
     {
         var enumerations = new List<string>();
         foreach (OdfSchemaDatatypeParameter parameter in parameters)
@@ -27,7 +27,7 @@ public static partial class OdfSchemaPatternValidator
                 continue;
             }
 
-            if (!MatchesDataParameter(parameter.Name, parameter.Value, value))
+            if (!MatchesDataParameter(dataType, parameter.Name, parameter.Value, value))
             {
                 return false;
             }
@@ -37,7 +37,7 @@ public static partial class OdfSchemaPatternValidator
             enumerations.Any(item => string.Equals(item, value, StringComparison.Ordinal));
     }
 
-    private static bool MatchesDataParameter(string name, string parameterValue, string value)
+    private static bool MatchesDataParameter(string dataType, string name, string parameterValue, string value)
     {
         switch (name)
         {
@@ -50,11 +50,9 @@ public static partial class OdfSchemaPatternValidator
             case "maxExclusive":
                 return CompareFacetValues(value, parameterValue) < 0;
             case "length":
-                return value.Length == ParseNonNegativeInt(parameterValue);
             case "minLength":
-                return value.Length >= ParseNonNegativeInt(parameterValue);
             case "maxLength":
-                return value.Length <= ParseNonNegativeInt(parameterValue);
+                return MatchesLengthParameter(dataType, name, parameterValue, value);
             case "pattern":
                 try
                 {
@@ -127,11 +125,60 @@ public static partial class OdfSchemaPatternValidator
         return string.CompareOrdinal(value, parameterValue);
     }
 
-    private static int ParseNonNegativeInt(string value)
+    private static bool MatchesLengthParameter(string dataType, string name, string parameterValue, string value)
     {
-        return int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out int parsed) && parsed >= 0
-            ? parsed
-            : -1;
+        if (!TryParseXmlInteger(NormalizeDatatypeWhitespace("nonNegativeInteger", parameterValue), out BigInteger limit) || limit < BigInteger.Zero)
+            return false;
+        // XML Schema 1.0 對 QName/NOTATION 的長度限制視為符合，該用法已棄用。
+        if (dataType is "QName" or "xsd:QName" or "NOTATION" or "xsd:NOTATION")
+            return true;
+        int length = GetDatatypeLength(dataType, value);
+        return name switch
+        {
+            "length" => length == limit,
+            "minLength" => length >= limit,
+            "maxLength" => length <= limit,
+            _ => false
+        };
+    }
+
+    private static int GetDatatypeLength(string dataType, string value)
+    {
+        switch (dataType)
+        {
+            case "hexBinary":
+            case "xsd:hexBinary":
+                return value.Length / 2;
+            case "base64Binary":
+            case "xsd:base64Binary":
+                int encodedLength = 0;
+                int padding = 0;
+                foreach (char character in value)
+                {
+                    if (character is ' ' or '\t' or '\r' or '\n')
+                        continue;
+                    encodedLength++;
+                    if (character == '=')
+                        padding++;
+                }
+                return encodedLength / 4 * 3 - padding;
+            case "NMTOKENS":
+            case "xsd:NMTOKENS":
+            case "IDREFS":
+            case "xsd:IDREFS":
+            case "ENTITIES":
+            case "xsd:ENTITIES":
+                return SplitListTokens(value).Length;
+            default:
+                int length = 0;
+                for (int index = 0; index < value.Length; index++)
+                {
+                    if (char.IsHighSurrogate(value[index]) && index + 1 < value.Length && char.IsLowSurrogate(value[index + 1]))
+                        index++;
+                    length++;
+                }
+                return length;
+        }
     }
 
     private static bool TryCompareXmlDecimals(string value, string parameterValue, out int comparison)

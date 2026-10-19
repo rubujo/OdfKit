@@ -138,27 +138,24 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     /// round-trip semantics; otherwise this accessor preserves the raw date string.
     /// 日期儲存格若可將 <c>office:date-value</c> 依 round-trip 語意解析，會回傳
     /// <see cref="DateTime"/>；否則保留原始日期字串。
+    /// String cells prefer an explicit office:string-value over display text. Time cells return
+    /// an exact TimeSpan when supported, otherwise the original duration string; assigning a TimeSpan writes a native time value.
+    /// 字串儲存格優先使用明示的 office:string-value，而非顯示文字。時間儲存格可精確解析時回傳
+    /// TimeSpan，否則保留原時間長度字串；指定 TimeSpan 會寫入原生時間值。
     /// </remarks>
     public object? CellValue
     {
         get
         {
-            return ValueType switch
+            return ValueType.Trim(' ', '\t', '\r', '\n') switch
             {
-                "float" => double.TryParse(RawValue, NumberStyles.Float, CultureInfo.InvariantCulture, out double number)
-                    ? number
-                    : null,
+                "float" or "percentage" or "currency" => OdfCellValueParser.ReadNumber(RawValue),
                 "boolean" => bool.TryParse(Node.GetAttribute("boolean-value", OdfNamespaces.Office), out bool flag)
                     ? flag
                     : null,
-                "date" => DateTime.TryParse(
-                    Node.GetAttribute("date-value", OdfNamespaces.Office),
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.RoundtripKind,
-                    out DateTime date)
-                    ? date
-                    : Node.GetAttribute("date-value", OdfNamespaces.Office),
-                "string" => DisplayText,
+                "date" => OdfCellValueParser.ReadDate(Node.GetAttribute("date-value", OdfNamespaces.Office)),
+                "time" => OdfCellValueParser.ReadDuration(Node.GetAttribute("time-value", OdfNamespaces.Office)),
+                "string" => Node.GetAttribute("string-value", OdfNamespaces.Office) ?? DisplayText,
                 _ => string.IsNullOrEmpty(DisplayText) ? null : DisplayText
             };
         }
@@ -179,6 +176,13 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
                     break;
                 case DateTime date:
                     SetValue(date);
+                    break;
+                case TimeSpan time:
+                    ClearCachedValueAttributes();
+                    ValueType = "time";
+                    string duration = System.Xml.XmlConvert.ToString(time);
+                    Node.SetAttribute("time-value", OdfNamespaces.Office, duration, "office");
+                    DisplayText = duration;
                     break;
                 case byte or sbyte or short or ushort or int or uint or long or ulong or float or double or decimal:
                     SetValue(Convert.ToDouble(value, CultureInfo.InvariantCulture));
@@ -344,7 +348,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     {
         ClearCachedValueAttributes();
         ValueType = "float";
-        RawValue = val.ToString(CultureInfo.InvariantCulture);
+        RawValue = OdfCellValueParser.FormatNumber(val);
         DisplayText = val.ToString(CultureInfo.InvariantCulture);
         NotifyFormulaCellChanged(formulaChanged: false);
     }

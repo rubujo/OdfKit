@@ -95,6 +95,13 @@ public static partial class OdfEncryption
         || string.Equals(algorithmName, BlowfishAlgorithmName, StringComparison.Ordinal);
 
     /// <summary>
+    /// 判斷金鑰衍生名稱是否為 PBKDF2 的簡短名稱或規範 IRI。
+    /// </summary>
+    internal static bool IsPbkdf2Derivation(string? derivationName) =>
+        string.Equals(derivationName, "PBKDF2", StringComparison.OrdinalIgnoreCase)
+        || string.Equals(derivationName, "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#pbkdf2", StringComparison.Ordinal);
+
+    /// <summary>
     /// 判斷 `manifest:algorithm-name` 是否為早期 OdfKit 版本寫出的非規範 Blowfish CBC 宣告。
     /// </summary>
     internal static bool IsLegacyBlowfishCbcAlgorithm(string? algorithmName) =>

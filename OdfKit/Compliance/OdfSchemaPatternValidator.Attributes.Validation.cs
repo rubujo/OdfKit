@@ -27,7 +27,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
         return true;
     }
 
-    private static bool AttributePatternAllowsAttribute(
+    internal static bool AttributePatternAllowsAttribute(
         OdfSchemaPatternNode node,
         XAttribute attribute,
         OdfSchemaPatternMatchContext context)

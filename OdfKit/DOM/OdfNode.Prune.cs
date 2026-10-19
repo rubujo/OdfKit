@@ -86,6 +86,7 @@ public partial class OdfNode
         _lastChild = null;
         Children.ResetAfterPrune();
         Attributes.Clear();
+        OdfNamespaceDeclarations.Forget(this);
         _attributePrefixes.Clear();
         Parent = null;
         PreviousSibling = null;
@@ -97,6 +98,7 @@ public partial class OdfNode
         _xmlByteRange = null;
         _lazyMaxXmlCharactersInDocument = 0;
         _lazyStrictXmlParsing = false;
+        _lazyPreserveWhitespace = false;
         _lazyInScopeNamespaces = null;
         _sourceNamespacePrefixes = null;
         _isLazy = false;

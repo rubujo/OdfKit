@@ -96,6 +96,10 @@ public static partial class OdfEncryption
                     ?? throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_InvalidDecryptionFailedSum_2"));
             }
 
+            if (entry.EncryptionInfo.PlaintextSize is long expectedSize && expectedSize != decryptedPlaintext.LongLength)
+                throw new CryptographicException(OdfLocalizer.GetMessage(
+                    "Err_OdfEncryption_PlaintextSizeMismatch", expectedSize, decryptedPlaintext.LongLength));
+
             entry.SetContent(decryptedPlaintext);
             entry.EncryptionInfo = null;
         }
@@ -295,6 +299,7 @@ public static partial class OdfEncryption
             OdfEncryptionInfo info;
 
             ciphertext = package.SaveOptions.CryptographyProvider.Encrypt(plaintext, name, package.SaveOptions, out info);
+            info.PlaintextSize = plaintext.LongLength;
 
             entry.SetContent(ciphertext);
             entry.EncryptionInfo = info;

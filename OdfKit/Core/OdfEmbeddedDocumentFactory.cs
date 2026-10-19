@@ -74,8 +74,7 @@ internal static class OdfEmbeddedDocumentFactory
 
         if (PackageOnlyFactories.TryGetValue(type, out Func<OdfPackage, OdfDocument>? packageOnly))
         {
-            document = (T)packageOnly(package);
-            document.SubPath = subPath;
+            document = OdfEmbeddedDocumentConstruction.Create(package, subPath, () => (T)packageOnly(package));
             return true;
         }
 

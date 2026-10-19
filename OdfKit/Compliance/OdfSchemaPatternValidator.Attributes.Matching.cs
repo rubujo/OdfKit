@@ -226,7 +226,13 @@ internal static partial class OdfSchemaPatternAttributeMatcher
             return new AttributeStateSet();
         }
 
-        return MatchAttributePatternSequence(pattern.Roots, attributes, state, context);
+        var matches = new AttributeStateSet();
+        foreach (OdfSchemaPatternNode root in pattern.Roots)
+        {
+            foreach (BigInteger matched in MatchAttributePatternNode(root, attributes, state, context))
+                matches.Add(matched);
+        }
+        return matches;
     }
 
     private static AttributeStateSet MatchAttributePatternChoice(

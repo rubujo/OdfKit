@@ -924,9 +924,15 @@ public partial class TableTableElement
 
         string prefix = nsDict.TryGetValue(NamespaceUri, out var p) ? p : Prefix ?? "table";
         writer.WriteStartElement(prefix, LocalName, NamespaceUri);
+        foreach (KeyValuePair<string, string> declaration in OdfNamespaceDeclarations.GetOwn(this))
+            if (declaration.Key != "xml")
+                writer.WriteAttributeString("xmlns", declaration.Key, OdfNamespaceDeclarations.XmlnsNamespace, declaration.Value);
 
         foreach (var attr in Attributes)
         {
+            if (attr.Key.NamespaceUri == OdfNamespaceDeclarations.XmlnsNamespace ||
+                attr.Key.NamespaceUri.Length == 0 && attr.Key.LocalName == "xmlns")
+                continue;
             string attrPrefix = nsDict.TryGetValue(attr.Key.NamespaceUri, out var ap) ? ap : "table";
             if (!string.IsNullOrEmpty(attr.Key.NamespaceUri))
             {

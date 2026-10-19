@@ -5,7 +5,8 @@ using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
-/// 表示 ODF schema 中 0 到 100 範圍內的百分比 lexical form。
+/// Represents a bounded ODF percentage lexical form from -100% to 100%.
+/// 表示 ODF schema 中 -100% 到 100% 的有界百分比詞法形式。
 /// </summary>
 public readonly struct OdfPercent : IEquatable<OdfPercent>
 {
@@ -36,6 +37,10 @@ public readonly struct OdfPercent : IEquatable<OdfPercent>
     /// Gets the Percent value.
     /// 取得百分比數值。
     /// </summary>
+    /// <remarks>
+    /// Decimal precision applies to this numeric view; <see cref="Value"/> preserves the exact lexical form.
+    /// 此數值檢視受 decimal 精確度限制；<see cref="Value"/> 保留完整詞法形式。
+    /// </remarks>
     public decimal Percent { get; }
 
     /// <summary>
@@ -130,22 +135,34 @@ public readonly struct OdfPercent : IEquatable<OdfPercent>
             return false;
         }
 
-        string number = value!.Substring(0, value.Length - 1);
-        if (number.Length == 0 || global::OdfKit.Internal.OdfStringHelper.StartsWith(number, '+'))
-        {
+        int end = value!.Length - 1;
+        int start = value[0] == '-' ? 1 : 0;
+        if (start == 1 && !allowNegative)
             return false;
-        }
-
-        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(number, '-') && !allowNegative)
-        {
+        int index = start;
+        while (index < end && value[index] >= '0' && value[index] <= '9')
+            index++;
+        int integerDigits = index - start;
+        if (integerDigits > 3 || integerDigits == 3 &&
+            (value[start] != '1' || value[start + 1] != '0' || value[start + 2] != '0'))
             return false;
-        }
-
-        if (!decimal.TryParse(number, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out percent))
+        if (index < end)
         {
-            return false;
+            if (value[index++] != '.')
+                return false;
+            int fractionStart = index;
+            for (; index < end; index++)
+                if (value[index] < '0' || value[index] > '9' || integerDigits == 3 && value[index] != '0')
+                    return false;
+            if (integerDigits == 0 && index == fractionStart)
+                return false;
         }
-
-        return percent >= (allowNegative ? -100 : 0) && percent <= 100;
+        else if (integerDigits == 0)
+            return false;
+#if NETSTANDARD2_0
+        return decimal.TryParse(value.Substring(0, end), NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out percent);
+#else
+        return decimal.TryParse(value.AsSpan(0, end), NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out percent);
+#endif
     }
 }

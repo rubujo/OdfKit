@@ -31,20 +31,40 @@ public class OdfAlphabeticalIndexMark(OdfNode node)
     /// Gets or sets the primary key of this index mark.
     /// 取得或設定此索引標記的主要鍵值。
     /// </summary>
+    /// <remarks>
+    /// Setting null removes the optional attribute.
+    /// 設為 null 會移除可選屬性。
+    /// </remarks>
     public string? Key1
     {
         get => Node.GetAttribute("key1", OdfNamespaces.Text);
-        set => Node.SetAttribute("key1", OdfNamespaces.Text, value ?? string.Empty, "text");
+        set
+        {
+            if (value is null)
+                Node.RemoveAttribute("key1", OdfNamespaces.Text);
+            else
+                Node.SetAttribute("key1", OdfNamespaces.Text, value, "text");
+        }
     }
 
     /// <summary>
     /// Gets or sets the secondary key of this index mark.
     /// 取得或設定此索引標記的次要鍵值。
     /// </summary>
+    /// <remarks>
+    /// Setting null removes the optional attribute.
+    /// 設為 null 會移除可選屬性。
+    /// </remarks>
     public string? Key2
     {
         get => Node.GetAttribute("key2", OdfNamespaces.Text);
-        set => Node.SetAttribute("key2", OdfNamespaces.Text, value ?? string.Empty, "text");
+        set
+        {
+            if (value is null)
+                Node.RemoveAttribute("key2", OdfNamespaces.Text);
+            else
+                Node.SetAttribute("key2", OdfNamespaces.Text, value, "text");
+        }
     }
 }
 

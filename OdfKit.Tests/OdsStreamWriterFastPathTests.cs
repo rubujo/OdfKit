@@ -123,7 +123,7 @@ public class OdsStreamWriterFastPathTests
 
         foreach (double value in values)
         {
-            string text = value.ToString(CultureInfo.InvariantCulture);
+            string text = System.Xml.XmlConvert.ToString(value);
             Assert.Contains($"office:value=\"{text}\"><text:p>{text}</text:p>", xml, StringComparison.Ordinal);
         }
     }

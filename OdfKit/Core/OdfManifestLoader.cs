@@ -243,7 +243,7 @@ internal static class OdfManifestLoader
                 currentEncryptionInfo.KeySize = keySize;
             if (int.TryParse(iterationCountStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int iterationCount))
             {
-                bool isPbkdf2 = string.Equals(currentEncryptionInfo.KeyDerivationName, "PBKDF2", StringComparison.OrdinalIgnoreCase);
+                bool isPbkdf2 = OdfEncryption.IsPbkdf2Derivation(currentEncryptionInfo.KeyDerivationName);
                 if (iterationCount > OdfEncryption.MaxPbkdf2IterationCount || (isPbkdf2 && iterationCount < 1))
                 {
                     throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_NumberPbkdf2IterationsExceeds_2", iterationCount, OdfEncryption.MaxPbkdf2IterationCount));

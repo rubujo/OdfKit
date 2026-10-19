@@ -62,19 +62,49 @@ public class OdfTableOfContents : OdfIndex
     }
 
     /// <summary>
-    /// Adds an entry template for the table of contents.
-    /// 新增目錄專案範本。
+    /// Adds or replaces the entry template for an outline level of the table of contents.
+    /// 新增或取代目錄指定大綱階層的項目範本。
     /// </summary>
     /// <param name="outlineLevel">The outline level. / 大綱階層。</param>
     /// <param name="styleName">The style name. / 樣式名稱。</param>
     /// <returns>An <see cref="OdfIndexTemplateBuilder"/> instance for constructing the template. / 用於建構範本的 <see cref="OdfIndexTemplateBuilder"/> 執行個體。</returns>
+    /// <remarks>
+    /// Replacing a template discards its previous content.
+    /// 取代範本時會捨棄原有內容。
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">The outline level is not positive. / 大綱階層不是正整數。</exception>
     public OdfIndexTemplateBuilder AddEntryTemplate(int outlineLevel, string styleName)
     {
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegativeOrZero(outlineLevel, nameof(outlineLevel));
         var src = FindOrCreateChild(Node, GetSourceLocalName(), OdfNamespaces.Text, "text");
         var template = OdfNodeFactory.CreateElement("table-of-content-entry-template", OdfNamespaces.Text, "text");
         template.SetAttribute("outline-level", OdfNamespaces.Text, outlineLevel.ToString(CultureInfo.InvariantCulture), "text");
         template.SetAttribute("style-name", OdfNamespaces.Text, styleName, "text");
-        src.AppendChild(template);
+        OdfNode? existing = null;
+        OdfNode? successor = null;
+        foreach (OdfNode child in src.Children)
+        {
+            if (child.NamespaceUri != OdfNamespaces.Text)
+                continue;
+            if (child.LocalName == "table-of-content-entry-template" &&
+                int.TryParse(child.GetAttribute("outline-level", OdfNamespaces.Text), NumberStyles.Integer,
+                    CultureInfo.InvariantCulture, out int level) && level == outlineLevel)
+            {
+                existing = child;
+                break;
+            }
+            if (successor is null && child.LocalName == "index-source-styles")
+                successor = child;
+        }
+        if (existing is not null)
+        {
+            src.InsertBefore(template, existing);
+            src.RemoveChild(existing);
+        }
+        else if (successor is not null)
+            src.InsertBefore(template, successor);
+        else
+            src.AppendChild(template);
         return new OdfIndexTemplateBuilder(template);
     }
 

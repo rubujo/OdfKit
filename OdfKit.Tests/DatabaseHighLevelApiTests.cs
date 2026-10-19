@@ -244,7 +244,8 @@ public class DatabaseHighLevelApiTests
         stream.Position = 0;
 
         using var loaded = DatabaseDocument.Load(stream, "database.odb");
-        using var contentStream = loaded.Package.GetEntryStream("content.xml");
+        OdfDatabaseFormInfo form = Assert.Single(loaded.Forms);
+        using var contentStream = loaded.Package.GetEntryStream(form.Href!.TrimEnd('/') + "/content.xml");
         using var reader = new StreamReader(contentStream);
         string xml = reader.ReadToEnd();
 
@@ -336,7 +337,8 @@ public class DatabaseHighLevelApiTests
         stream.Position = 0;
 
         using var loaded = DatabaseDocument.Load(stream, "database.odb");
-        using var contentStream = loaded.Package.GetEntryStream("content.xml");
+        OdfDatabaseFormInfo form = Assert.Single(loaded.Forms);
+        using var contentStream = loaded.Package.GetEntryStream(form.Href!.TrimEnd('/') + "/content.xml");
         using var reader = new StreamReader(contentStream);
         string xml = reader.ReadToEnd();
 
@@ -362,7 +364,8 @@ public class DatabaseHighLevelApiTests
         stream.Position = 0;
 
         using var loaded = DatabaseDocument.Load(stream, "database.odb");
-        using var contentStream = loaded.Package.GetEntryStream("content.xml");
+        OdfDatabaseFormInfo form = Assert.Single(loaded.Forms);
+        using var contentStream = loaded.Package.GetEntryStream(form.Href!.TrimEnd('/') + "/content.xml");
         using var reader = new StreamReader(contentStream);
         string xml = reader.ReadToEnd();
 

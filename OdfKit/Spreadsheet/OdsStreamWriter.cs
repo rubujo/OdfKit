@@ -40,6 +40,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     private SheetBuffer? _activeSheetBuffer;
     private bool _isRowStarted;
     private bool _isSheetStarted;
+    private bool _hasWrittenColumns;
     private bool _disposed;
     private readonly List<(string styleName, OdfLength width)> _columnStyles = [];
     private readonly List<(string styleName, OdfLength? height, bool useOptimalHeight)> _rowStyles = [];
@@ -162,6 +163,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         if (_isSheetStarted)
             WriteEndSheet();
         _activeSheetBuffer = null;
+        _hasWrittenColumns = false;
         _rawWriter.WriteStartElement("table:table");
         _rawWriter.WriteAttribute("table:name", sheetName.AsSpan());
         _isSheetStarted = true;
@@ -231,6 +233,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         raw.WriteStartElement("table:table-column");
         raw.WriteAttribute("table:style-name", name.AsSpan());
         raw.WriteEndElement("table:table-column");
+        CurrentSheetHasColumns = true;
 
         _columnStyles.Add((name, width));
     }
@@ -259,6 +262,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         OdfXmlCharacterGuard.ValidateText(styleName.AsSpan(), nameof(options.StyleName));
         if (_isRowStarted)
             WriteEndRow();
+        EnsureSheetColumns();
         _isRowStarted = true;
 
         string? resolvedStyleName = styleName;
@@ -382,7 +386,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             return;
         OdfXmlCharacterGuard.ValidateText(styleName.AsSpan(), nameof(styleName));
         // office:value 屬性與 text:p 內文共用同一次格式化結果，避免重複的 ToString 配置。
-        string text = value.ToString(CultureInfo.InvariantCulture);
+        string text = OdfCellValueParser.FormatNumber(value);
         OdfRawXmlWriter raw = CurrentRawWriter;
         raw.WriteStartElement("table:table-cell");
         raw.WriteAttribute("office:value-type", "float".AsSpan());
@@ -507,6 +511,13 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         // 底層 XmlWriter 已關閉 CheckCharacters，寫入前先以輕量防線驗證整棵子樹，
         // 維持與先前「XmlWriter 於寫入時擲出」等價的快速失敗語意。
         ValidateNodeXmlCharacters(node);
+        if (!_isRowStarted && node.NodeType == OdfNodeType.Element && node.NamespaceUri == OdfNamespaces.Table)
+        {
+            if (node.LocalName is "table-column" or "table-columns" or "table-column-group" or "table-header-columns")
+                CurrentSheetHasColumns = true;
+            else if (node.LocalName is "table-row" or "table-rows" or "table-row-group" or "table-header-rows")
+                EnsureSheetColumns();
+        }
         // 交接同步點：任意 DOM 子樹維持走 XmlWriter，寫入前先閉合快速路徑的
         // 未完成起始標籤並清空其字元緩衝，確保輸出順序正確。
         CurrentRawWriter.FlushToTarget();
@@ -836,6 +847,32 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     private XmlWriter CurrentWriter => _activeSheetBuffer?.Writer ?? _writer;
 
     private OdfRawXmlWriter CurrentRawWriter => _activeSheetBuffer?.RawWriter ?? _rawWriter;
+
+    private bool CurrentSheetHasColumns
+    {
+        get => _activeSheetBuffer?.HasColumns ?? _hasWrittenColumns;
+        set
+        {
+            if (_activeSheetBuffer is not null)
+                _activeSheetBuffer.HasColumns = value;
+            else
+                _hasWrittenColumns = value;
+        }
+    }
+
+    private static void WriteDefaultColumn(OdfRawXmlWriter writer)
+    {
+        writer.WriteStartElement("table:table-column");
+        writer.WriteEndElement("table:table-column");
+    }
+
+    private void EnsureSheetColumns()
+    {
+        if (CurrentSheetHasColumns)
+            return;
+        WriteDefaultColumn(CurrentRawWriter);
+        CurrentSheetHasColumns = true;
+    }
     /// <summary>
     /// Short overload of WriteSheetsAsync that accepts jobs; remaining optional parameters use defaults and forward to the full overload.
     /// 便利多載：提供 jobs；其餘可選參數使用預設值並轉呼叫最長 WriteSheetsAsync 多載。
@@ -898,6 +935,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
                     // 建構後立即指派，確保寫入工作中途失敗時 catch 能處置到此緩衝
                     var buffer = new SheetBuffer(job.SheetName);
                     buffers[jobIndex] = buffer;
+                    WriteDefaultColumn(buffer.RawWriter);
+                    buffer.HasColumns = true;
                     var sheetWriter = new OdsSheetWriter(buffer.RawWriter);
                     await job.WriteAsync(sheetWriter, cancellationToken).ConfigureAwait(false);
                     sheetWriter.CloseOpenRow();
@@ -972,6 +1011,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     {
         private readonly MemoryStream _stream = new();
         private bool _closed;
+
+        internal bool HasColumns { get; set; }
 
         /// <summary>
         /// Full overload of SheetBuffer that accepts sheetName.

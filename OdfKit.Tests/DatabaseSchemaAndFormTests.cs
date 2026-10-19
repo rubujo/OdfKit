@@ -166,7 +166,7 @@ public class DatabaseSchemaAndFormTests
         // 驗證表單控制項 XML 結構
         Assert.Contains("form:text", xml);
         Assert.Contains("form:name=\"txtUserName\"", xml);
-        Assert.Contains("form:string-value=\"預設值\"", xml);
+        Assert.Contains("office:string-value=\"預設值\"", xml);
 
         Assert.Contains("form:checkbox", xml);
         Assert.Contains("form:name=\"chkAgreed\"", xml);

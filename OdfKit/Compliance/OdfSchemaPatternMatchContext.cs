@@ -130,7 +130,8 @@ internal sealed class OdfSchemaPatternMatchContext
             schema,
             0,
             new Dictionary<(OdfSchemaPatternNode, XElement), bool>(),
-            new Dictionary<OdfSchemaPatternNode, OdfSchemaPatternNode?>())
+            new Dictionary<OdfSchemaPatternNode, OdfSchemaPatternNode?>(),
+            new OdfSchemaAttributeDerivative(schema))
     {
     }
 
@@ -138,18 +139,22 @@ internal sealed class OdfSchemaPatternMatchContext
         OdfSchemaSet schema,
         int recursiveDepth,
         Dictionary<(OdfSchemaPatternNode Node, XElement Element), bool> elementMatchCache,
-        Dictionary<OdfSchemaPatternNode, OdfSchemaPatternNode?> strippedRootCache)
+        Dictionary<OdfSchemaPatternNode, OdfSchemaPatternNode?> strippedRootCache,
+        OdfSchemaAttributeDerivative attributeDerivative)
     {
         Schema = schema;
         _recursiveDepth = recursiveDepth;
         _elementMatchCache = elementMatchCache;
         _strippedRootCache = strippedRootCache;
+        AttributeDerivative = attributeDerivative;
     }
 
     /// <summary>
     /// 取得結構描述集。
     /// </summary>
     public OdfSchemaSet Schema { get; }
+
+    internal OdfSchemaAttributeDerivative AttributeDerivative { get; }
 
     // QName datatype 的值必須使用目前元素的 in-scope namespace，而不是固定的 ODF 前綴表。
     internal XElement? NamespaceContext { get; set; }
@@ -175,7 +180,7 @@ internal sealed class OdfSchemaPatternMatchContext
     public OdfSchemaPatternMatchContext? CreateRecursiveContext() =>
         _recursiveDepth >= MaxRecursiveDepth
             ? null
-            : new OdfSchemaPatternMatchContext(Schema, _recursiveDepth + 1, _elementMatchCache, _strippedRootCache)
+            : new OdfSchemaPatternMatchContext(Schema, _recursiveDepth + 1, _elementMatchCache, _strippedRootCache, AttributeDerivative)
             {
                 NamespaceContext = NamespaceContext
             };
@@ -183,7 +188,7 @@ internal sealed class OdfSchemaPatternMatchContext
     /// <summary>
     /// 建立比對子元素用的新內容：循環參照防護從空白開始，但共用「模式節點對元素」的比對快取。
     /// </summary>
-    public OdfSchemaPatternMatchContext CreateChildContext() => new(Schema, 0, _elementMatchCache, _strippedRootCache);
+    public OdfSchemaPatternMatchContext CreateChildContext() => new(Schema, 0, _elementMatchCache, _strippedRootCache, AttributeDerivative);
 
     /// <summary>
     /// 取得（必要時建立）指定定義根節點剝離屬性模式後的結果。

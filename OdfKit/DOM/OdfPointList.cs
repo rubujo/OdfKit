@@ -143,7 +143,7 @@ public readonly struct OdfPointList : IEquatable<OdfPointList>
             return false;
         }
 
-        string[] tokens = value.Split(' ');
+        string[] tokens = value.Split([' '], StringSplitOptions.RemoveEmptyEntries);
         OdfPoint2D[] parsed = new OdfPoint2D[tokens.Length];
         for (int index = 0; index < tokens.Length; index++)
         {

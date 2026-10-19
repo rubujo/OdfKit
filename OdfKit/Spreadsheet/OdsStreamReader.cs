@@ -599,7 +599,7 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     {
         object? value;
         OdsCellValueKind kind;
-        switch (valueType)
+        switch (valueType?.Trim(' ', '\t', '\r', '\n'))
         {
             case "float":
                 kind = OdsCellValueKind.Number;
@@ -621,14 +621,11 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
 
             case "date":
                 kind = OdsCellValueKind.Date;
-                value = DateTime.TryParse(dateValue, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTime date)
-                    ? date : dateValue;
+                value = OdfCellValueParser.ReadDate(dateValue);
                 break;
             case "time":
                 kind = OdsCellValueKind.Time;
-                try
-                { value = string.IsNullOrEmpty(timeValue) ? null : XmlConvert.ToTimeSpan(timeValue); }
-                catch (FormatException) { value = timeValue; }
+                value = OdfCellValueParser.ReadDuration(timeValue);
                 break;
 
             case "string":
@@ -647,7 +644,7 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     }
 
     private static double? ParseNumber(string? value) =>
-        double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double number) ? number : null;
+        OdfCellValueParser.ReadNumber(value);
 
     // 讀取儲存格的顯示文字：每個 text:p 各自讀成一段，段落之間以 "\n" 相接。
     // 不使用 ReadSubtree（理由見 ParseCurrentRow）。讀完每個段落後，讀取器停在該段落的 EndElement

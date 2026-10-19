@@ -446,7 +446,7 @@ namespace OdfKit.Tests
             string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\"><office:body><office:text/></office:body></office:document-content>";
             var additional = new Dictionary<string, string>
             {
-                { "settings.xml", "<office:document-settings xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" office:version=\"1.4\"><office:settings><config:config-item-set config:name=\"ooo:view-settings\"><config:config-item config:name=\"ShowGrid\" config:type=\"boolean\">true</config:config-item></config:config-item-set></office:settings></office:document-settings>" }
+                { "settings.xml", "<office:document-settings xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" xmlns:ooo=\"http://openoffice.org/2004/office\" office:version=\"1.4\"><office:settings><config:config-item-set config:name=\"ooo:view-settings\"><config:config-item config:name=\"ShowGrid\" config:type=\"boolean\">true</config:config-item></config:config-item-set></office:settings></office:document-settings>" }
             };
             using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content, additional);
             using OdfPackage package = OdfPackage.Open(ms);
@@ -513,7 +513,7 @@ namespace OdfKit.Tests
         [Fact]
         public void OasisOdf14CorpusPositiveFlatDocument()
         {
-            string flatXml = "<office:document xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" office:version=\"1.4\" office:mimetype=\"application/vnd.oasis.opendocument.text\"><office:meta/><office:settings><config:config-item-set config:name=\"ooo:view-settings\"><config:config-item config:name=\"ShowGrid\" config:type=\"boolean\">true</config:config-item></config:config-item-set></office:settings><office:styles/><office:body><office:text/></office:body></office:document>";
+            string flatXml = "<office:document xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" xmlns:ooo=\"http://openoffice.org/2004/office\" office:version=\"1.4\" office:mimetype=\"application/vnd.oasis.opendocument.text\"><office:meta/><office:settings><config:config-item-set config:name=\"ooo:view-settings\"><config:config-item config:name=\"ShowGrid\" config:type=\"boolean\">true</config:config-item></config:config-item-set></office:settings><office:styles/><office:body><office:text/></office:body></office:document>";
             using var ms = new MemoryStream(Encoding.UTF8.GetBytes(flatXml));
             OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = "document.fodt", Profile = OdfComplianceProfiles.OasisOdf14Strict });
             LogReport("OasisOdf14CorpusPositiveFlatDocument", report);

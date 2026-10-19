@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Xml;
 using OdfKit.DOM;
 
 using OdfKit.Compliance;
@@ -118,13 +119,6 @@ internal static class OdfDocumentMetadataEngine
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocumentMetadataEngine_PropertyCannotBeEmpty"), nameof(name));
-
-        if (name.Contains(':'))
-        {
-            string oldName = name;
-            name = name.Replace(":", "_");
-            OdfKitDiagnostics.Warn($"Custom property name '{oldName}' contains invalid character ':'. Renamed to '{name}' for Excel compatibility.");
-        }
 
         var metaRoot = FindOrCreateMetaRoot(metaDom);
 
@@ -301,7 +295,7 @@ internal static class OdfDocumentMetadataEngine
         return type.ToLowerInvariant() switch
         {
             "boolean" => ((bool)val) ? "true" : "false",
-            "float" => Convert.ToDouble(val, System.Globalization.CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture),
+            "float" => XmlConvert.ToString(Convert.ToDouble(val, CultureInfo.InvariantCulture)),
             "date" => FormatDateValue((DateTime)val),
             _ => val.ToString() ?? string.Empty
         };
@@ -325,13 +319,33 @@ internal static class OdfDocumentMetadataEngine
 
     private static object ParseValue(string val, string? type)
     {
-        return type?.ToLowerInvariant() switch
+        return type?.Trim(' ', '\t', '\r', '\n').ToLowerInvariant() switch
         {
             "boolean" => bool.TryParse(val, out var b) && b,
-            "float" => double.TryParse(val, NumberStyles.Float, CultureInfo.InvariantCulture, out var f) ? f : 0.0,
-            "date" => DateTime.TryParse(val, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var d) ? d : DateTime.MinValue,
+            "float" => val.Trim(' ', '\t', '\r', '\n') switch
+            {
+                "INF" => double.PositiveInfinity,
+                "-INF" => double.NegativeInfinity,
+                "NaN" => double.NaN,
+                _ => double.TryParse(val, NumberStyles.Float, CultureInfo.InvariantCulture, out var f) ? f : 0.0
+            },
+            "date" => ParseDateValue(val),
             _ => val
         };
+    }
+
+    private static object ParseDateValue(string value)
+    {
+        // DateTime 只能精確保存七位小數秒；無法表示的合法值保留原字串，不替換成最小日期。
+        int time = value.IndexOf('T');
+        int point = time < 0 ? -1 : value.IndexOf('.', time);
+        if (point >= 0)
+            for (int index = point + 1; index < value.Length && value[index] is >= '0' and <= '9'; index++)
+                if (index - point > 7 && value[index] != '0')
+                    return value;
+        return DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTime parsed)
+            ? (object)parsed
+            : value;
     }
 
     private static void TraverseForStats(OdfNode node, ref int words, ref int chars, ref int paragraphs, ref int tables, ref int images)

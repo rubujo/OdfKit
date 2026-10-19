@@ -59,6 +59,7 @@ public static class OdfXmlReader
         OdfNode? rootNode = null;
         Stack<OdfNode> stack = new();
         Stack<Dictionary<string, string>> namespaceScopes = new();
+        Stack<bool> whitespaceScopes = new();
         Dictionary<string, string> sourceNamespacePrefixes = new(StringComparer.Ordinal);
         int currentDepth = 0;
         long xmlCharacterCount = 0;
@@ -109,11 +110,25 @@ public static class OdfXmlReader
 
                     var node = OdfNodeFactory.CreateElement(localName, nsUri, prefix);
 
+                    if (HasNamespaceDeclarations(token.Attributes))
+                    {
+                        var declarations = new Dictionary<string, string>(StringComparer.Ordinal);
+                        AddNamespaceDeclarations(token.Attributes, declarations);
+                        OdfNamespaceDeclarations.Set(node, declarations);
+                    }
+
                     // 解析屬性
                     if (!token.Attributes.IsEmpty)
                     {
                         ParseAttributes(token.Attributes, node, elementNamespaces, ref xmlCharacterCount, options);
                     }
+
+                    bool preserveWhitespace = node.GetAttribute("space", OdfNamespaces.Xml) switch
+                    {
+                        "preserve" => true,
+                        "default" => false,
+                        _ => whitespaceScopes.Count > 0 && whitespaceScopes.Peek()
+                    };
 
                     if (stack.Count > 0)
                     {
@@ -167,6 +182,7 @@ public static class OdfXmlReader
                                 node._lazyMaxXmlCharactersInDocument = options.MaxXmlCharactersInDocument;
                                 node._lazyStrictXmlParsing = options.StrictXmlParsing;
                                 node._lazyInScopeNamespaces = elementNamespaces;
+                                node._lazyPreserveWhitespace = preserveWhitespace;
                                 node._isLazy = true;
                                 reader = lazyReader;
                             }
@@ -185,6 +201,7 @@ public static class OdfXmlReader
                     {
                         stack.Push(node);
                         namespaceScopes.Push(elementNamespaces);
+                        whitespaceScopes.Push(preserveWhitespace);
                     }
                     else if (token.Kind == OdfUtf8XmlTokenKind.SelfClosingElement || shouldLazy)
                     {
@@ -200,6 +217,10 @@ public static class OdfXmlReader
                     if (namespaceScopes.Count > 0)
                     {
                         namespaceScopes.Pop();
+                    }
+                    if (whitespaceScopes.Count > 0)
+                    {
+                        whitespaceScopes.Pop();
                     }
                     currentDepth--;
                     break;
@@ -217,7 +238,7 @@ public static class OdfXmlReader
                         ReadOnlySpan<byte> content = token.Value.Length >= prefixLength + 3
                             ? token.Value.Slice(prefixLength, token.Value.Length - prefixLength - 3)
                             : ReadOnlySpan<byte>.Empty;
-                        string value = OdfUtf8XmlReader.GetStringMaybeDecoded(content);
+                        string value = DecodeXmlCharacterData(content, decodeEntities: false);
                         AddXmlCharacters(options, ref xmlCharacterCount, value.Length);
                         OdfNode contentNode = new(
                             isCData ? OdfNodeType.Text : OdfNodeType.Comment,
@@ -248,12 +269,12 @@ public static class OdfXmlReader
                     {
                         // 結構性元素（office:body、table:table 等）之間的縮排空白沒有意義而略過；
                         // 段落內容元素中僅含空白的文字是有意義的內容（例如兩個 text:span 之間的空格）。
-                        if (IsWhitespaceOnly(token.Value) && !IsMixedContentElement(stack.Peek()))
+                        if (IsWhitespaceOnly(token.Value) && !whitespaceScopes.Peek() && !IsMixedContentElement(stack.Peek()))
                         {
                             break;
                         }
 
-                        string textVal = OdfUtf8XmlReader.GetStringMaybeDecoded(token.Value);
+                        string textVal = DecodeXmlCharacterData(token.Value, decodeEntities: true);
                         AddXmlCharacters(options, ref xmlCharacterCount, textVal.Length);
                         OdfNode textNode = new(OdfNodeType.Text, string.Empty, string.Empty)
                         {
@@ -358,11 +379,11 @@ public static class OdfXmlReader
 
             if (attrFullName == "xmlns")
             {
-                namespaces[string.Empty] = OdfUtf8XmlReader.GetStringMaybeDecoded(attrValueSpan);
+                namespaces[string.Empty] = DecodeXmlAttributeValue(attrValueSpan);
             }
             else if (attrFullName.StartsWith("xmlns:", StringComparison.Ordinal))
             {
-                namespaces[attrFullName.Substring("xmlns:".Length)] = OdfUtf8XmlReader.GetStringMaybeDecoded(attrValueSpan);
+                namespaces[attrFullName.Substring("xmlns:".Length)] = DecodeXmlAttributeValue(attrValueSpan);
             }
         }
     }
@@ -433,7 +454,7 @@ public static class OdfXmlReader
             if (i < attrsSpan.Length)
                 i++; // consume quote
 
-            string attrValue = OdfUtf8XmlReader.GetStringMaybeDecoded(attrValSpan);
+            string attrValue = DecodeXmlAttributeValue(attrValSpan);
 
             if (IsNamespaceDeclaration(attrNameSpan))
             {
@@ -455,6 +476,14 @@ public static class OdfXmlReader
         out string localName,
         out string namespaceUri)
     {
+        // 預設命名空間適用於元素名稱，不適用於無前綴屬性。
+        if (name.IndexOf((byte)':') < 0)
+        {
+            prefix = string.Empty;
+            localName = DecodeUtf8(name);
+            namespaceUri = string.Empty;
+            return;
+        }
         if (OdfCustomAttributeRegistry.TryMatchLocalName(name, out string registeredLocalName))
         {
             ResolveQualifiedName(name, namespaces, out prefix, out localName, out namespaceUri);
@@ -492,7 +521,7 @@ public static class OdfXmlReader
             localName = DecodeUtf8(name.Slice(colonIdx + 1));
         }
 
-        namespaceUri = prefix.Length == 0 ? string.Empty : LookupNamespaceUri(prefix, namespaces);
+        namespaceUri = LookupNamespaceUri(prefix, namespaces);
     }
 
     private static string DecodeUtf8(ReadOnlySpan<byte> value) => Encoding.UTF8.GetString(
@@ -582,6 +611,8 @@ public static class OdfXmlReader
 
                             var node = OdfNodeFactory.CreateElement(localName, nsUri, prefix);
 
+                            Dictionary<string, string>? declarations = null;
+
                             // 解析屬性
                             if (reader.HasAttributes)
                             {
@@ -599,6 +630,8 @@ public static class OdfXmlReader
                                     // 跳過命名空間宣告 (xmlns 或 xmlns:prefix)
                                     if (attrNsUri == "http://www.w3.org/2000/xmlns/" || attrLocalName == "xmlns" || attrPrefix == "xmlns")
                                     {
+                                        declarations ??= new Dictionary<string, string>(StringComparer.Ordinal);
+                                        declarations[attrPrefix == "xmlns" ? attrLocalName : string.Empty] = attrValue;
                                         continue;
                                     }
 
@@ -606,6 +639,9 @@ public static class OdfXmlReader
                                 }
                                 reader.MoveToElement();
                             }
+
+                            if (declarations is not null)
+                                OdfNamespaceDeclarations.Set(node, declarations);
 
                             if (stack.Count > 0)
                             {
@@ -616,18 +652,20 @@ public static class OdfXmlReader
                                 rootNode = node;
                             }
 
+                            bool preserveWhitespace = reader.XmlSpace == XmlSpace.Preserve;
                             bool shouldLazy = false;
                             if (options.AllowLazyLoading && !reader.IsEmptyElement)
                             {
                                 if (localName == "table" && nsUri == "urn:oasis:names:tc:opendocument:xmlns:table:1.0")
                                 {
                                     Dictionary<string, string> inScopeNamespaces = CaptureInScopeNamespaces(reader);
-                                    string innerXml = reader.ReadInnerXml();
+                                    string innerXml = ReadInnerXmlPreservingCharacters(reader);
                                     AddXmlCharacters(options, ref xmlCharacterCount, innerXml.Length);
                                     node._lazyXmlMemory = Encoding.UTF8.GetBytes(innerXml);
                                     node._lazyMaxXmlCharactersInDocument = options.MaxXmlCharactersInDocument;
                                     node._lazyStrictXmlParsing = options.StrictXmlParsing;
                                     node._lazyInScopeNamespaces = inScopeNamespaces;
+                                    node._lazyPreserveWhitespace = preserveWhitespace;
                                     node._isLazy = true;
                                     shouldLazy = true;
                                     currentDepth--;
@@ -636,7 +674,7 @@ public static class OdfXmlReader
                                 else if (localName == "meta" || localName == "settings" || localName == "styles" || localName == "p" || localName == "list")
                                 {
                                     Dictionary<string, string> inScopeNamespaces = CaptureInScopeNamespaces(reader);
-                                    string innerXml = reader.ReadInnerXml();
+                                    string innerXml = ReadInnerXmlPreservingCharacters(reader);
                                     AddXmlCharacters(options, ref xmlCharacterCount, innerXml.Length);
                                     if (innerXml.Length >= 8192)
                                     {
@@ -644,13 +682,14 @@ public static class OdfXmlReader
                                         node._lazyMaxXmlCharactersInDocument = options.MaxXmlCharactersInDocument;
                                         node._lazyStrictXmlParsing = options.StrictXmlParsing;
                                         node._lazyInScopeNamespaces = inScopeNamespaces;
+                                        node._lazyPreserveWhitespace = preserveWhitespace;
                                         node._isLazy = true;
                                         shouldLazy = true;
                                     }
                                     else if (innerXml.Length > 0)
                                     {
-                                        bool mixedInner = localName == "p";
-                                        byte[] wrapperPrefix = OdfNode.BuildWrapperPrefixBytes(inScopeNamespaces, mixedInner);
+                                        bool mixedInner = IsMixedContentElement(node);
+                                        byte[] wrapperPrefix = OdfNode.BuildWrapperPrefixBytes(inScopeNamespaces, mixedInner, preserveWhitespace);
                                         byte[] innerBody = Encoding.UTF8.GetBytes(
                                             innerXml + (mixedInner ? "</" + OdfNode.MixedWrapperName + ">" : "</wrapper>"));
                                         byte[] innerBytes = new byte[wrapperPrefix.Length + innerBody.Length];
@@ -722,6 +761,7 @@ public static class OdfXmlReader
                             break;
 
                         case XmlNodeType.Text:
+                        case XmlNodeType.CDATA:
                         case XmlNodeType.SignificantWhitespace:
                         case XmlNodeType.Whitespace:
                             if (stack.Count > 0)
@@ -794,10 +834,90 @@ public static class OdfXmlReader
         return true;
     }
 
+    private static string ReadInnerXmlPreservingCharacters(XmlReader reader)
+    {
+        // ReadInnerXml 會把 CR 字元參照改成字面 CR，片段再次解析時便遺失原值。
+        StringBuilder content = new();
+        using (XmlWriter writer = XmlWriter.Create(content, new XmlWriterSettings
+        {
+            ConformanceLevel = ConformanceLevel.Fragment,
+            OmitXmlDeclaration = true,
+            NewLineHandling = NewLineHandling.Entitize
+        }))
+        {
+            int parentDepth = reader.Depth;
+            reader.Read();
+            while (reader.ReadState == ReadState.Interactive && reader.Depth > parentDepth)
+                writer.WriteNode(reader, defattr: true);
+            if (reader.NodeType == XmlNodeType.EndElement && reader.Depth == parentDepth)
+                reader.Read();
+        }
+        return content.ToString();
+    }
+
+    private static string DecodeXmlAttributeValue(ReadOnlySpan<byte> bytes)
+    {
+        // XML 3.3.3：先替換字面的 TAB/LF/CR，再解碼參照；一般空格與參照結果不摺疊。
+        if (bytes.IndexOfAny((byte)'\t', (byte)'\n', (byte)'\r') < 0)
+            return OdfUtf8XmlReader.GetStringMaybeDecoded(bytes);
+
+        byte[] normalized = new byte[bytes.Length];
+        int length = 0;
+        for (int index = 0; index < bytes.Length; index++)
+        {
+            byte value = bytes[index];
+            if (value is (byte)'\t' or (byte)'\n' or (byte)'\r')
+            {
+                if (value == (byte)'\r' && index + 1 < bytes.Length && bytes[index + 1] == (byte)'\n')
+                    index++;
+                value = (byte)' ';
+            }
+            normalized[length++] = value;
+        }
+        return OdfUtf8XmlReader.GetStringMaybeDecoded(normalized.AsSpan(0, length));
+    }
+
+    private static string DecodeXmlCharacterData(ReadOnlySpan<byte> bytes, bool decodeEntities)
+    {
+        // XML 的字面 CR/CRLF 必須先正規化，字元參照產生的 CR 則保留原值。
+        // 一般無 CR 的熱路徑不配置額外緩衝區；CDATA 與註解不解碼實體。
+        if (bytes.IndexOf((byte)'\r') >= 0)
+        {
+            byte[] normalized = new byte[bytes.Length];
+            int length = 0;
+            for (int index = 0; index < bytes.Length; index++)
+            {
+                byte value = bytes[index];
+                if (value == (byte)'\r')
+                {
+                    value = (byte)'\n';
+                    if (index + 1 < bytes.Length && bytes[index + 1] == (byte)'\n')
+                        index++;
+                }
+                normalized[length++] = value;
+            }
+            bytes = normalized.AsSpan(0, length);
+        }
+
+        if (decodeEntities)
+            return OdfUtf8XmlReader.GetStringMaybeDecoded(bytes);
+
+        return Encoding.UTF8.GetString(
+#if NETSTANDARD2_0
+            bytes.ToArray()
+#else
+            bytes
+#endif
+        );
+    }
+
     internal static bool IsMixedContentElement(OdfNode element) =>
-        element.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-            ? element.LocalName is "p" or "h" or "span" or "a" or "meta" or "ruby-base" or "ruby-text"
-            : element.NamespaceUri.Length == 0 && element.LocalName == OdfNode.MixedWrapperName;
+        (element.NamespaceUri.Length == 0 && element.LocalName == OdfNode.MixedWrapperName) ||
+        Odf14OfficialSchemaMetadata.AllowsCharacterData(element.NamespaceUri, element.LocalName) ||
+        Odf13OfficialSchemaMetadata.AllowsCharacterData(element.NamespaceUri, element.LocalName) ||
+        Odf12OfficialSchemaMetadata.AllowsCharacterData(element.NamespaceUri, element.LocalName) ||
+        Odf11OfficialSchemaMetadata.AllowsCharacterData(element.NamespaceUri, element.LocalName) ||
+        Odf10OfficialSchemaMetadata.AllowsCharacterData(element.NamespaceUri, element.LocalName);
 
     private static Dictionary<string, string> CaptureInScopeNamespaces(XmlReader reader)
     {

@@ -190,7 +190,7 @@ public partial class SpreadsheetDocument
     {
         get
         {
-            var val = FindSettingsConfigItem("StructureProtected");
+            var val = OdfDocumentSettingsEngine.FindOfficeConfigItem(SettingsDom, "ooo:document-settings", "StructureProtected");
             return val is not null && val.TextContent == "true";
         }
     }

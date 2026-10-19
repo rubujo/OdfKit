@@ -602,6 +602,61 @@ public sealed class OpenFormulaExtendedEvaluatorTests
     }
 
     /// <summary>
+    /// Verifies TRIM uses the four OpenFormula space characters and preserves other characters.
+    /// 驗證 TRIM 使用 OpenFormula 定義的四種空白字元並保留其他字元。
+    /// </summary>
+    [Theory]
+    [InlineData("\t\r\n A\t \nB \r\n", "A B")]
+    [InlineData("\t\r\n ", "")]
+    [InlineData("A\t\tB", "A B")]
+    [InlineData("A\n\rB", "A B")]
+    [InlineData("A\tB", "A\tB")]
+    [InlineData("\u00a0 A  B \u00a0", "\u00a0 A B \u00a0")]
+    [InlineData("\u2003A\u2003", "\u2003A\u2003")]
+    public void TrimUsesOpenFormulaSpaceCharacters(string input, string expected)
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+
+        Assert.Equal(expected, evaluator.Evaluate("TRIM(\"" + input + "\")", new ExtendedEvaluationContext()));
+    }
+
+    /// <summary>
+    /// Verifies that HYPERLINK preserves numeric results for subsequent calculations.
+    /// 驗證 HYPERLINK 保留數值結果供後續計算使用。
+    /// </summary>
+    [Theory]
+    [InlineData("0", 0d)]
+    [InlineData("-12.5", -12.5d)]
+    [InlineData("2+3", 5d)]
+    public void HyperlinkPreservesNumericResult(string expression, double expected)
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+        string formula = "HYPERLINK(\"https://example.invalid\";" + expression + ")";
+
+        Assert.Equal(expected, Assert.IsType<double>(evaluator.Evaluate(formula, context)));
+        Assert.Equal(expected, Assert.IsType<double>(evaluator.Evaluate("SUM(" + formula + ")", context)));
+    }
+
+    /// <summary>
+    /// Verifies HYPERLINK defaults, text results, and error propagation.
+    /// 驗證 HYPERLINK 的預設值、文字結果與錯誤傳遞。
+    /// </summary>
+    [Fact]
+    public void HyperlinkPreservesTextAndErrors()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        Assert.Equal("https://example.invalid", evaluator.Evaluate("HYPERLINK(\"https://example.invalid\")", context));
+        Assert.Equal("", evaluator.Evaluate("HYPERLINK(\"https://example.invalid\";\"\")", context));
+        Assert.Equal("label", evaluator.Evaluate("HYPERLINK(\"https://example.invalid\";\"label\")", context));
+        Assert.Equal(OdfFormulaError.Div0, evaluator.Evaluate("HYPERLINK(\"https://example.invalid\";1/0)", context));
+        Assert.Equal(OdfFormulaError.Div0, evaluator.Evaluate("HYPERLINK(1/0;42)", context));
+        Assert.Equal(OdfFormulaError.Value, evaluator.Evaluate("HYPERLINK(42;42)", context));
+    }
+
+    /// <summary>
     /// Verifies every required INFO category and host-controlled overrides.
     /// 驗證所有必要 INFO 類別及由主機控制的覆寫值。
     /// </summary>

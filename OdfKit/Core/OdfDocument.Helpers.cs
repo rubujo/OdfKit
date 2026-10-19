@@ -88,12 +88,13 @@ public abstract partial class OdfDocument
     /// Gets or sets the external link update mode stored in document settings.
     /// 取得或設定文件設定中儲存的外部連結更新模式。
     /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">The mode is not representable as an XML Schema short. / 模式值無法以 XML Schema short 表示。</exception>
     public int LinkUpdateMode
     {
         get
         {
-            var item = FindSettingsConfigItem("LinkUpdateMode");
-            if (item != null && int.TryParse(item.TextContent, out var val))
+            var item = OdfDocumentSettingsEngine.FindOfficeConfigItem(SettingsDom, ContentKind == OdfDocumentKind.Spreadsheet ? "ooo:document-settings" : "ooo:configuration-settings", "LinkUpdateMode");
+            if (item != null && int.TryParse(item.TextContent, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var val))
                 return val;
             return 2; // 預設為 2 (On request)
         }
@@ -111,7 +112,7 @@ public abstract partial class OdfDocument
     {
         get
         {
-            var item = FindSettingsConfigItem("AutoCalculate");
+            var item = OdfDocumentSettingsEngine.FindOfficeConfigItem(SettingsDom, "ooo:document-settings", "AutoCalculate");
             if (item != null && bool.TryParse(item.TextContent, out var val))
                 return val;
             return true; // 預設為 true

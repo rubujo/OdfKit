@@ -36,6 +36,7 @@ public static class OdfXmlWriter
         {
             Encoding = new UTF8Encoding(false), // 不含位元組順序標記 (BOM) 的 UTF-8
             Indent = options.IndentXml,
+            NewLineHandling = NewLineHandling.Entitize,
             CloseOutput = false
         };
 
@@ -49,6 +50,7 @@ public static class OdfXmlWriter
 
         // 確保標準 XML 命名空間不會被重複宣告為 xmlns:xml
         nsDict.Remove("http://www.w3.org/XML/1998/namespace");
+        PrepareNamespacePrefixes(rootNode, nsDict);
 
         using (var writer = XmlWriter.Create(stream, settings))
         {
@@ -200,7 +202,7 @@ public static class OdfXmlWriter
         }
         else
         {
-            writer.WriteStartElement(node.LocalName);
+            writer.WriteStartElement(string.Empty, node.LocalName, string.Empty);
         }
 
         openElementsCount++;
@@ -220,8 +222,18 @@ public static class OdfXmlWriter
             }
         }
 
+        foreach (KeyValuePair<string, string> declaration in OdfNamespaceDeclarations.GetOwn(node))
+        {
+            if (declaration.Key == "xml" || isRoot && nsDict.TryGetValue(declaration.Value, out string? declaredPrefix) && declaredPrefix == declaration.Key)
+                continue;
+            writer.WriteAttributeString("xmlns", declaration.Key, OdfNamespaceDeclarations.XmlnsNamespace, declaration.Value);
+        }
+
         foreach (var attr in node.Attributes)
         {
+            if (attr.Key.NamespaceUri == OdfNamespaceDeclarations.XmlnsNamespace ||
+                attr.Key.NamespaceUri.Length == 0 && attr.Key.LocalName == "xmlns")
+                continue;
             string attrPrefix = GetNamespacePrefix(attr.Key.NamespaceUri, node.GetAttributePrefix(attr.Key), nsDict);
             if (!string.IsNullOrEmpty(attr.Key.NamespaceUri))
             {
@@ -261,6 +273,48 @@ public static class OdfXmlWriter
 
         writer.WriteEndElement();
         openElementsCount--;
+    }
+
+    // 先保留整棵樹的來源別名，再選擇結構化名稱使用的前綴。
+    // 保留僅供屬性值使用的前綴與區域重新繫結，避免逐節點複製整份對照表。
+    private static void PrepareNamespacePrefixes(OdfNode root, Dictionary<string, string> namespaces)
+    {
+        var bindings = new Dictionary<string, string?>(StringComparer.Ordinal);
+        bindings["xml"] = "http://www.w3.org/XML/1998/namespace";
+        bindings["xmlns"] = OdfNamespaceDeclarations.XmlnsNamespace;
+        bindings[string.Empty] = null;
+        var pending = new Stack<OdfNode>();
+        pending.Push(root);
+        while (pending.Count > 0)
+        {
+            OdfNode node = pending.Pop();
+            foreach (KeyValuePair<string, string> declaration in OdfNamespaceDeclarations.GetOwn(node))
+            {
+                if (bindings.TryGetValue(declaration.Key, out string? prior) && prior != declaration.Value)
+                    bindings[declaration.Key] = null;
+                else if (!bindings.ContainsKey(declaration.Key))
+                    bindings.Add(declaration.Key, declaration.Value);
+            }
+            if (node._isLazy && node.Children.LoadedCount == 0)
+                continue;
+            foreach (OdfNode child in node.Children)
+                pending.Push(child);
+        }
+        int suffix = 0;
+        foreach (string uri in namespaces.Keys.ToArray())
+        {
+            string prefix = namespaces[uri];
+            if (bindings.TryGetValue(prefix, out string? binding) && binding != uri)
+            {
+                do
+                {
+                    prefix = "ns" + (++suffix).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                }
+                while (bindings.ContainsKey(prefix));
+            }
+            bindings[prefix] = uri;
+            namespaces[uri] = prefix;
+        }
     }
 
     private static string GetNamespacePrefix(string? nsUri, string? preferredPrefix, Dictionary<string, string> nsDict)
@@ -310,6 +364,7 @@ public static class OdfXmlWriter
             {
                 OdfAttributeName attr = attrEntry.Key;
                 if (!string.IsNullOrEmpty(attr.NamespaceUri) &&
+                    attr.NamespaceUri != OdfNamespaceDeclarations.XmlnsNamespace &&
                     !nsDict.ContainsKey(attr.NamespaceUri))
                 {
                     string prefix = OdfNamespaces.GetPrefix(attr.NamespaceUri);

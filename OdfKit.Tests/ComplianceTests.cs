@@ -927,7 +927,7 @@ namespace OdfKit.Tests
                 "<text:span xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\">-1</text:span>");
             XElement validNormalizedString = XElement.Parse(
                 "<text:span xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\">two words</text:span>");
-            XElement invalidNormalizedString = XElement.Parse(
+            XElement replacedNormalizedString = XElement.Parse(
                 "<text:span xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\">two&#x9;words</text:span>");
             XElement validDecimal = XElement.Parse(
                 "<text:span xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\">123456789012345678901234567890.123456789</text:span>");
@@ -959,7 +959,7 @@ namespace OdfKit.Tests
             Assert.True(OdfSchemaPatternValidator.ValidateElement(validNonNegativeInteger, schema, "nonnegative-integer-text").IsMatch);
             Assert.False(OdfSchemaPatternValidator.ValidateElement(invalidNonNegativeInteger, schema, "nonnegative-integer-text").IsMatch);
             Assert.True(OdfSchemaPatternValidator.ValidateElement(validNormalizedString, schema, "normalized-string-text").IsMatch);
-            Assert.False(OdfSchemaPatternValidator.ValidateElement(invalidNormalizedString, schema, "normalized-string-text").IsMatch);
+            Assert.True(OdfSchemaPatternValidator.ValidateElement(replacedNormalizedString, schema, "normalized-string-text").IsMatch);
             Assert.True(OdfSchemaPatternValidator.ValidateElement(validDecimal, schema, "decimal-text").IsMatch);
             Assert.False(OdfSchemaPatternValidator.ValidateElement(invalidDecimalExponent, schema, "decimal-text").IsMatch);
         }

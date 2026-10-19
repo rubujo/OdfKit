@@ -22,13 +22,13 @@ public static class OdfNumberFormatEngine
     public static string Format(double value, OdfNode numberStyleNode)
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(numberStyleNode, nameof(numberStyleNode));
-        string styleName = numberStyleNode.LocalName;
+        string styleName = numberStyleNode.NamespaceUri == OdfNamespaces.Number ? numberStyleNode.LocalName : string.Empty;
 
         if (styleName == "percentage-style")
             return FormatPercentage(value, numberStyleNode);
 
         if (styleName == "boolean-style")
-            return value != 0 ? "TRUE" : "FALSE";
+            return FormatTextValue(value != 0 ? "TRUE" : "FALSE", numberStyleNode, "boolean");
 
         if (styleName == "currency-style")
             return FormatCurrency(value, numberStyleNode);
@@ -46,9 +46,7 @@ public static class OdfNumberFormatEngine
     public static string Format(DateTime value, OdfNode dateStyleNode)
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(dateStyleNode, nameof(dateStyleNode));
-        return dateStyleNode.LocalName == "time-style"
-            ? FormatTime(value, dateStyleNode)
-            : FormatDate(value, dateStyleNode);
+        return FormatDateTime(value, dateStyleNode);
     }
 
     /// <summary>
@@ -77,7 +75,11 @@ public static class OdfNumberFormatEngine
             int i => Format((double)i, formatNode),
             long l => Format((double)l, formatNode),
             DateTime dt => Format(dt, formatNode),
-            bool b => b ? "TRUE" : "FALSE",
+            bool b => formatNode.NamespaceUri == OdfNamespaces.Number && formatNode.LocalName == "boolean-style"
+                ? FormatTextValue(b ? "TRUE" : "FALSE", formatNode, "boolean")
+                : b ? "TRUE" : "FALSE",
+            string text when formatNode.NamespaceUri == OdfNamespaces.Number && formatNode.LocalName == "text-style"
+                => FormatTextValue(text, formatNode, "text-content"),
             _ => value.ToString() ?? string.Empty
         };
     }
@@ -116,6 +118,7 @@ public static class OdfNumberFormatEngine
     private static string FormatNumber(double value, OdfNode styleNode)
     {
         var sb = new StringBuilder();
+        bool hasLiteral = false;
         foreach (var child in styleNode.Children)
         {
             if (child.NamespaceUri != OdfNamespaces.Number)
@@ -126,6 +129,7 @@ public static class OdfNumberFormatEngine
                     sb.Append(FormatNumberPart(value, child));
                     break;
                 case "text":
+                    hasLiteral = true;
                     sb.Append(child.TextContent);
                     break;
                 case "currency-symbol":
@@ -133,7 +137,29 @@ public static class OdfNumberFormatEngine
                     break;
             }
         }
-        return sb.Length > 0 ? sb.ToString() : value.ToString(CultureInfo.InvariantCulture);
+        return hasLiteral || sb.Length > 0 ? sb.ToString() : value.ToString(CultureInfo.InvariantCulture);
+    }
+
+    private static string FormatTextValue(string value, OdfNode styleNode, string placeholder)
+    {
+        var output = new StringBuilder();
+        bool hasContent = false;
+        foreach (OdfNode child in styleNode.Children)
+        {
+            if (child.NamespaceUri != OdfNamespaces.Number)
+                continue;
+            if (child.LocalName == "text")
+            {
+                output.Append(child.TextContent);
+                hasContent = true;
+            }
+            else if (child.LocalName == placeholder)
+            {
+                output.Append(value);
+                hasContent = true;
+            }
+        }
+        return hasContent ? output.ToString() : value;
     }
 
     private static string FormatCurrency(double value, OdfNode styleNode)
@@ -144,6 +170,7 @@ public static class OdfNumberFormatEngine
     private static string FormatPercentage(double value, OdfNode styleNode)
     {
         var sb = new StringBuilder();
+        bool hasLiteral = false;
         foreach (var child in styleNode.Children)
         {
             if (child.NamespaceUri != OdfNamespaces.Number)
@@ -154,11 +181,12 @@ public static class OdfNumberFormatEngine
                     sb.Append(FormatNumberPart(value * 100, child));
                     break;
                 case "text":
+                    hasLiteral = true;
                     sb.Append(child.TextContent);
                     break;
             }
         }
-        return sb.Length > 0 ? sb.ToString() : (value * 100).ToString("0.00", CultureInfo.InvariantCulture) + "%";
+        return hasLiteral || sb.Length > 0 ? sb.ToString() : (value * 100).ToString("0.00", CultureInfo.InvariantCulture) + "%";
     }
 
     private static string FormatNumberPart(double value, OdfNode numberNode)
@@ -186,8 +214,17 @@ public static class OdfNumberFormatEngine
         return value.ToString(fmt, CultureInfo.InvariantCulture);
     }
 
-    private static string FormatDate(DateTime dt, OdfNode styleNode)
+    private static string FormatDateTime(DateTime dt, OdfNode styleNode)
     {
+        bool twelveHourClock = false;
+        foreach (var child in styleNode.Children)
+        {
+            if (child.NamespaceUri == OdfNamespaces.Number && child.LocalName == "am-pm")
+            {
+                twelveHourClock = true;
+                break;
+            }
+        }
         var sb = new StringBuilder();
         foreach (var child in styleNode.Children)
         {
@@ -213,26 +250,10 @@ public static class OdfNumberFormatEngine
                         ? dt.ToString("dddd", CultureInfo.InvariantCulture)
                         : dt.ToString("ddd", CultureInfo.InvariantCulture));
                     break;
-                case "text":
-                    sb.Append(child.TextContent);
-                    break;
-            }
-        }
-        return sb.Length > 0 ? sb.ToString() : dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-    }
-
-    private static string FormatTime(DateTime dt, OdfNode styleNode)
-    {
-        var sb = new StringBuilder();
-        foreach (var child in styleNode.Children)
-        {
-            if (child.NamespaceUri != OdfNamespaces.Number)
-                continue;
-            switch (child.LocalName)
-            {
                 case "hours":
                     bool longH = child.GetAttribute("style", OdfNamespaces.Number) == "long";
-                    sb.Append(longH ? dt.Hour.ToString("D2", System.Globalization.CultureInfo.InvariantCulture) : dt.Hour.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    int hour = twelveHourClock ? (dt.Hour + 11) % 12 + 1 : dt.Hour;
+                    sb.Append(hour.ToString(longH ? "D2" : "D", CultureInfo.InvariantCulture));
                     break;
                 case "minutes":
                     bool longM = child.GetAttribute("style", OdfNamespaces.Number) == "long";
@@ -258,6 +279,7 @@ public static class OdfNumberFormatEngine
                     break;
             }
         }
-        return sb.Length > 0 ? sb.ToString() : dt.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+        return sb.Length > 0 ? sb.ToString() : dt.ToString(
+            styleNode.LocalName == "time-style" ? "HH:mm:ss" : "yyyy-MM-dd", CultureInfo.InvariantCulture);
     }
 }

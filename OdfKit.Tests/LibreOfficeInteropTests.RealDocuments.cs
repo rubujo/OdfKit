@@ -288,7 +288,8 @@ public partial class LibreOfficeInteropTests
                 new WP.Hyperlink(
                     new WP.Run(new WP.Text("第一章")),
                     new WP.Run(new WP.TabChar()),
-                    new WP.Run(new WP.Text("1"))) { Anchor = "_Toc1" });
+                    new WP.Run(new WP.Text("1")))
+                { Anchor = "_Toc1" });
             var tocEnd = new WP.Paragraph(Field(WP.FieldCharValues.End));
 
             main.Document = new WP.Document(new WP.Body(

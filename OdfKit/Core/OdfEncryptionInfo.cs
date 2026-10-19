@@ -40,8 +40,8 @@ public sealed class OdfEncryptionInfo
     public string KeyDerivationName { get; set; } = "PBKDF2";
 
     /// <summary>
-    /// Gets or sets the derived content encryption key size in bits.
-    /// 取得或設定衍生內容加密金鑰的位元大小。
+    /// Gets or sets the derived content encryption key size in bytes.
+    /// 取得或設定衍生內容加密金鑰的位元組大小。
     /// </summary>
     public int KeySize { get; set; }
 
@@ -64,8 +64,8 @@ public sealed class OdfEncryptionInfo
     public string? StartKeyGenerationName { get; set; }
 
     /// <summary>
-    /// Gets or sets the start-key size in bits.
-    /// 取得或設定起始金鑰位元大小。
+    /// Gets or sets the start-key size in bytes.
+    /// 取得或設定起始金鑰的位元組大小。
     /// </summary>
     public int? StartKeySize { get; set; }
 

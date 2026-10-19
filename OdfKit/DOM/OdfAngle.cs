@@ -5,16 +5,17 @@ using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
-/// 表示 ODF schema 中名為 <c>angle</c> 的角度值。
+/// Represents an ODF angle with an optional degree, grad or radian unit.
+/// 表示可選擇度、百分度或弧度單位的 ODF 角度值。
 /// </summary>
 public readonly struct OdfAngle : IEquatable<OdfAngle>
 {
     /// <summary>
-    /// Performs odf angle.
-    /// 以角度 lexical form 建立 <see cref="OdfAngle"/>。
+    /// Creates an angle from its numeric lexical form and optional unit.
+    /// 以數值詞法形式及可選單位建立角度。
     /// </summary>
-    /// <param name="value">角度字串，例如 <c>90</c> 或 <c>-45.5</c></param>
-    /// <exception cref="ArgumentException">當角度字串空白或包含控制字元時擲回</exception>
+    /// <param name="value">An angle such as <c>90</c> or <c>-45.5deg</c>. / 角度字串，例如 <c>90</c> 或 <c>-45.5deg</c>。</param>
+    /// <exception cref="ArgumentException">The value is not an ODF angle. / 值不是合法 ODF 角度。</exception>
     public OdfAngle(string value)
     {
         if (!IsValid(value))
@@ -26,8 +27,8 @@ public readonly struct OdfAngle : IEquatable<OdfAngle>
     }
 
     /// <summary>
-    /// Gets the Value value.
-    /// 取得原始角度字串。
+    /// Gets the angle lexical form with surrounding XML whitespace removed.
+    /// 取得移除前後 XML 空白後的角度詞法形式。
     /// </summary>
     public string Value { get; }
 
@@ -59,14 +60,40 @@ public readonly struct OdfAngle : IEquatable<OdfAngle>
     }
 
     /// <summary>
-    /// Tries to get degrees.
-    /// 嘗試將目前 lexical form 解析為度數。
+    /// Converts the angle to decimal degrees when its value is representable.
+    /// 在數值可表示時，將角度轉換為 decimal 度數。
     /// </summary>
-    /// <param name="degrees">成功時傳回度數</param>
-    /// <returns>若目前值是十進位度數則為 <see langword="true"/></returns>
+    /// <param name="degrees">The degree value on success. / 成功時傳回度數。</param>
+    /// <returns>Whether conversion fits decimal precision and range. / 轉換是否可由 decimal 的精確度與範圍表示。</returns>
+    /// <remarks>
+    /// Radian conversion uses a decimal approximation of pi; the lexical value remains unchanged.
+    /// 弧度轉換使用 decimal 的圓周率近似值；原始詞法值不變。
+    /// </remarks>
     public bool TryGetDegrees(out decimal degrees)
     {
-        return decimal.TryParse(Value, NumberStyles.Number, CultureInfo.InvariantCulture, out degrees);
+        degrees = 0;
+        if (Value is null)
+            return false;
+        bool grads = Value.EndsWith("grad", StringComparison.Ordinal);
+        bool radians = Value.EndsWith("rad", StringComparison.Ordinal) && !grads;
+        int suffixLength = grads ? 4 : radians || Value.EndsWith("deg", StringComparison.Ordinal) ? 3 : 0;
+        const NumberStyles styles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent;
+#if NETSTANDARD2_0
+        bool parsed = decimal.TryParse(Value.Substring(0, Value.Length - suffixLength), styles, CultureInfo.InvariantCulture, out decimal number);
+#else
+        bool parsed = decimal.TryParse(Value.AsSpan(0, Value.Length - suffixLength), styles, CultureInfo.InvariantCulture, out decimal number);
+#endif
+        if (!parsed)
+            return false;
+        try
+        {
+            degrees = grads ? number * 0.9m : radians ? number / 3.1415926535897932384626433833m * 180m : number;
+            return true;
+        }
+        catch (OverflowException)
+        {
+            return false;
+        }
     }
 
     /// <summary>
@@ -118,19 +145,51 @@ public readonly struct OdfAngle : IEquatable<OdfAngle>
 
     private static bool IsValid(string? value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
+        if (value is null)
             return false;
-        }
-
-        foreach (char ch in value!.Trim())
+        int start = 0;
+        int end = value.Length;
+        while (start < end && IsXmlWhitespace(value[start]))
+            start++;
+        while (end > start && IsXmlWhitespace(value[end - 1]))
+            end--;
+        if (end - start >= 4 && string.CompareOrdinal(value, end - 4, "grad", 0, 4) == 0)
+            end -= 4;
+        else if (end - start >= 3 &&
+            (string.CompareOrdinal(value, end - 3, "deg", 0, 3) == 0 || string.CompareOrdinal(value, end - 3, "rad", 0, 3) == 0))
+            end -= 3;
+        int index = start;
+        if (index < end && value[index] is '+' or '-')
+            index++;
+        int integerStart = index;
+        while (index < end && IsAsciiDigit(value[index]))
+            index++;
+        bool hasInteger = index > integerStart;
+        if (index < end && value[index] == '.')
         {
-            if (char.IsControl(ch))
-            {
+            int fractionStart = ++index;
+            while (index < end && IsAsciiDigit(value[index]))
+                index++;
+            if (index == fractionStart)
                 return false;
-            }
         }
-
-        return true;
+        else if (!hasInteger)
+            return false;
+        if (index < end && value[index] is 'e' or 'E')
+        {
+            index++;
+            if (index < end && value[index] is '+' or '-')
+                index++;
+            int exponentStart = index;
+            while (index < end && IsAsciiDigit(value[index]))
+                index++;
+            if (index == exponentStart)
+                return false;
+        }
+        return index == end;
     }
+
+    private static bool IsAsciiDigit(char value) => value is >= '0' and <= '9';
+
+    private static bool IsXmlWhitespace(char value) => value is ' ' or '\t' or '\r' or '\n';
 }

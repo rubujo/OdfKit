@@ -219,6 +219,7 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
                 clone.SetAttribute(attr.Key.LocalName, attr.Key.NamespaceUri, attr.Value, attrPrefix);
             }
         }
+        OdfNamespaceDeclarations.Copy(this, clone, includeInherited: CloneRecursionDepth == 0);
         if (deep && TryCopyLazyXmlStateTo(clone))
         {
             return clone;

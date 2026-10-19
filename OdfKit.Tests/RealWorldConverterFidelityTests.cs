@@ -815,7 +815,8 @@ public sealed class RealWorldConverterFidelityTests
                     new WP.Hyperlink(
                         new WP.Run(new WP.Text("前段")),
                         new WP.Run(new WP.Break { Type = WP.BreakValues.Page }),
-                        new WP.Run(new WP.Text("後段"))) { Id = "rIdLink" }));
+                        new WP.Run(new WP.Text("後段")))
+                    { Id = "rIdLink" }));
             },
             main => main.AddHyperlinkRelationship(new Uri("https://example.org/split"), true, "rIdLink"));
 
@@ -998,7 +999,8 @@ public sealed class RealWorldConverterFidelityTests
             paragraph.Append(new WP.Hyperlink(
                 new WP.Run(new WP.Text(text)),
                 new WP.Run(new WP.TabChar()),
-                FieldBegin(), FieldCode(" PAGEREF " + bookmark + " \\h "), FieldSeparate(), PlainRun(page), FieldEnd()) { Anchor = bookmark });
+                FieldBegin(), FieldCode(" PAGEREF " + bookmark + " \\h "), FieldSeparate(), PlainRun(page), FieldEnd())
+            { Anchor = bookmark });
             if (last)
             {
                 paragraph.Append(FieldEnd());
@@ -1066,7 +1068,8 @@ public sealed class RealWorldConverterFidelityTests
                     new WP.SectionType { Val = WP.SectionMarkValues.Continuous },
                     new WP.Columns(
                         new WP.Column { Width = "2000", Space = "400" },
-                        new WP.Column { Width = "6000" }) { ColumnCount = 2, EqualWidth = false })),
+                        new WP.Column { Width = "6000" })
+                    { ColumnCount = 2, EqualWidth = false })),
                 PlainRun("不等寬")));
             body.Append(new WP.Paragraph(PlainRun("結尾")));
             body.Append(new WP.SectionProperties(new WP.SectionType { Val = WP.SectionMarkValues.Continuous }));

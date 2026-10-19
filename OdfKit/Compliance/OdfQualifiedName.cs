@@ -9,14 +9,14 @@ namespace OdfKit.Compliance;
 public sealed class OdfQualifiedName : IEquatable<OdfQualifiedName>
 {
     /// <summary>
-    /// Performs odf qualified name.
+    /// Initializes an XML name, including names without a namespace.
     /// 初始化限定名稱的新執行個體。
     /// </summary>
-    /// <param name="namespaceUri">命名空間 URI</param>
-    /// <param name="localName">區域元素或屬性名稱</param>
+    /// <param name="namespaceUri">Namespace URI, or an empty string for no namespace. / 命名空間 URI；空字串表示沒有命名空間。</param>
+    /// <param name="localName">Local element or attribute name. / 區域元素或屬性名稱。</param>
     public OdfQualifiedName(string namespaceUri, string localName)
     {
-        if (string.IsNullOrWhiteSpace(namespaceUri))
+        if (namespaceUri == null || (namespaceUri.Length != 0 && string.IsNullOrWhiteSpace(namespaceUri)))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfQualifiedName_NamespaceCannotBeEmpty"), nameof(namespaceUri));
         if (string.IsNullOrWhiteSpace(localName))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfQualifiedName_LocalCannotBeEmpty"), nameof(localName));

@@ -46,12 +46,16 @@ public partial class OdfNode
 
         if (Children.Count == 1)
         {
-            Children[0].WriteTextContentTo(sink);
+            if (Children[0].NodeType is not (OdfNodeType.Comment or OdfNodeType.ProcessingInstruction))
+                Children[0].WriteTextContentTo(sink);
             return;
         }
 
         foreach (var child in Children)
         {
+            if (child.NodeType is OdfNodeType.Comment or OdfNodeType.ProcessingInstruction)
+                continue;
+
             if (child.NodeType == OdfNodeType.Element && child.NamespaceUri == OdfNamespaces.Text)
             {
                 if (child.LocalName == "line-break")

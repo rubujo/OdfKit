@@ -178,7 +178,9 @@ public partial class OdfNode
 
             if (Children.Count == 1)
             {
-                return Children[0].TextContent;
+                return Children[0].NodeType is OdfNodeType.Comment or OdfNodeType.ProcessingInstruction
+                    ? string.Empty
+                    : Children[0].TextContent;
             }
 
             var sb = new StringBuilder();
@@ -286,6 +288,7 @@ public partial class OdfNode
     internal volatile bool _isLazy;
     internal long _lazyMaxXmlCharactersInDocument;
     internal bool _lazyStrictXmlParsing;
+    internal bool _lazyPreserveWhitespace;
     internal Dictionary<string, string>? _lazyInScopeNamespaces;
     internal Dictionary<string, string>? _sourceNamespacePrefixes;
     private object? _lazyMaterializationLock;
@@ -459,13 +462,18 @@ public partial class OdfNode
         BuildWrapperPrefixBytes(inScopeNamespaces, mixedContent: false);
 
     internal static byte[] BuildWrapperPrefixBytes(IReadOnlyDictionary<string, string>? inScopeNamespaces, bool mixedContent)
+        => BuildWrapperPrefixBytes(inScopeNamespaces, mixedContent, preserveWhitespace: false);
+
+    internal static byte[] BuildWrapperPrefixBytes(IReadOnlyDictionary<string, string>? inScopeNamespaces, bool mixedContent, bool preserveWhitespace)
     {
-        if (!mixedContent && (inScopeNamespaces is null || inScopeNamespaces.Count == 0))
+        if (!mixedContent && !preserveWhitespace && (inScopeNamespaces is null || inScopeNamespaces.Count == 0))
         {
             return WrapperPrefixBytes;
         }
 
         var builder = new StringBuilder(mixedContent ? "<" + MixedWrapperName : "<wrapper");
+        if (preserveWhitespace)
+            builder.Append(" xml:space=\"preserve\"");
         var declared = new HashSet<string>(StringComparer.Ordinal);
         if (inScopeNamespaces is not null)
         {
@@ -521,7 +529,7 @@ public partial class OdfNode
     {
         bool wasModified = IsModified;
         bool mixedContent = OdfXmlReader.IsMixedContentElement(this);
-        byte[] wrapperPrefix = BuildWrapperPrefixBytes(_lazyInScopeNamespaces, mixedContent);
+        byte[] wrapperPrefix = BuildWrapperPrefixBytes(_lazyInScopeNamespaces, mixedContent, _lazyPreserveWhitespace);
         byte[] wrapperSuffix = mixedContent ? MixedWrapperSuffixBytes : WrapperSuffixBytes;
         using var seqStream = new OdfSequenceStream(wrapperPrefix, xmlData, wrapperSuffix);
         OdfNode? tempRoot = OdfXmlReader.Parse(seqStream, new OdfLoadOptions

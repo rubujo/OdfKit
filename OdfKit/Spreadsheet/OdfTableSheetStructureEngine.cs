@@ -321,6 +321,9 @@ internal static class OdfTableSheetStructureEngine
         cellNode.RemoveAttribute("value", OdfNamespaces.Office);
         cellNode.RemoveAttribute("boolean-value", OdfNamespaces.Office);
         cellNode.RemoveAttribute("date-value", OdfNamespaces.Office);
+        cellNode.RemoveAttribute("time-value", OdfNamespaces.Office);
+        cellNode.RemoveAttribute("string-value", OdfNamespaces.Office);
+        cellNode.RemoveAttribute("currency", OdfNamespaces.Office);
         cellNode.RemoveAttribute("formula", OdfNamespaces.Table);
 
         var textChildren = new List<OdfNode>();
@@ -340,6 +343,9 @@ internal static class OdfTableSheetStructureEngine
         CopyAttribute(source, target, "value", OdfNamespaces.Office);
         CopyAttribute(source, target, "boolean-value", OdfNamespaces.Office);
         CopyAttribute(source, target, "date-value", OdfNamespaces.Office);
+        CopyAttribute(source, target, "time-value", OdfNamespaces.Office);
+        CopyAttribute(source, target, "string-value", OdfNamespaces.Office);
+        CopyAttribute(source, target, "currency", OdfNamespaces.Office);
         CopyAttribute(source, target, "formula", OdfNamespaces.Table);
         CopyAttribute(source, target, "style-name", OdfNamespaces.Table);
     }

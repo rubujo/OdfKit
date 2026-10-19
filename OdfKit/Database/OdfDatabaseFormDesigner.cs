@@ -1,4 +1,7 @@
 ﻿using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.Xml;
+using OdfKit.Text;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -25,21 +28,44 @@ public sealed class OdfDatabaseFormDesigner
 {
     private readonly OdfDocument _document;
     private readonly OdfNode _formNode;
-    private int _controlCounter = 1;
+    private static readonly ConditionalWeakTable<OdfNode, ControlIdentityState> ControlIdentities = new();
+    private readonly ControlIdentityState _controlIdentities;
+
+    private sealed class ControlIdentityState
+    {
+        internal readonly HashSet<string> Reserved = new(StringComparer.Ordinal);
+        internal long Next = 1;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OdfDatabaseFormDesigner"/> class.
     /// 初始化 <see cref="OdfDatabaseFormDesigner"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="document">The ODF sub-document on which to design the form. / 要進行表單設計的 ODF 子文件。</param>
+    /// <param name="document">The text document or database document on which to design the form. / 要設計表單的文字文件或資料庫文件。</param>
+    /// <remarks>
+    /// A database document receives a new embedded text form and a matching database component; parent saves persist the form automatically.
+    /// 資料庫文件會建立新的內嵌文字表單及對應資料庫元件，父文件儲存時會自動保存表單。
+    /// </remarks>
+    /// <exception cref="ArgumentException">When the document kind is unsupported. / 當文件種類不受支援時擲出。</exception>
     /// <exception cref="ArgumentNullException">When <paramref name="document"/> is <see langword="null"/>. / 當 <paramref name="document"/> 為 <see langword="null"/> 時擲出。</exception>
     public OdfDatabaseFormDesigner(OdfDocument document)
     {
-        _document = document ?? throw new ArgumentNullException(nameof(document));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
+        _document = ResolveDesignDocument(document);
+        _controlIdentities = ControlIdentities.GetValue(_document.ContentDom, BuildControlIdentities);
 
         var body = FindOrCreateChild(_document.ContentDom, "body", OdfNamespaces.Office, "office");
         var text = FindOrCreateChild(body, "text", OdfNamespaces.Office, "office");
-        _formNode = FindOrCreateChild(text, "form", OdfNamespaces.Form, "form");
+        OdfNode? forms = FindChildElement(text, "forms", OdfNamespaces.Office);
+        if (forms is null)
+        {
+            forms = OdfNodeFactory.CreateElement("forms", OdfNamespaces.Office, "office");
+            if (text.Children.Count == 0)
+                text.AppendChild(forms);
+            else
+                text.InsertBefore(forms, text.Children[0]);
+        }
+        _formNode = FindOrCreateChild(forms, "form", OdfNamespaces.Form, "form");
         if (string.IsNullOrEmpty(_formNode.GetAttribute("name", OdfNamespaces.Form)))
         {
             _formNode.SetAttribute("name", OdfNamespaces.Form, "Standard", "form");
@@ -90,10 +116,15 @@ public sealed class OdfDatabaseFormDesigner
     /// <returns>The OdfNode node representing the added text box. / 代表新增的文字框 OdfNode 節點。</returns>
     public OdfNode AddTextBox(string name, string label, string? defaultValue, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height)
     {
-        var id = $"control{_controlCounter++}";
+        string id = AllocateControlId();
         var textNode = OdfNodeFactory.CreateElement("text", OdfNamespaces.Form, "form");
         textNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
-        textNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
+        SetControlIdentity(textNode, id);
+        if (defaultValue is not null)
+        {
+            textNode.SetAttribute("value", OdfNamespaces.Form, defaultValue, "form");
+            textNode.SetAttribute("current-value", OdfNamespaces.Form, defaultValue, "form");
+        }
 
         if (!string.IsNullOrEmpty(defaultValue) || !string.IsNullOrEmpty(label))
         {
@@ -105,7 +136,7 @@ public sealed class OdfDatabaseFormDesigner
                 var prop = OdfNodeFactory.CreateElement("property", OdfNamespaces.Form, "form");
                 prop.SetAttribute("property-name", OdfNamespaces.Form, "DefaultVal", "form");
                 prop.SetAttribute("value-type", OdfNamespaces.Office, "string", "office");
-                prop.SetAttribute("string-value", OdfNamespaces.Form, defaultValue!, "form");
+                prop.SetAttribute("string-value", OdfNamespaces.Office, defaultValue!, "office");
                 props.AppendChild(prop);
             }
 
@@ -114,7 +145,7 @@ public sealed class OdfDatabaseFormDesigner
                 var prop = OdfNodeFactory.CreateElement("property", OdfNamespaces.Form, "form");
                 prop.SetAttribute("property-name", OdfNamespaces.Form, "Label", "form");
                 prop.SetAttribute("value-type", OdfNamespaces.Office, "string", "office");
-                prop.SetAttribute("string-value", OdfNamespaces.Form, label, "form");
+                prop.SetAttribute("string-value", OdfNamespaces.Office, label, "office");
                 props.AppendChild(prop);
             }
         }
@@ -169,11 +200,12 @@ public sealed class OdfDatabaseFormDesigner
     /// <returns>The OdfNode node representing the added checkbox. / 代表新增的核取方塊 OdfNode 節點。</returns>
     public OdfNode AddCheckBox(string name, string label, bool isChecked, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height)
     {
-        var id = $"control{_controlCounter++}";
+        string id = AllocateControlId();
         var checkNode = OdfNodeFactory.CreateElement("checkbox", OdfNamespaces.Form, "form");
         checkNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
-        checkNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
+        SetControlIdentity(checkNode, id);
         checkNode.SetAttribute("label", OdfNamespaces.Form, label, "form");
+        checkNode.SetAttribute("state", OdfNamespaces.Form, isChecked ? "checked" : "unchecked", "form");
         checkNode.SetAttribute("current-state", OdfNamespaces.Form, isChecked ? "checked" : "unchecked", "form");
 
         _formNode.AppendChild(checkNode);
@@ -226,10 +258,10 @@ public sealed class OdfDatabaseFormDesigner
     /// <returns>The OdfNode node representing the added list box. / 代表新增的下拉選單 OdfNode 節點。</returns>
     public OdfNode AddListBox(string name, string label, IEnumerable<string>? items, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height)
     {
-        var id = $"control{_controlCounter++}";
+        string id = AllocateControlId();
         var listNode = OdfNodeFactory.CreateElement("listbox", OdfNamespaces.Form, "form");
         listNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
-        listNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
+        SetControlIdentity(listNode, id);
 
         if (!string.IsNullOrEmpty(label))
         {
@@ -239,7 +271,7 @@ public sealed class OdfDatabaseFormDesigner
             var prop = OdfNodeFactory.CreateElement("property", OdfNamespaces.Form, "form");
             prop.SetAttribute("property-name", OdfNamespaces.Form, "Label", "form");
             prop.SetAttribute("value-type", OdfNamespaces.Office, "string", "office");
-            prop.SetAttribute("string-value", OdfNamespaces.Form, label, "form");
+            prop.SetAttribute("string-value", OdfNamespaces.Office, label, "office");
             props.AppendChild(prop);
         }
 
@@ -249,6 +281,7 @@ public sealed class OdfDatabaseFormDesigner
             {
                 var option = OdfNodeFactory.CreateElement("option", OdfNamespaces.Form, "form");
                 option.SetAttribute("value", OdfNamespaces.Form, item, "form");
+                option.SetAttribute("label", OdfNamespaces.Form, item, "form");
                 listNode.AppendChild(option);
             }
         }
@@ -303,10 +336,10 @@ public sealed class OdfDatabaseFormDesigner
     /// <returns>The OdfNode node representing the added button. / 代表新增的按鈕 OdfNode 節點。</returns>
     public OdfNode AddButton(string name, string label, string? value, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height)
     {
-        var id = $"control{_controlCounter++}";
+        string id = AllocateControlId();
         var buttonNode = OdfNodeFactory.CreateElement("button", OdfNamespaces.Form, "form");
         buttonNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
-        buttonNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
+        SetControlIdentity(buttonNode, id);
         buttonNode.SetAttribute("label", OdfNamespaces.Form, label, "form");
         if (!string.IsNullOrEmpty(value))
         {
@@ -356,10 +389,10 @@ public sealed class OdfDatabaseFormDesigner
     /// <returns>The OdfNode node representing the added label. / 代表新增的標籤 OdfNode 節點。</returns>
     public OdfNode AddLabel(string name, string label, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height)
     {
-        var id = $"control{_controlCounter++}";
+        string id = AllocateControlId();
         var labelNode = OdfNodeFactory.CreateElement("fixed-text", OdfNamespaces.Form, "form");
         labelNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
-        labelNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
+        SetControlIdentity(labelNode, id);
         labelNode.SetAttribute("label", OdfNamespaces.Form, label, "form");
 
         _formNode.AppendChild(labelNode);
@@ -412,11 +445,12 @@ public sealed class OdfDatabaseFormDesigner
     /// <returns>The OdfNode node representing the added radio button. / 代表新增的單選按鈕 OdfNode 節點。</returns>
     public OdfNode AddRadioButton(string name, string label, bool isSelected, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height)
     {
-        var id = $"control{_controlCounter++}";
+        string id = AllocateControlId();
         var radioNode = OdfNodeFactory.CreateElement("radio", OdfNamespaces.Form, "form");
         radioNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
-        radioNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
+        SetControlIdentity(radioNode, id);
         radioNode.SetAttribute("label", OdfNamespaces.Form, label, "form");
+        radioNode.SetAttribute("selected", OdfNamespaces.Form, isSelected ? "true" : "false", "form");
         radioNode.SetAttribute("current-selected", OdfNamespaces.Form, isSelected ? "true" : "false", "form");
 
         _formNode.AppendChild(radioNode);
@@ -469,10 +503,10 @@ public sealed class OdfDatabaseFormDesigner
     /// <returns>The OdfNode node representing the added combo box. / 代表新增的組合方塊 OdfNode 節點。</returns>
     public OdfNode AddComboBox(string name, string label, IEnumerable<string>? items, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height)
     {
-        var id = $"control{_controlCounter++}";
+        string id = AllocateControlId();
         var comboNode = OdfNodeFactory.CreateElement("combobox", OdfNamespaces.Form, "form");
         comboNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
-        comboNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
+        SetControlIdentity(comboNode, id);
         AddLabelProperty(comboNode, label);
 
         if (items is not null)
@@ -480,6 +514,7 @@ public sealed class OdfDatabaseFormDesigner
             foreach (var item in items)
             {
                 var option = OdfNodeFactory.CreateElement("item", OdfNamespaces.Form, "form");
+                option.SetAttribute("label", OdfNamespaces.Form, item, "form");
                 option.TextContent = item;
                 comboNode.AppendChild(option);
             }
@@ -535,13 +570,13 @@ public sealed class OdfDatabaseFormDesigner
     /// <returns>The OdfNode node representing the added numeric input. / 代表新增的數值輸入 OdfNode 節點。</returns>
     public OdfNode AddNumericField(string name, string label, double? value, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height)
     {
-        var id = $"control{_controlCounter++}";
+        string id = AllocateControlId();
         var numberNode = OdfNodeFactory.CreateElement("number", OdfNamespaces.Form, "form");
         numberNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
-        numberNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
+        SetControlIdentity(numberNode, id);
         if (value.HasValue)
         {
-            string text = value.Value.ToString(CultureInfo.InvariantCulture);
+            string text = XmlConvert.ToString(value.Value);
             numberNode.SetAttribute("value", OdfNamespaces.Form, text, "form");
             numberNode.SetAttribute("current-value", OdfNamespaces.Form, text, "form");
         }
@@ -597,10 +632,10 @@ public sealed class OdfDatabaseFormDesigner
     /// <returns>The OdfNode node representing the added date input. / 代表新增的日期輸入 OdfNode 節點。</returns>
     public OdfNode AddDateField(string name, string label, DateTime? value, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height)
     {
-        var id = $"control{_controlCounter++}";
+        string id = AllocateControlId();
         var dateNode = OdfNodeFactory.CreateElement("date", OdfNamespaces.Form, "form");
         dateNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
-        dateNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
+        SetControlIdentity(dateNode, id);
         if (value.HasValue)
         {
             string text = value.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -657,15 +692,22 @@ public sealed class OdfDatabaseFormDesigner
     /// <param name="width">The control width. / 控制項寬度。</param>
     /// <param name="height">The control height. / 控制項高度。</param>
     /// <returns>The OdfNode node representing the added time input. / 代表新增的時間輸入 OdfNode 節點。</returns>
+    /// <exception cref="ArgumentOutOfRangeException">When the time is outside the inclusive range from 00:00:00 to 24:00:00. / 當時間不在包含端點的 00:00:00 至 24:00:00 範圍時擲出。</exception>
     public OdfNode AddTimeField(string name, string label, TimeSpan? value, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height)
     {
-        var id = $"control{_controlCounter++}";
+        if (value is { } time && (time < TimeSpan.Zero || time > TimeSpan.FromDays(1)))
+            throw new ArgumentOutOfRangeException(nameof(value), OdfLocalizer.GetMessage("Err_OdfDatabaseFormDesigner_TimeOutsideDay"));
+        string id = AllocateControlId();
         var timeNode = OdfNodeFactory.CreateElement("time", OdfNamespaces.Form, "form");
         timeNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
-        timeNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
+        SetControlIdentity(timeNode, id);
         if (value.HasValue)
         {
-            string text = value.Value.ToString("c", CultureInfo.InvariantCulture);
+            // XML Schema time 允許 24:00:00，但不允許含天數或負號的 TimeSpan 詞法。
+            // https://www.w3.org/TR/xmlschema-2/#time
+            string text = value.Value == TimeSpan.FromDays(1)
+                ? "24:00:00"
+                : new DateTime(value.Value.Ticks).ToString("HH:mm:ss.fffffff", CultureInfo.InvariantCulture).TrimEnd('0').TrimEnd('.');
             timeNode.SetAttribute("value", OdfNamespaces.Form, text, "form");
             timeNode.SetAttribute("current-value", OdfNamespaces.Form, text, "form");
         }
@@ -735,6 +777,8 @@ public sealed class OdfDatabaseFormDesigner
             listeners.AppendChild(listener);
         }
 
+        if (language == "ooo:script")
+            listener.SetAttribute("ooo", OdfNamespaceDeclarations.XmlnsNamespace, OdfNamespaceDeclarations.OfficeConfigurationNamespace, "xmlns");
         listener.SetAttribute("language", ScriptNs, language, "script");
         listener.SetAttribute("macro-name", ScriptNs, macroName, "script");
     }
@@ -813,10 +857,10 @@ public sealed class OdfDatabaseFormDesigner
     /// <returns>The OdfNode node representing the added group box. / 代表新增的群組框 OdfNode 節點。</returns>
     public OdfNode AddGroupBox(string name, string label, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height)
     {
-        var id = $"control{_controlCounter++}";
+        string id = AllocateControlId();
         var frameNode = OdfNodeFactory.CreateElement("frame", OdfNamespaces.Form, "form");
         frameNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
-        frameNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
+        SetControlIdentity(frameNode, id);
         if (!string.IsNullOrWhiteSpace(label))
         {
             frameNode.SetAttribute("label", OdfNamespaces.Form, label, "form");
@@ -841,7 +885,7 @@ public sealed class OdfDatabaseFormDesigner
         var prop = OdfNodeFactory.CreateElement("property", OdfNamespaces.Form, "form");
         prop.SetAttribute("property-name", OdfNamespaces.Form, "Label", "form");
         prop.SetAttribute("value-type", OdfNamespaces.Office, "string", "office");
-        prop.SetAttribute("string-value", OdfNamespaces.Form, label!, "form");
+        prop.SetAttribute("string-value", OdfNamespaces.Office, label!, "office");
         props.AppendChild(prop);
     }
 
@@ -874,6 +918,86 @@ public sealed class OdfDatabaseFormDesigner
         }
 
         p.AppendChild(drawControl);
+    }
+
+    private static OdfDocument ResolveDesignDocument(OdfDocument document)
+    {
+        if (document.ContentKind == OdfDocumentKind.Text)
+            return document;
+        if (document is not OdfDatabaseDocument database)
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseFormDesigner_UnsupportedDocumentKind"), nameof(document));
+
+        IReadOnlyList<OdfDatabaseFormInfo> forms = database.GetForms();
+        HashSet<string> names = new(forms.Select(form => form.Name), StringComparer.Ordinal);
+        HashSet<string> occupied = new(StringComparer.Ordinal);
+        string basePath = document.SubPath + "Forms/";
+        foreach (string entry in document.Package.Entries.Keys)
+        {
+            if (!entry.StartsWith(basePath, StringComparison.Ordinal))
+                continue;
+            string rest = entry.Substring(basePath.Length);
+            int slash = rest.IndexOf('/');
+            occupied.Add(slash < 0 ? rest : rest.Substring(0, slash));
+        }
+        foreach (OdfDatabaseFormInfo form in forms)
+        {
+            string? href = form.Href;
+            if (href is null)
+                continue;
+            if (href.StartsWith("./", StringComparison.Ordinal))
+                href = href.Substring(2);
+            if (href.StartsWith("Forms/", StringComparison.Ordinal))
+            {
+                string rest = href.Substring(6);
+                int slash = rest.IndexOf('/');
+                occupied.Add(slash < 0 ? rest : rest.Substring(0, slash));
+            }
+        }
+        int index = 1;
+        string name;
+        do
+        {
+            name = index == 1 ? "Standard" : "Standard" + index.ToString(CultureInfo.InvariantCulture);
+            index++;
+        }
+        while (names.Contains(name) || occupied.Contains(name));
+
+        TextDocument embedded = document.CreateEmbeddedDocument<TextDocument>(basePath + name);
+        embedded.TargetVersion = document.TargetVersion ?? document.ContentDom.GetDocumentVersion();
+        database.AddForm(name, "Forms/" + name);
+        return embedded;
+    }
+
+    private static ControlIdentityState BuildControlIdentities(OdfNode root)
+    {
+        var state = new ControlIdentityState();
+        foreach (OdfNode node in root.Descendants().Prepend(root))
+        {
+            if (node.GetAttribute("id", OdfNamespaces.Xml) is { } xmlId)
+                state.Reserved.Add(xmlId.Trim(' ', '\t', '\r', '\n'));
+            if (node.GetAttribute("id", OdfNamespaces.Form) is { } legacyId)
+                state.Reserved.Add(legacyId.Trim(' ', '\t', '\r', '\n'));
+        }
+        return state;
+    }
+
+    private void SetControlIdentity(OdfNode control, string id)
+    {
+        control.SetAttribute("id", OdfNamespaces.Form, id, "form");
+        if ((_document.TargetVersion ?? _document.ContentDom.GetDocumentVersion()) >= OdfVersion.Odf12)
+            control.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
+    }
+
+    private string AllocateControlId()
+    {
+        // 每棵 DOM 共用已保留的識別碼，避免交錯設計器及重新載入文件時重複配置。
+        string id;
+        do
+        {
+            id = "control" + (_controlIdentities.Next++).ToString(CultureInfo.InvariantCulture);
+        }
+        while (_controlIdentities.Reserved.Contains(id));
+        return id;
     }
 
     private static OdfNode FindOrCreateChild(OdfNode parent, string localName, string namespaceUri, string prefix)

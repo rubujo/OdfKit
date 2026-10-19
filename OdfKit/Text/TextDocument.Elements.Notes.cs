@@ -175,8 +175,8 @@ public partial class TextDocument
         TextDocumentNotesEngine.AddBibliographyMark(paragraph, identifier, bibliographyType, author, title, year);
 
     /// <summary>
-    /// Adds a table index to the end of the document body.
-    /// 新增表格索引至文件本文結尾。
+    /// Adds a table index based on table names to the end of the document body.
+    /// 新增依表格名稱建立的表格索引至文件本文結尾。
     /// </summary>
     public void AddTableIndex() =>
         TextDocumentNotesEngine.AddTableIndex(MutationContext);

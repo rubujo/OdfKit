@@ -83,7 +83,7 @@ public static partial class OdfEncryption
                         string.Equals(derivationName, Argon2idOdf15DerivationUri, StringComparison.OrdinalIgnoreCase) ||
                         string.Equals(derivationName, Argon2idLegacyDerivationUri, StringComparison.OrdinalIgnoreCase);
 
-        if (!isArgon2 && string.Equals(derivationName, "PBKDF2", StringComparison.OrdinalIgnoreCase) && iterationCount > MaxPbkdf2IterationCount)
+        if (!isArgon2 && IsPbkdf2Derivation(derivationName) && iterationCount > MaxPbkdf2IterationCount)
         {
             throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_NumberPbkdf2IterationsExceeds_2", iterationCount, MaxPbkdf2IterationCount));
         }
@@ -95,7 +95,7 @@ public static partial class OdfEncryption
             throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfEncryption_UnsupportedEncryptionAlgorithmOdfkit", algorithmUri));
         }
 
-        if (!isArgon2 && !string.Equals(derivationName, "PBKDF2", StringComparison.OrdinalIgnoreCase))
+        if (!isArgon2 && !IsPbkdf2Derivation(derivationName))
         {
             throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfEncryption_UnsupportedKeyDerivationFunction", derivationName));
         }

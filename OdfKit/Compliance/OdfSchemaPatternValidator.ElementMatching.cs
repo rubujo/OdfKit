@@ -66,6 +66,19 @@ public static partial class OdfSchemaPatternValidator
         bool childNameClassesDescribeElementName = node.Kind == OdfSchemaPatternNodeKind.Element &&
             string.IsNullOrEmpty(node.NamespaceUri) &&
             string.IsNullOrEmpty(node.LocalName);
+        IReadOnlyList<OdfSchemaPatternNode> bodyNodes = childNameClassesDescribeElementName
+            ? node.Children.Where(child => !OdfSchemaPatternAttributeMatcher.IsAttributeNameClassPattern(child)).ToList()
+            : node.Children;
+        if (context.AttributeDerivative.RequiresResolution(bodyNodes))
+        {
+            OdfSchemaPatternNode residual = context.AttributeDerivative.Resolve(bodyNodes, element, context);
+            if (HasSignificantDirectText(element) &&
+                !OdfSchemaPatternContentMatcher.ContentAllowsDirectText([residual], childElements.Count > 0, context))
+                return false;
+            return OdfSchemaPatternContentMatcher.MatchSequence([residual], element, childElements, 0, context)
+                .Contains(childElements.Count);
+        }
+
         var contentNodes = node.Children
             .Select(child => childNameClassesDescribeElementName &&
                 OdfSchemaPatternAttributeMatcher.IsAttributeNameClassPattern(child)

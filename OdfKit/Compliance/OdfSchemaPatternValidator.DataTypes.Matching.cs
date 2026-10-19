@@ -17,7 +17,7 @@ public static partial class OdfSchemaPatternValidator
 
     private static string[] SplitListTokens(string value)
     {
-        return (value ?? string.Empty).Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+        return (value ?? string.Empty).Split(s_xmlWhitespace, StringSplitOptions.RemoveEmptyEntries);
     }
 
     internal static bool MatchesLiteralValue(OdfSchemaPatternNode node, string value)
@@ -35,10 +35,9 @@ public static partial class OdfSchemaPatternValidator
         string value,
         OdfSchemaPatternMatchContext context)
     {
+        value = NormalizeDatatypeWhitespace(node.DataType, value);
         if (node.DataType is "QName" or "xsd:QName")
         {
-            // XML Schema 的 QName whiteSpace facet 固定為 collapse；只有 XML 四種空白參與正規化。
-            value = string.Join(" ", value.Split([' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries));
             if (!IsQName(value))
             {
                 return false;
@@ -78,9 +77,10 @@ public static partial class OdfSchemaPatternValidator
 
     private static bool MatchesDataType(OdfSchemaPatternNode node, string value)
     {
+        value = NormalizeDatatypeWhitespace(node.DataType, value);
         return IsSupportedDatatypeLibrary(node.DataTypeLibrary) &&
             MatchesDataType(node.DataType, value) &&
-            MatchesDataParameters(node.DataParameters, value);
+            MatchesDataParameters(node.DataType, node.DataParameters, value);
     }
 
     private static bool IsSupportedDatatypeLibrary(string dataTypeLibrary)
@@ -178,27 +178,21 @@ public static partial class OdfSchemaPatternValidator
                     return IsXmlDecimal(value);
                 case "float":
                 case "xsd:float":
-                    XmlConvert.ToSingle(value);
-                    return true;
                 case "double":
                 case "xsd:double":
-                    XmlConvert.ToDouble(value);
-                    return true;
+                    return IsXmlFloatingPoint(value);
                 case "date":
                 case "xsd:date":
-                    XmlConvert.ToDateTime(value, XmlDateTimeSerializationMode.RoundtripKind);
-                    return value.IndexOf('T') < 0;
+                    return IsXmlDate(value, requireTime: false);
                 case "dateTime":
                 case "xsd:dateTime":
-                    XmlConvert.ToDateTime(value, XmlDateTimeSerializationMode.RoundtripKind);
-                    return value.Contains('T');
+                    return IsXmlDate(value, requireTime: true);
                 case "time":
                 case "xsd:time":
                     return IsXmlTime(value);
                 case "duration":
                 case "xsd:duration":
-                    XmlConvert.ToTimeSpan(value);
-                    return true;
+                    return IsXmlDuration(value);
                 case "anyURI":
                 case "xsd:anyURI":
                     return IsAnyUri(value);
@@ -293,6 +287,113 @@ public static partial class OdfSchemaPatternValidator
             "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)$");
     }
 
+    internal static bool MatchesConfigurationValue(string type, string value)
+    {
+        string declared = type.Trim(s_xmlWhitespace);
+        if (declared == "boolean")
+            return NormalizeDatatypeWhitespace("token", value) is "true" or "false";
+        string dataType = declared == "datetime" ? "dateTime" : declared;
+        if (dataType is not ("short" or "int" or "long" or "double" or "dateTime" or "base64Binary"))
+            return true;
+        return MatchesDataType(dataType, NormalizeDatatypeWhitespace(dataType, value));
+    }
+
+    private static bool IsXmlDuration(string value)
+    {
+        // 只檢查詞彙，不將任意精度的分量轉成有容量限制的 TimeSpan。
+        int index = value.Length > 0 && value[0] == '-' ? 1 : 0;
+        if (index >= value.Length || value[index++] != 'P')
+            return false;
+        bool time = false;
+        int lastDate = -1;
+        int lastTime = -1;
+        while (index < value.Length)
+        {
+            if (value[index] == 'T')
+            {
+                if (time || ++index == value.Length)
+                    return false;
+                time = true;
+                continue;
+            }
+            int start = index;
+            while (index < value.Length && value[index] is >= '0' and <= '9')
+                index++;
+            if (index == start)
+                return false;
+            bool fraction = index < value.Length && value[index] == '.';
+            if (fraction)
+            {
+                int fractionalStart = ++index;
+                while (index < value.Length && value[index] is >= '0' and <= '9')
+                    index++;
+                if (index == fractionalStart)
+                    return false;
+            }
+            if (index == value.Length)
+                return false;
+            char unit = value[index++];
+            int order = time
+                ? unit switch { 'H' => 0, 'M' => 1, 'S' => 2, _ => -1 }
+                : unit switch { 'Y' => 0, 'M' => 1, 'D' => 2, _ => -1 };
+            if (order < 0 || (fraction && (!time || unit != 'S')))
+                return false;
+            if (time)
+            {
+                if (order <= lastTime)
+                    return false;
+                lastTime = order;
+            }
+            else
+            {
+                if (order <= lastDate)
+                    return false;
+                lastDate = order;
+            }
+        }
+        return time ? lastTime >= 0 : lastDate >= 0;
+    }
+
+    internal static bool IsXmlFloatingPoint(string value)
+    {
+        // CLR 解析器也接受 Infinity 與大小寫變體；XML Schema 僅允許這三種特殊詞彙。
+        if (value is "INF" or "-INF" or "NaN")
+            return true;
+
+        int index = 0;
+        if (index < value.Length && value[index] is '+' or '-')
+            index++;
+        int digits = 0;
+        while (index < value.Length && value[index] is >= '0' and <= '9')
+        {
+            index++;
+            digits++;
+        }
+        if (index < value.Length && value[index] == '.')
+        {
+            index++;
+            while (index < value.Length && value[index] is >= '0' and <= '9')
+            {
+                index++;
+                digits++;
+            }
+        }
+        if (digits == 0)
+            return false;
+        if (index < value.Length && value[index] is 'e' or 'E')
+        {
+            index++;
+            if (index < value.Length && value[index] is '+' or '-')
+                index++;
+            int exponentStart = index;
+            while (index < value.Length && value[index] is >= '0' and <= '9')
+                index++;
+            if (index == exponentStart)
+                return false;
+        }
+        return index == value.Length;
+    }
+
     private static bool IsHexBinary(string value)
     {
         return value.Length % 2 == 0 && value.All(IsHexDigit);
@@ -307,15 +408,30 @@ public static partial class OdfSchemaPatternValidator
 
     private static bool IsBase64Binary(string value)
     {
-        try
+        int length = 0;
+        int padding = 0;
+        char lastData = '\0';
+        foreach (char character in value)
         {
-            Convert.FromBase64String(NormalizeValue(value));
-            return true;
+            if (character is ' ' or '\t' or '\r' or '\n')
+                continue;
+            if (character == '=')
+            {
+                if (++padding > 2)
+                    return false;
+            }
+            else
+            {
+                if (padding != 0 || character is not (>= 'A' and <= 'Z' or >= 'a' and <= 'z' or >= '0' and <= '9' or '+' or '/'))
+                    return false;
+                lastData = character;
+            }
+            length++;
         }
-        catch (FormatException)
-        {
-            return false;
-        }
+        // 填補後的未使用位元必須為零；只驗證詞彙，不配置解碼緩衝區。
+        return length % 4 == 0 && (padding == 0 ||
+            (padding == 1 && lastData is 'A' or 'E' or 'I' or 'M' or 'Q' or 'U' or 'Y' or 'c' or 'g' or 'k' or 'o' or 's' or 'w' or '0' or '4' or '8') ||
+            (padding == 2 && lastData is 'A' or 'Q' or 'g' or 'w'));
     }
 
     private static bool IsLanguage(string value)
@@ -334,6 +450,8 @@ public static partial class OdfSchemaPatternValidator
     private static bool LiteralValuesEqual(string dataType, string value, string literal)
     {
         string type = dataType ?? string.Empty;
+        value = NormalizeDatatypeWhitespace(type, value);
+        literal = NormalizeDatatypeWhitespace(type, literal);
         if (type.Length == 0 ||
             string.Equals(type, "token", StringComparison.Ordinal) ||
             string.Equals(type, "xsd:token", StringComparison.Ordinal))

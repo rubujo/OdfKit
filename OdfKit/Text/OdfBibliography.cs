@@ -32,19 +32,37 @@ public class OdfBibliography : OdfIndex
     protected override string GetSourceLocalName() => "bibliography-source";
 
     /// <summary>
-    /// Adds an entry template for the bibliography.
-    /// 新增文獻目錄專案範本。
+    /// Adds or replaces the entry template for a bibliography type.
+    /// 新增或取代指定文獻類型的文獻目錄項目範本。
     /// </summary>
     /// <param name="bibType">The bibliography type. / 文獻類型。</param>
     /// <param name="styleName">The style name. / 樣式名稱。</param>
     /// <returns>An <see cref="OdfBibliographyTemplateBuilder"/> instance for constructing the bibliography template. / 用於建構文獻範本的 <see cref="OdfBibliographyTemplateBuilder"/> 執行個體。</returns>
     public OdfBibliographyTemplateBuilder AddEntryTemplate(string bibType, string styleName)
     {
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(bibType, nameof(bibType));
+        string type = bibType.Trim(' ', '\t', '\r', '\n');
         var src = FindOrCreateChild(Node, GetSourceLocalName(), OdfNamespaces.Text, "text");
         var template = OdfNodeFactory.CreateElement("bibliography-entry-template", OdfNamespaces.Text, "text");
-        template.SetAttribute("bibliography-type", OdfNamespaces.Text, bibType, "text");
+        template.SetAttribute("bibliography-type", OdfNamespaces.Text, type, "text");
         template.SetAttribute("style-name", OdfNamespaces.Text, styleName, "text");
-        src.AppendChild(template);
+        OdfNode? existing = null;
+        foreach (OdfNode child in src.Children)
+        {
+            if (child.NamespaceUri == OdfNamespaces.Text && child.LocalName == "bibliography-entry-template" &&
+                child.GetAttribute("bibliography-type", OdfNamespaces.Text)?.Trim(' ', '\t', '\r', '\n') == type)
+            {
+                existing = child;
+                break;
+            }
+        }
+        if (existing is not null)
+        {
+            src.InsertBefore(template, existing);
+            src.RemoveChild(existing);
+        }
+        else
+            src.AppendChild(template);
         return new OdfBibliographyTemplateBuilder(template);
     }
 

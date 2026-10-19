@@ -10,6 +10,37 @@ namespace OdfKit.Tests;
 [Trait(TestCategories.Kind, TestCategories.Compliance)]
 public class OdfPackageSignatureConformanceTests
 {
+    /// <summary>
+    /// Verifies signature versions against each official schema, including the ODF 1.3 prose discrepancy.
+    /// 驗證簽章版本遵循各版官方 schema，包含 ODF 1.3 正文的版本差異。
+    /// </summary>
+    [Theory]
+    [InlineData(OdfVersion.Odf12, "1.2", true)]
+    [InlineData(OdfVersion.Odf12, "1.3", false)]
+    [InlineData(OdfVersion.Odf12, "1.4", false)]
+    [InlineData(OdfVersion.Odf13, "1.2", false)]
+    [InlineData(OdfVersion.Odf13, "1.3", true)]
+    [InlineData(OdfVersion.Odf13, "1.4", false)]
+    [InlineData(OdfVersion.Odf14, "1.2", false)]
+    [InlineData(OdfVersion.Odf14, "1.3", false)]
+    [InlineData(OdfVersion.Odf14, "1.4", true)]
+    public void SignatureVersionFollowsOfficialSchema(OdfVersion version, string signatureVersion, bool valid)
+    {
+        const string path = "META-INF/documentsignatures.xml";
+        string xml = $"<d:document-signatures xmlns:d='urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0' xmlns:ds='http://www.w3.org/2000/09/xmldsig#' d:version='{signatureVersion}'><ds:Signature Id='s1'><ds:KeyInfo/></ds:Signature></d:document-signatures>";
+        using MemoryStream stream = CreatePackage(version, path, xml);
+        using OdfPackage package = OdfPackage.Open(stream);
+
+        foreach (OdfComplianceProfile profile in Profiles(version))
+        {
+            OdfValidationReport report = OdfPackageValidator.Validate(package, profile);
+            if (valid)
+                Assert.DoesNotContain(report.Issues, issue => issue.RuleId == "ODF3111" && issue.PackagePath == path);
+            else
+                Assert.Contains(report.Issues, issue => issue.RuleId == "ODF3111" && issue.PackagePath == path);
+        }
+    }
+
     public static IEnumerable<object[]> SignatureCases()
     {
         foreach (OdfVersion version in new[] { OdfVersion.Odf12, OdfVersion.Odf13, OdfVersion.Odf14 })

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using OdfKit.Compliance;
 using OdfKit.DOM;
 
 namespace OdfKit.Core;
@@ -28,11 +29,17 @@ internal static class OdfDocumentSettingsEngine
             {
                 foreach (var sc in child.Children)
                 {
-                    if (sc.LocalName == "config-item-set" && sc.GetAttribute("name", OdfNamespaces.Config) == name)
+                    if (sc.LocalName == "config-item-set" && sc.NamespaceUri == OdfNamespaces.Config && OdfNamespaceDeclarations.MatchesSettingName(sc, name))
+                    {
+                        if (name.StartsWith("ooo:", StringComparison.Ordinal))
+                            OdfNamespaceDeclarations.BindOfficeSetting(sc);
                         return sc;
+                    }
                 }
                 var node = new OdfNode(OdfNodeType.Element, "config-item-set", OdfNamespaces.Config, "config");
                 node.SetAttribute("name", OdfNamespaces.Config, name, "config");
+                if (name.StartsWith("ooo:", StringComparison.Ordinal))
+                    OdfNamespaceDeclarations.BindOfficeSetting(node);
                 child.AppendChild(node);
                 return node;
             }
@@ -40,6 +47,8 @@ internal static class OdfDocumentSettingsEngine
         var sets = new OdfNode(OdfNodeType.Element, "settings", OdfNamespaces.Office, "office");
         var setNode = new OdfNode(OdfNodeType.Element, "config-item-set", OdfNamespaces.Config, "config");
         setNode.SetAttribute("name", OdfNamespaces.Config, name, "config");
+        if (name.StartsWith("ooo:", StringComparison.Ordinal))
+            OdfNamespaceDeclarations.BindOfficeSetting(setNode);
         sets.AppendChild(setNode);
         root.AppendChild(sets);
         return setNode;
@@ -56,7 +65,7 @@ internal static class OdfDocumentSettingsEngine
             {
                 foreach (var sc in child.Children)
                 {
-                    if (sc.LocalName == "config-item-set" && sc.GetAttribute("name", OdfNamespaces.Config) == name)
+                    if (sc.LocalName == "config-item-set" && sc.NamespaceUri == OdfNamespaces.Config && OdfNamespaceDeclarations.MatchesSettingName(sc, name))
                         return sc;
                 }
             }
@@ -71,7 +80,7 @@ internal static class OdfDocumentSettingsEngine
     {
         foreach (var child in setNode.Children)
         {
-            if (child.LocalName == "config-item-map-indexed" && child.GetAttribute("name", OdfNamespaces.Config) == name)
+            if (child.LocalName == "config-item-map-indexed" && child.NamespaceUri == OdfNamespaces.Config && child.GetAttribute("name", OdfNamespaces.Config) == name)
                 return child;
         }
         var node = new OdfNode(OdfNodeType.Element, "config-item-map-indexed", OdfNamespaces.Config, "config");
@@ -85,8 +94,9 @@ internal static class OdfDocumentSettingsEngine
     /// </summary>
     internal static OdfNode FindOrCreateMapEntryNode(OdfNode mapNode)
     {
-        if (mapNode.Children.Count > 0)
-            return mapNode.Children[0];
+        foreach (OdfNode child in mapNode.Children)
+            if (child.LocalName == "config-item-map-entry" && child.NamespaceUri == OdfNamespaces.Config)
+                return child;
         var node = new OdfNode(OdfNodeType.Element, "config-item-map-entry", OdfNamespaces.Config, "config");
         mapNode.AppendChild(node);
         return node;
@@ -99,8 +109,11 @@ internal static class OdfDocumentSettingsEngine
     {
         foreach (var child in entryNode.Children)
         {
-            if (child.LocalName == "config-item" && child.GetAttribute("name", OdfNamespaces.Config) == name)
+            if (child.LocalName == "config-item" && child.NamespaceUri == OdfNamespaces.Config && child.GetAttribute("name", OdfNamespaces.Config) == name)
+            {
+                child.SetAttribute("type", OdfNamespaces.Config, type, "config");
                 return child;
+            }
         }
         var node = new OdfNode(OdfNodeType.Element, "config-item", OdfNamespaces.Config, "config");
         node.SetAttribute("name", OdfNamespaces.Config, name, "config");
@@ -114,7 +127,7 @@ internal static class OdfDocumentSettingsEngine
     /// </summary>
     internal static double GetZoomLevel(OdfNode settingsDom)
     {
-        var entry = FindSettingsConfigItem(settingsDom, "ZoomValue");
+        var entry = FindOfficeConfigItem(settingsDom, "ooo:view-settings", "ZoomValue");
         if (entry != null && double.TryParse(entry.TextContent, NumberStyles.Float, CultureInfo.InvariantCulture, out var val))
             return val;
         return 100.0;
@@ -125,11 +138,14 @@ internal static class OdfDocumentSettingsEngine
     /// </summary>
     internal static void SetZoomLevel(OdfNode settingsDom, double zoom)
     {
+        double rounded = Math.Round(zoom);
+        if (double.IsNaN(rounded) || rounded < int.MinValue || rounded > int.MaxValue)
+            throw new ArgumentOutOfRangeException(nameof(zoom), zoom, OdfLocalizer.GetMessage("Err_OdfDocumentSettingsEngine_ValueDoesNotFitType"));
         var setNode = FindOrCreateSettingsNode(settingsDom, "ooo:view-settings");
         var mapNode = FindOrCreateMapNode(setNode, "Views");
         var entryNode = FindOrCreateMapEntryNode(mapNode);
         var zoomNode = FindOrCreateConfigItemNode(entryNode, "ZoomValue", "int");
-        zoomNode.TextContent = Math.Round(zoom).ToString(CultureInfo.InvariantCulture);
+        zoomNode.TextContent = rounded.ToString(CultureInfo.InvariantCulture);
 
         var zoomTypeNode = FindOrCreateConfigItemNode(entryNode, "ZoomType", "short");
         zoomTypeNode.TextContent = "0";
@@ -150,6 +166,8 @@ internal static class OdfDocumentSettingsEngine
     /// </summary>
     internal static void SetLinkUpdateMode(OdfNode settingsDom, int mode, bool isSpreadsheet)
     {
+        if (mode < short.MinValue || mode > short.MaxValue)
+            throw new ArgumentOutOfRangeException(nameof(mode), mode, OdfLocalizer.GetMessage("Err_OdfDocumentSettingsEngine_ValueDoesNotFitType"));
         string setName = isSpreadsheet ? "ooo:document-settings" : "ooo:configuration-settings";
         var setNode = FindOrCreateSettingsNode(settingsDom, setName);
         var item = FindOrCreateConfigItemNode(setNode, "LinkUpdateMode", "short");
@@ -167,9 +185,15 @@ internal static class OdfDocumentSettingsEngine
     }
 
 
+    internal static OdfNode? FindOfficeConfigItem(OdfNode root, string setName, string itemName)
+    {
+        OdfNode? set = FindSettingsNode(root, setName);
+        return set is null ? null : FindSettingsConfigItem(set, itemName);
+    }
+
     private static OdfNode? FindNodeByNameRecursive(OdfNode parent, string localName, string nameAttr)
     {
-        if (parent.LocalName == localName && parent.GetAttribute("name", OdfNamespaces.Config) == nameAttr)
+        if (parent.LocalName == localName && parent.NamespaceUri == OdfNamespaces.Config && parent.GetAttribute("name", OdfNamespaces.Config) == nameAttr)
             return parent;
         foreach (var child in parent.Children)
         {

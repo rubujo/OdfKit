@@ -222,8 +222,12 @@ public static partial class OdfPackageValidator
             // ODF 公式文件（application/vnd.oasis.opendocument.formula）的 content.xml 採用真實
             // LibreOffice 慣用的特殊封裝慣例：根節點直接是裸 MathML math:math 元素，並不包裹於
             // office:document-content 結構內。此為該文件類型獨有的合法形狀，非結構錯誤。
-            if (isFormulaKind &&
-                expected.Key == "content.xml" &&
+            bool isFormulaEntry = expected.Key == "content.xml"
+                ? isFormulaKind
+                : expected.Key.EndsWith("/content.xml", StringComparison.Ordinal) &&
+                    OdfEmbeddedMediaTypeResolver.Resolve(package, expected.Key.Substring(0, expected.Key.Length - "content.xml".Length))
+                        is OdfDocumentKind.Formula or OdfDocumentKind.FormulaTemplate;
+            if (isFormulaEntry &&
                 rootInfo.NamespaceUri == "http://www.w3.org/1998/Math/MathML" &&
                 rootInfo.LocalName == "math")
             {

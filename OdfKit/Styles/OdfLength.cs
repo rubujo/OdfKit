@@ -334,10 +334,10 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     }
 
     /// <summary>
-    /// Converts to string.
-    /// 將長度結構轉換為其字串表示法。
+    /// Formats the length without scientific notation.
+    /// 以不含科學記號的格式輸出長度。
     /// </summary>
-    /// <returns>代表目前長度結構的字串</returns>
+    /// <returns>The invariant decimal value followed by its unit suffix. / 固定文化特性的十進位數值及其單位字尾。</returns>
     public override string ToString()
     {
         string unitStr = Unit switch
@@ -352,7 +352,38 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
             OdfUnit.Em => "em",
             _ => ""
         };
-        return Value.ToString(CultureInfo.InvariantCulture) + unitStr;
+        return FormatDecimalValue(Value) + unitStr;
+    }
+
+    private static string FormatDecimalValue(double value)
+    {
+        string number = value.ToString("R", CultureInfo.InvariantCulture);
+        int exponent = number.IndexOf('E');
+        if (exponent < 0)
+            return number;
+        int power = 0;
+        int exponentDigit = exponent + 1;
+        bool negativeExponent = number[exponentDigit] == '-';
+        if (number[exponentDigit] is '+' or '-')
+            exponentDigit++;
+        for (; exponentDigit < number.Length; exponentDigit++)
+            power = (power * 10) + number[exponentDigit] - '0';
+        if (negativeExponent)
+            power = -power;
+        string coefficient = number.Substring(0, exponent);
+        string sign = coefficient[0] == '-' ? "-" : string.Empty;
+        if (sign.Length != 0)
+            coefficient = coefficient.Substring(1);
+        int point = coefficient.IndexOf('.');
+        if (point < 0)
+            point = coefficient.Length;
+        string digits = coefficient.Replace(".", string.Empty);
+        point += power;
+        if (point <= 0)
+            return sign + "0." + new string('0', -point) + digits;
+        if (point >= digits.Length)
+            return sign + digits + new string('0', point - digits.Length);
+        return sign + digits.Insert(point, ".");
     }
 
     #endregion

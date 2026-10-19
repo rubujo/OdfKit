@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Xml;
 using OdfKit.Core;
+using OdfKit.Compliance;
 
 namespace OdfKit.Spreadsheet;
 /// <summary>
@@ -30,7 +31,8 @@ public partial class OdsStreamWriter
         {
             writer.WriteStartDocument();
             writer.WriteStartElement("manifest", "manifest", OdfNamespaces.Manifest);
-            writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, FormatVersion(_version));
+            if (_version is not (OdfVersion.Odf10 or OdfVersion.Odf11))
+                writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, FormatVersion(_version));
 
             writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
             writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "/");

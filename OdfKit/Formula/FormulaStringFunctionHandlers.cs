@@ -394,23 +394,23 @@ internal static class FormulaStringFunctionHandlers
         if (val is OdfFormulaError err)
             return err;
         string str = val.ToString() ?? "";
-        str = str.Trim();
         var sb = new StringBuilder();
-        bool lastWasSpace = false;
+        int spaces = 0;
+        char firstSpace = ' ';
         foreach (char c in str)
         {
-            if (c == ' ')
+            if (c is '\t' or '\n' or '\r' or ' ')
             {
-                if (!lastWasSpace)
-                {
-                    sb.Append(c);
-                    lastWasSpace = true;
-                }
+                if (spaces == 0)
+                    firstSpace = c;
+                spaces++;
             }
             else
             {
+                if (sb.Length > 0 && spaces > 0)
+                    sb.Append(spaces == 1 ? firstSpace : ' ');
                 sb.Append(c);
-                lastWasSpace = false;
+                spaces = 0;
             }
         }
         return sb.ToString();
