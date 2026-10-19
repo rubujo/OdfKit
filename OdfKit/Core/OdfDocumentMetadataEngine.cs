@@ -336,7 +336,7 @@ internal static class OdfDocumentMetadataEngine
 
     private static object ParseDateValue(string value)
     {
-        // DateTime 只能精確保存七位小數秒；無法表示的合法值保留原字串，不替換成最小日期。
+        // DateTime 只能精確儲存七位小數秒；無法表示的合法值保留原字串，不替換成最小日期。
         int time = value.IndexOf('T');
         int point = time < 0 ? -1 : value.IndexOf('.', time);
         if (point >= 0)

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "reviewedAt": "2026-09-12",
+  "reviewedAt": "2026-10-19",
   "maximumReviewAgeDays": 90,
   "standards": [
     {
@@ -74,7 +74,7 @@
       "scope": "transitive-via-odfkit-core",
       "reason": "OdfKit core formula APIs use the 1.0 atom model; WebFont does not directly reference this package. The older 0.5.1 stable line is not API-compatible with the current formula implementation.",
       "removeWhen": "OdfKit ships a stable compatible CSharpMath version or WebFont localization is separated from the core package dependency.",
-      "reviewBy": "2026-10-16"
+      "reviewBy": "2027-01-16"
     }
   ]
 }

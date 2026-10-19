@@ -44,7 +44,7 @@ public sealed class OdfDatabaseFormDesigner
     /// <param name="document">The text document or database document on which to design the form. / 要設計表單的文字文件或資料庫文件。</param>
     /// <remarks>
     /// A database document receives a new embedded text form and a matching database component; parent saves persist the form automatically.
-    /// 資料庫文件會建立新的內嵌文字表單及對應資料庫元件，父文件儲存時會自動保存表單。
+    /// 資料庫文件會建立新的內嵌文字表單及對應資料庫元件，父文件儲存時會自動儲存表單。
     /// </remarks>
     /// <exception cref="ArgumentException">When the document kind is unsupported. / 當文件種類不受支援時擲出。</exception>
     /// <exception cref="ArgumentNullException">When <paramref name="document"/> is <see langword="null"/>. / 當 <paramref name="document"/> 為 <see langword="null"/> 時擲出。</exception>

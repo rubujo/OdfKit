@@ -143,7 +143,7 @@ ISNA 的 Syntax 寫成 ISERR、CSC 的冗詞及 FACTDOUBLE 圖式標記等來源
 必須另有逐組、逐版的語意審閱才可列入已分類群組。CORREL 的算式括號、IMSQRT 的
 sin／cos 項及 ISODD 摘要等上游矛盾保留，不能靠複製錯誤式修補 SDK。
 
-純文字 hash 無法保留公式的上標／下標。`docs/odf-formula-semantic-batches.json` 另外保存
+純文字 hash 無法保留公式的上標／下標。`docs/odf-formula-semantic-batches.json` 另外儲存
 原段落 XML hash、非基線文字及樣式繼承：例如 DEC2HEX 的範圍是 −2^39～2^39−1，
 不是擷取結果中的 −239～239−1。帶有此類格式的語意審閱須綁定其獨立證據 hash；
 保留來源格式不等於數學公式或 SDK 實作已裁決正確。
@@ -242,7 +242,7 @@ ODF 1.4 的共用 `writing-mode` 列舉也不能取代上下文檢查：`ODF3118
 `OdfLength` 的有限數值輸出改用可往返的十進位詞彙，避免極小／極大值產生不合法的
 科學記號長度。`ODF3143` 補上 marker／stroke-dash 名稱參照的目標種類與存在性，
 允許空參照，支援 content.xml 與 styles.xml 之間的合法參照，並分隔封裝目錄與行內文件。
-對角線邊框仍依規範宣告的 string 保存，不擅自加入 CSS 語法限制；text-combine 的字元
+對角線邊框仍依規範宣告的 string 儲存，不擅自加入 CSS 語法限制；text-combine 的字元
 也不因停用呈現效果就被禁止。資料型別全集與其他相依條款仍獨立追蹤，共 31 組相依
 尚未完成，沒有新增 SDK 範圍豁免或實體渲染完成宣稱。
 
@@ -269,9 +269,9 @@ SDK 沒有自動更新作者欄位的功能，測試另證明載入與儲存不�
 [元素回歸](../OdfKit.Tests/OdfFieldElementConformanceTests.cs)與
 [產生器回歸](../OdfKit.Tests/OdfFieldProducerConformanceTests.cs)逐版核對：
 最小實例、每個屬性的資料型別正反例、必要屬性缺漏、未知屬性、子元素、錯誤位置、外來同名元素、
-字元資料保存及載入後儲存的屬性不變。這批發現並修正兩個產生器缺陷：`AddChapterField`
+字元資料儲存及載入後儲存的屬性不變。這批發現並修正兩個產生器缺陷：`AddChapterField`
 漏寫必要的 `text:display` 與 `text:outline-level`，`AddVariableSetField` 漏寫必要的
-`office:value-type`，兩者先前輸出都不符 schema。SDK 不對欄位求值，僅保存資料。
+`office:value-type`，兩者先前輸出都不符 schema。SDK 不對欄位求值，僅儲存資料。
 另有 4 組（`number:fill-character`、`text:hidden-text`、`text:page-number`、`text:script`）
 尚無語意分類，未列入。兩框架各 5,038 項回歸通過，直接裁決累計 **211 組、5,651 組待裁決**
 （189 組具執行期實作與測試證據）。
@@ -317,7 +317,7 @@ CLR 的 `XmlConvert` 會接受 `Infinity`、`nan` 等 XML Schema 不允許的特
 但各版 `form:value` 數值子節明定 double；完整合規檢查以 `ODF3141` 補足正文限制，
 不改寫官方 RNG。[型別回歸](../OdfKit.Tests/OdfFormTypedValueConformanceTests.cs) 分開驗證
 schema 接受與正文拒絕、原生命名空間、缺省、日期／時間邊界及兩條讀寫路徑。
-便利屬性的 CLR 型別容量與原始屬性資料保存是不同覆蓋項目；本批不宣稱所有便利 API
+便利屬性的 CLR 型別容量與原始屬性資料儲存是不同覆蓋項目；本批不宣稱所有便利 API
 都能表示 XML Schema 的完整值域，也不將這項容量限制豁免為 SDK 範圍以外。
 詞彙依據為 [XML Schema 1.0 Part 2 的 float 與 double 規則](https://www.w3.org/TR/xmlschema-2/#double)，
 數值承載元素依據為各版本已鎖定來源的 `form:value` 子節。
@@ -344,7 +344,7 @@ schema 接受與正文拒絕、原生命名空間、缺省、日期／時間邊�
 先前 schema 批次新增註解作者縮寫、簡報頁首／頁尾宣告及 `presentation:name` 四組直接裁決，
 並核對公開 API 基線。
 [原生文字宣告回歸](../OdfKit.Tests/OdfNativeTextDeclarationConformanceTests.cs) 分別驗證
-版本適用性、原生父元素與內容模型、必要名稱、字串型別及資料保存。
+版本適用性、原生父元素與內容模型、必要名稱、字串型別及資料儲存。
 共用讀取器改用官方 schema 推導的字元內容判定，並補上 XML 屬性字面空白正規化。
 另修正 RELAX NG 名稱 token 空白、常值文字保留、子樹前綴脈絡，以及無命名空間名稱遭丟棄的問題；
 所有受影響 schema 均由產生器重產，舊版統計屬性有合法值與負值拒絕的回歸證據。
@@ -354,16 +354,16 @@ schema 接受與正文拒絕、原生命名空間、缺省、日期／時間邊�
 [表格描述回歸](../OdfKit.Tests/OdfTableDescriptionConformanceTests.cs) 補上直接框架內容表格的
 標題／描述禁止條件，保留文字流程中的表格及框架 SVG 描述。
 [固定文字回歸](../OdfKit.Tests/OdfNumberLiteralTextConformanceTests.cs) 驗證七種資料樣式及 1.4 清單格式的
-文字保存，並修正既有格式引擎的明確空常值及布林／字串前後文字遺失。
+文字儲存，並修正既有格式引擎的明確空常值及布林／字串前後文字遺失。
 [XML 空白脈絡回歸](../OdfKit.Tests/OdfXmlSpaceConformanceTests.cs) 修正繼承、覆寫、小型子樹重讀及延遲複本的
-資料保存，同時核驗字元預算；這項共用補強沒有額外計入完整群組裁決。
+資料儲存，同時核驗字元預算；這項共用補強沒有額外計入完整群組裁決。
 [表單項目回歸](../OdfKit.Tests/OdfFormItemConformanceTests.cs) 核驗 `form:item`／`form:option` 的
 資料與結構，屬性完整語意另列明確相依。
 [選取互斥回歸](../OdfKit.Tests/OdfRadioSelectionConformanceTests.cs) 及
 [選取屬性回歸](../OdfKit.Tests/OdfFormSelectionAttributeConformanceTests.cs) 補上同表單具名選項按鈕的
 預設／目前選取各自互斥，並更正設計器只寫目前狀態而漏寫參數所承諾預設狀態的問題。
 `form:selected` 的 30 個來源單位逐句分類；僅宿主互動初始化／重設的三句另列 SDK 範圍，
-資料保存、缺省值、型別、產生器契約與群組一致性均保留為 SDK 義務。
+資料儲存、缺省值、型別、產生器契約與群組一致性均保留為 SDK 義務。
 目前仍有 30 個未完成的相依群組，直接裁決數不能解讀為其所有參照功能均已完成。
 
 先前的 [索引層級回歸](../OdfKit.Tests/OdfIndexOutlineLevelConformanceTests.cs)
@@ -408,7 +408,7 @@ block 相同；目前已逐頁查看的純 grammar 頁仍保留跨頁 pattern、
 資料庫表單產生器的本機修正涵蓋 `office:forms` 容器、控制項識別碼、原生值屬性、
 清單項目標籤，以及 ODB 的內嵌文字表單與對應元件。內嵌文件須在載入 XML 前取得
 自身路徑，不能先載入父文件再設定路徑；文件種類及 MathML 根元素例外也依自身媒體
-型別判定。回歸另涵蓋多種內建文件、範本、反射建構失敗及父文件保存往返。
+型別判定。回歸另涵蓋多種內建文件、範本、反射建構失敗及父文件儲存往返。
 時間詞法驗證接受合法的 `24:00:00`，拒絕該時刻的非零分鐘、秒或小數秒及非 ASCII
 數字。這些修正不結案所有表單、版面參照或 MathML 義務；完整 MathML schema 與
 一般樣式參照的語意驗證仍須獨立審閱，不能由產生器測試通過推論完整覆蓋。
@@ -439,13 +439,13 @@ ODF 1.1 的分類另核對原始字重：該版 Notation 只賦予粗體規範�
 BCE 年份與時區邊界。`OdfCharacter` 使用單一合法 XML 字元，不把多字元顯示字素
 當成一個字元；有界 `OdfPercent` 先檢查完整詞法，再提供受 decimal 精確度限制的
 數值檢視。一般 `percent` 與 1.4 的 `nonNegativePercent` 不套用 0～100 的上限，
-原始詞法由字串與通用 DOM 保存。型別定義的裁決不外推使用處的預設值、樣式引用、
+原始詞法由字串與通用 DOM 儲存。型別定義的裁決不外推使用處的預設值、樣式引用、
 計算或排版義務；`styleName` 也不能只憑 NCName 正反例就宣告引用語意已完成。
 
 `relativeLength` 的官方 grammar 接受 `0*`，但 1.2～1.4 正文要求正整數後接星號。
 本機語意檢查因此在兩個原生使用處拒絕全零值：`style:column/@style:rel-width`
 及 `style:table-column-properties/@style:rel-column-width`。前導零正值與任意大正值
-仍可保存；外來命名空間的同名屬性不套用此規則。這項正文補充不修改官方 schema，
+仍可儲存；外來命名空間的同名屬性不套用此規則。這項正文補充不修改官方 schema，
 也不宣稱相對欄寬的整體版面分配演算法已完成裁決。
 
 角度的補充驗證沿三版實際引用的 SVG 1.1（2003）核對，涵蓋官方 schema 中全部
