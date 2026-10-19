@@ -265,6 +265,17 @@ SDK 沒有自動更新作者欄位的功能，測試另證明載入與儲存不�
 另為獨立相依。兩框架各 5,017 項回歸通過，直接裁決累計 **145 組、5,717 組待裁決**
 （123 組具執行期實作與測試證據）。
 
+文字欄位元素批次（ODF 1.2～1.4 的 66 個 text／number／presentation 欄位與相關元素）以
+[元素回歸](../OdfKit.Tests/OdfFieldElementConformanceTests.cs)與
+[產生器回歸](../OdfKit.Tests/OdfFieldProducerConformanceTests.cs)逐版核對：
+最小實例、每個屬性的資料型別正反例、必要屬性缺漏、未知屬性、子元素、錯誤位置、外來同名元素、
+字元資料保存及載入後儲存的屬性不變。這批發現並修正兩個產生器缺陷：`AddChapterField`
+漏寫必要的 `text:display` 與 `text:outline-level`，`AddVariableSetField` 漏寫必要的
+`office:value-type`，兩者先前輸出都不符 schema。SDK 不對欄位求值，僅保存資料。
+另有 4 組（`number:fill-character`、`text:hidden-text`、`text:page-number`、`text:script`）
+尚無語意分類，未列入。兩框架各 5,038 項回歸通過，直接裁決累計 **211 組、5,651 組待裁決**
+（189 組具執行期實作與測試證據）。
+
 表單型別批次已修正並完整核驗兩項不同的驗證缺口，三個型別子節已計入直接裁決：
 CLR 的 `XmlConvert` 會接受 `Infinity`、`nan` 等 XML Schema 不允許的特殊詞彙，
 因此 float／double 轉換前增加線性 ASCII 詞彙檢查，保留合法的指數與 `INF`、`-INF`、`NaN`。
