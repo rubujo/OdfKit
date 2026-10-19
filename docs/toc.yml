@@ -96,8 +96,8 @@
     href: odf-conformance-matrix.md
   - name: ODF 義務分類與待辦統計
     href: odf-obligation-classification.md
-  - name: ODF 規範性義務逐句裁決
-    href: odf-obligation-adjudication.md
+  - name: ODF 條款對測試追蹤
+    href: odf-conformance-tracking.md
   - name: ODF 1.4 覆蓋契約
     href: odf14-coverage-contract.md
   - name: ODF 1.4 覆蓋狀態

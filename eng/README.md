@@ -78,14 +78,10 @@
 | `Test-OdfExternalSourceContracts.ps1` | 檢查 OASIS inventory／採用 manifest 與 OPF 固定版本／例外的對應。 |
 | `Build-OdfConformanceMatrix.py` | 從已取得的固定 OASIS 出版物建立 1.0～1.4 條款索引；`--verify` 檢查重建一致性，PDF 部分需 pypdf。 |
 | `Test-OdfConformanceMatrix.ps1` | 離線檢查逐條合規矩陣的來源／schema hash、條款 ID 與人工 audit／測試證據對應；見 [合規矩陣](../docs/odf-conformance-matrix.md)。 |
-| `Build-OdfObligationInventory.py` | 建立逐句來源定位與精確人工裁決對應，包含核准勘誤；`--check-contracts` 離線驗證，`--require-complete` 拒絕未完成的裁決。見 [義務裁決](../docs/odf-obligation-adjudication.md)。 |
+| `Build-OdfObligationInventory.py` | 建立逐句來源定位與精確人工裁決對應，包含核准勘誤；`--check-contracts` 離線驗證，`--require-complete` 拒絕未完成的裁決。見 [條款對測試追蹤](../docs/odf-conformance-tracking.md)。 |
 | `Build-OdfObligationClassification.py` | 依官方來源結構分派主題佇列與跨版本候選工作群組；`--verify` 核對來源重建，`--check-contracts` 離線確認完整分派、hash、群組成員及既有裁決。分組不等於語意相同、SDK 範圍或合規裁決，見 [分類統計](../docs/odf-obligation-classification.md)。 |
-| `Test-OdfSemanticReviews.py` | 核對群組語意分類的完整成員、版本、SDK 責任與豁免依據；`--require-complete` 拒絕尚未分類的群組。語意分類不等於實作符合，見 `docs/odf-semantic-reviews.json`。 |
-| `Test-OdfImplementationReviews.py` | 核對獨立實作裁決的來源成員、語意紀錄、程式碼與回歸案例 hash、跨 TFM 執行紀錄及逐規則裁決。`--check-local-receipts` 另核對本機 TRX；`--require-complete` 拒絕未裁決群組。直接義務通過不會關閉其相依群組，也不會推論完整合規。 |
 | `Test-OdfAttributeFixture.py` | 以 Jing 獨立重驗 `OdfKit.Tests/TestData/OdfAttributeCases.jsonl.gz`：正例須被官方 RELAX NG schema 接受、反例須被拒絕，並核對固定資料與清單雜湊相符。不使用 OdfKit，需要 Java 與 `eng/Install-Jing.ps1` 安裝的 Jing（`--jing` 指定路徑）。 |
 | `Test-OdfElementFixture.py` | 以 Jing 獨立重驗 `OdfKit.Tests/TestData/OdfElementCases.jsonl.gz` 記錄的每個元素實例判定（父元素、屬性、子元素、字元資料與變異反例），並核對固定資料與清單雜湊相符。不使用 OdfKit，需要 Java 與 Jing。 |
-| `Build-OdfSemanticBatches.py` | 以經審閱的完整句型編譯整組語意分類，保留型別、位置、列舉與來源 hash；`--verify` 從固定官方 ODT 重建，`--check-contracts` 離線核對。未辨識的句子、物件、PDF 與有效勘誤仍待審，不自動豁免。 |
-| `Build-OdfFormulaSemanticBatches.py` | 核對標準函式的完整 Summary／Syntax／Returns／Constraints／Semantics 結構與 SDK 角色，並儲存官方公式文件的上標、下標、數值位移及樣式繼承證據，避免將 2 的 39 次方誤讀為 239。`--verify` 重建固定來源，`--check-contracts` 離線核對。角色分類不算數值語意已審閱，未辨識的表格、物件、矛盾簽章及宿主函式仍待專項審閱。 |
 | `Build-OdfEmptyReferences.py` | 掃描固定官方 ODT 的 reference／bookmark／sequence 參照欄位，以實際 named anchor 定位空的快取顯示，保留同段落其他參照、不同目標及修訂／歧義狀態。`--verify` 完整重建；`--check-contracts` 離線核對。找到目標不等於已重新計算章節號、驗證所有非空參照或完成被引用義務。 |
 | `Build-OdfEffectiveText.py` | 依固定 ODF 1.1 勘誤完整版本及逐項核對的編輯樣式產生生效文字證據；保留原始 ID／hash，普通刪除線不視為勘誤刪除。`--verify` 核對全部文字區塊，`--check-contracts` 離線核對政策、來源與刪除範圍。 |
 | `Build-OdfPdfGrammarEvidence.py` | 核對 ODF 1.0 PDF 灰底且有行號的 document grammar 與官方 RNG 的完整樹及 namespace scope；7 處 pattern 與 2 處註解結尾換行按固定證據處理，不刪除 regex 空白。完整重建需 `pypdf==6.10.0`、`pdfplumber==0.11.9`；`--check-contracts` 僅用標準函式庫。未編號 BNF、prose、勘誤及 SDK matcher 等價性仍待審。 |

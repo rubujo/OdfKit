@@ -18,8 +18,6 @@ on:
       - 'eng/Build-OdfConformanceMatrix.py'
       - 'eng/Build-OdfObligationInventory.py'
       - 'eng/Build-OdfObligationClassification.py'
-      - 'eng/Test-OdfSemanticReviews.py'
-      - 'eng/Test-OdfImplementationReviews.py'
       - 'eng/Build-OdfPublicationObjects.py'
       - 'eng/testdata/Test-OdfPublicationObjects.py'
       - 'docs/odf-publication-objects.json'
@@ -31,22 +29,10 @@ on:
       - 'eng/testdata/Test-OdfEffectiveText.py'
       - 'docs/odf-effective-text-policy.json'
       - 'docs/odf-effective-text/**'
-      - 'eng/Build-OdfSemanticBatches.py'
-      - 'eng/testdata/Test-OdfSemanticBatches.py'
-      - 'eng/Build-OdfFormulaSemanticBatches.py'
-      - 'eng/testdata/Test-OdfFormulaSemanticBatches.py'
-      - 'docs/odf-formula-semantic-batches.json'
       - 'eng/Build-OdfEmptyReferences.py'
       - 'eng/testdata/Test-OdfEmptyReferences.py'
       - 'docs/odf-empty-reference-evidence.json'
-      - 'docs/odf-semantic-body-ranges.json'
       - 'docs/odf-package-informative-contexts.json'
-      - 'docs/odf-reviewed-examples.json'
-      - 'docs/odf-semantic-batches/**'
-      - 'eng/testdata/Test-OdfSemanticReviews.py'
-      - 'eng/testdata/Test-OdfImplementationReviews.py'
-      - 'docs/odf-semantic-reviews.json'
-      - 'docs/odf-implementation-reviews.json'
       - 'eng/testdata/Test-OdfObligationClassification.py'
       - 'eng/testdata/Test-OdfObligationInventory.py'
       - 'docs/odf-obligation-decisions.json'
@@ -90,8 +76,6 @@ on:
       - 'eng/Build-OdfConformanceMatrix.py'
       - 'eng/Build-OdfObligationInventory.py'
       - 'eng/Build-OdfObligationClassification.py'
-      - 'eng/Test-OdfSemanticReviews.py'
-      - 'eng/Test-OdfImplementationReviews.py'
       - 'eng/Build-OdfPublicationObjects.py'
       - 'eng/testdata/Test-OdfPublicationObjects.py'
       - 'docs/odf-publication-objects.json'
@@ -103,22 +87,10 @@ on:
       - 'eng/testdata/Test-OdfEffectiveText.py'
       - 'docs/odf-effective-text-policy.json'
       - 'docs/odf-effective-text/**'
-      - 'eng/Build-OdfSemanticBatches.py'
-      - 'eng/testdata/Test-OdfSemanticBatches.py'
-      - 'eng/Build-OdfFormulaSemanticBatches.py'
-      - 'eng/testdata/Test-OdfFormulaSemanticBatches.py'
-      - 'docs/odf-formula-semantic-batches.json'
       - 'eng/Build-OdfEmptyReferences.py'
       - 'eng/testdata/Test-OdfEmptyReferences.py'
       - 'docs/odf-empty-reference-evidence.json'
-      - 'docs/odf-semantic-body-ranges.json'
       - 'docs/odf-package-informative-contexts.json'
-      - 'docs/odf-reviewed-examples.json'
-      - 'docs/odf-semantic-batches/**'
-      - 'eng/testdata/Test-OdfSemanticReviews.py'
-      - 'eng/testdata/Test-OdfImplementationReviews.py'
-      - 'docs/odf-semantic-reviews.json'
-      - 'docs/odf-implementation-reviews.json'
       - 'eng/testdata/Test-OdfObligationClassification.py'
       - 'eng/testdata/Test-OdfObligationInventory.py'
       - 'docs/odf-obligation-decisions.json'
@@ -245,24 +217,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Empty reference reconstruction regressions failed.' }
           python eng/Build-OdfEmptyReferences.py --check-contracts
           if ($LASTEXITCODE -ne 0) { throw 'Named reference target contracts failed.' }
-          python eng/testdata/Test-OdfSemanticBatches.py
-          if ($LASTEXITCODE -ne 0) { throw 'Semantic family regressions failed.' }
-          python eng/Build-OdfSemanticBatches.py --check-contracts
-          if ($LASTEXITCODE -ne 0) { throw 'Semantic family contracts failed.' }
-          python eng/testdata/Test-OdfFormulaSemanticBatches.py
-          if ($LASTEXITCODE -ne 0) { throw 'Formula template and inline typography regressions failed.' }
-          python eng/Build-OdfFormulaSemanticBatches.py --check-contracts
-          if ($LASTEXITCODE -ne 0) { throw 'Formula source role and typography contracts failed.' }
           python eng/testdata/Test-OdfPublicationObjects.py
           if ($LASTEXITCODE -ne 0) { throw 'Publication object reconstruction regressions failed.' }
           python eng/Build-OdfPublicationObjects.py --check-contracts
           if ($LASTEXITCODE -ne 0) { throw 'Publication object provenance contracts failed.' }
-          python eng/testdata/Test-OdfSemanticReviews.py
-          python eng/testdata/Test-OdfImplementationReviews.py
-          if ($LASTEXITCODE -ne 0) { throw 'Semantic review regressions failed.' }
-          python eng/Test-OdfSemanticReviews.py
-          python eng/Test-OdfImplementationReviews.py
-          if ($LASTEXITCODE -ne 0) { throw 'Semantic review contracts failed.' }
           $tool = (Get-Content eng/external-tools.json -Raw | ConvertFrom-Json).opfOdfValidator
           $corpus = Get-Content docs/examples/oasis-odf-tc-corpus/manifest.json -Raw | ConvertFrom-Json
           $corpusHash = (Get-FileHash docs/examples/oasis-odf-tc-corpus/manifest.json -Algorithm SHA256).Hash.ToLowerInvariant()
