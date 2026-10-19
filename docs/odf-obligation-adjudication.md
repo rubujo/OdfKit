@@ -293,14 +293,16 @@ RDFa 屬性組被接受，現改為保留。`draw:z-index` 在 dr3d 場景子層
 元素定義批次（ODF 1.2～1.4 的 223 個元素群組）沿用同一做法：為每個元素的每個列出父元素、屬性與子元素
 合成實例，並產生未知屬性、未列出的子元素、錯誤的父元素與多餘文字等變異實例，一律以 Jing 的判定為準，
 要求驗證器給出相同結果。固定資料為 [OdfElementCases.jsonl.gz](../OdfKit.Tests/TestData/OdfElementCases.jsonl.gz)
-（10,704 個案例、265 個群組），以[差異測試](../OdfKit.Tests/OdfElementDefinitionConformanceTests.cs)
+（12,139 個案例、391 個群組），以[差異測試](../OdfKit.Tests/OdfElementDefinitionConformanceTests.cs)
 執行，`eng/Test-OdfElementFixture.py` 可單獨以 Jing 重算全部判定，兩者皆無不一致。
 含說明性條件句（should、may 等）的元素群組保留待個別裁決。兩框架各 21,689 項回歸通過，
 ODF 1.1 的 RELAX NG 片段群組（說明文字加上 `<define>`／`<attribute>` 片段，共 127 個單一屬性群組）
 以版本自己的 schema 推導載體元素（每組最多驗證 25 種），沿用同一套 Jing 差異做法；1.1 schema 以
 `combine="choice"` 定義的內容須只選一個分支，合成器已據此處理。這批沒有發現新的驗證器差異。
 含條件句或複合定義的 1.1 群組（約 190 組）保留待個別裁決。兩框架各 22,965 項回歸通過，
-直接裁決累計 **1,149 組、4,713 組待裁決**（1,127 組具執行期實作與測試證據）。
+ODF 1.1 的單一元素片段群組同樣由版本 schema 推導父元素、屬性與子元素後比對，新增 38 組
+（元素固定資料增為 12,139 個案例、391 個群組，Jing 重算無不一致）。兩框架各 23,091 項回歸通過，
+直接裁決累計 **1,187 組、4,675 組待裁決**（1,165 組具執行期實作與測試證據）。
 
 表單型別批次已修正並完整核驗兩項不同的驗證缺口，三個型別子節已計入直接裁決：
 CLR 的 `XmlConvert` 會接受 `Infinity`、`nan` 等 XML Schema 不允許的特殊詞彙，
