@@ -420,7 +420,6 @@
   "Err_OdfPackage_InvalidNotFound": "無效的 ODF 封裝容器：缺少 「META-INF/manifest.xml」。",
   "Err_OdfParagraphExtensions_FontCannotBeEmpty": "字型名稱不可為空。",
   "Err_OdfPdfRenderer_PdfExportOnlySupportedForTextDocument": "PDF 匯出僅支援 TextDocument。",
-  "Err_OdfPdfRenderer_PdfSigningNotSupported": "PDFsharp 轉譯器不支援 PDF 簽章。",
   "Err_OdfPdfExporter_UnableResolveFont": "無法解析字型「{0}」。",
   "Err_OdfPercent_PercentageValueBetween100": "百分比值必須介於 -100% 到 100% 之間。",
   "Err_OdfPoint3D_3dPointCoordinatesOnly": "三維點座標只可使用 cm、mm、in、pt 或 pc 單位。",

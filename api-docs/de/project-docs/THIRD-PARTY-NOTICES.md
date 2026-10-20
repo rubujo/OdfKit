@@ -2,7 +2,7 @@
 title: Hinweise zu Drittanbietern
 _lang: de
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4
+translation_source_sha256: 64c45bc0b0973108485e251b9faa3a1c30090ea4bbd03812d6a55f68015db84f
 ---
 
 # Hinweise zu Drittanbietern
@@ -30,7 +30,6 @@ OdfKit nutzt CC0 1.0 Universal. Folgende Abhängigkeiten behalten ihre Lizenzen:
 | SkiaSharp / HarfBuzzSharp | Zeichnen und Textformung | MIT |
 | ScottPlot | Diagramme und Ersatzvisualisierung | MIT |
 | ClosedXML / DocumentFormat.OpenXml | OOXML-Integration sowie Import und Export | MIT / MIT |
-| PDFsharp-MigraDoc | PDF-Verarbeitung, Layout und Zeichnen | MIT |
 | dotNetRdf.Core | RDF-Graph- und SPARQL-Brücke | MIT |
 | Microsoft.CSharp | Laufzeitbindung für `dynamic` | MIT |
 | OASIS OpenDocument Relax-NG Schemas | ODF-Validierung 1.1–1.4 und Codegenerierung | OASIS Copyright |

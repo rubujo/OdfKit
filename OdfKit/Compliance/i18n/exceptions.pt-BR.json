@@ -420,7 +420,6 @@
   "Err_OdfPackage_InvalidNotFound": "Pacote ODF inválido: não contém 'META-INF/manifest.xml'.",
   "Err_OdfParagraphExtensions_FontCannotBeEmpty": "O nome da fonte não pode ficar vazio.",
   "Err_OdfPdfRenderer_PdfExportOnlySupportedForTextDocument": "A exportação para PDF só é suportada para TextDocument.",
-  "Err_OdfPdfRenderer_PdfSigningNotSupported": "A assinatura de PDF não é suportada pelo renderizador PDFsharp.",
   "Err_OdfPdfExporter_UnableResolveFont": "Não foi possível resolver a fonte '{0}'.",
   "Err_OdfPercent_PercentageValueBetween100": "O valor percentual deve estar entre -100% e 100%.",
   "Err_OdfPoint3D_3dPointCoordinatesOnly": "As coordenadas do ponto 3D só podem usar unidades cm, mm, pol, pt ou pc.",

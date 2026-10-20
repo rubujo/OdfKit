@@ -420,7 +420,6 @@
   "Err_OdfPackage_InvalidNotFound": "Pakej ODF tidak sah: 'META-INF/manifest.xml' tiada.",
   "Err_OdfParagraphExtensions_FontCannotBeEmpty": "Nama fon tidak boleh kosong.",
   "Err_OdfPdfRenderer_PdfExportOnlySupportedForTextDocument": "Eksport PDF hanya disokong untuk TextDocument.",
-  "Err_OdfPdfRenderer_PdfSigningNotSupported": "Tandatangan PDF tidak disokong oleh renderer PDFsharp.",
   "Err_OdfPdfExporter_UnableResolveFont": "Tidak dapat menyelesaikan fon '{0}'.",
   "Err_OdfPercent_PercentageValueBetween100": "Nilai peratusan mestilah antara -100% dan 100%.",
   "Err_OdfPoint3D_3dPointCoordinatesOnly": "Koordinat titik 3D hanya boleh menggunakan unit cm, mm, in, pt atau pc.",

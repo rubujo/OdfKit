@@ -2,7 +2,7 @@
 title: Notis pihak ketiga
 _lang: ms
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4
+translation_source_sha256: 64c45bc0b0973108485e251b9faa3a1c30090ea4bbd03812d6a55f68015db84f
 ---
 
 # Notis pihak ketiga
@@ -29,7 +29,6 @@ OdfKit menggunakan CC0 1.0 Universal. Kebergantungan berikut mengekalkan lesenny
 | SkiaSharp / HarfBuzzSharp | Lukisan dan pembentukan teks | MIT |
 | ScottPlot | Carta dan visualisasi gantian | MIT |
 | ClosedXML / DocumentFormat.OpenXml | Integrasi, import dan eksport OOXML | MIT / MIT |
-| PDFsharp-MigraDoc | Pemprosesan, susun atur dan lukisan PDF | MIT |
 | dotNetRdf.Core | Jambatan graf RDF dan SPARQL | MIT |
 | Microsoft.CSharp | Pengikatan masa jalan untuk `dynamic` | MIT |
 | OASIS OpenDocument Relax-NG Schemas | Pengesahan ODF 1.1–1.4 dan penjanaan kod | OASIS Copyright |

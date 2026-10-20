@@ -41,10 +41,6 @@
     <PackageVersion Include="Microsoft.Playwright" Version="1.63.0" />
     <PackageVersion Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageVersion Include="MiniExcel" Version="1.46.0" />
-    <!-- 刻意釘選 6.2.4：6.5.0 起授權改為 AGPL-3.0-only 且執行時要求有效授權
-         （PdfSharpLicenseException: The loaded license is not valid），會使 PDF 匯出失敗，
-         並與本專案 CC0-1.0 的授權衝突。6.2.4 為最後一個 MIT 版本。 -->
-    <PackageVersion Include="PDFsharp-MigraDoc" Version="6.2.4" />
     <PackageVersion Include="ScottPlot" Version="5.1.59" />
     <PackageVersion Include="SkiaSharp" Version="4.153.1" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="4.153.1" />

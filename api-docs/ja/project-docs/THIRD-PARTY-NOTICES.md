@@ -2,7 +2,7 @@
 title: 第三者に関する通知
 _lang: ja
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4
+translation_source_sha256: 64c45bc0b0973108485e251b9faa3a1c30090ea4bbd03812d6a55f68015db84f
 ---
 
 # 第三者に関する通知
@@ -29,7 +29,6 @@ OdfKit プロジェクトは [CC0 1.0 Universal](https://creativecommons.org/pub
 | [SkiaSharp](https://github.com/mono/SkiaSharp) / [HarfBuzzSharp](https://github.com/mono/SkiaSharp) | OdfKit.Extensions.Imaging で使用するクロスプラットフォームの画像描画と文字組版 | [MIT](https://github.com/mono/SkiaSharp/blob/main/LICENSE.md) |
 | [ScottPlot](https://github.com/ScottPlot/ScottPlot) | OdfKit.Extensions.Imaging で使用するメモリ内グラフ描画とフォールバック画像の可視化 | [MIT](https://github.com/ScottPlot/ScottPlot/blob/main/LICENSE) |
 | [ClosedXML](https://github.com/ClosedXML/ClosedXML) / [DocumentFormat.OpenXml](https://github.com/dotnet/Open-XML-SDK) | OdfKit.Extensions.Ooxml で使用する Excel などの OOXML 形式との統合およびインポートとエクスポート | [MIT](https://github.com/ClosedXML/ClosedXML/blob/master/LICENSE) / [MIT](https://github.com/dotnet/Open-XML-SDK/blob/main/LICENSE) |
-| [PDFsharp-MigraDoc](https://github.com/empira/PDFsharp) | OdfKit.Extensions.Pdf で使用する PDF の処理、レイアウト、および描画拡張 | [MIT](https://github.com/empira/PDFsharp/blob/master/LICENSE) |
 | [dotNetRdf.Core](https://github.com/dotnetrdf/dotnetrdf) | OdfKit.Extensions.Rdf で使用する RDF グラフと SPARQL クエリのブリッジ | [MIT](https://github.com/dotnetrdf/dotnetrdf/blob/master/License.txt) |
 | [Microsoft.CSharp](https://github.com/dotnet/runtime) | OdfKit.Extensions.Ooxml の netstandard2.0 ターゲットで使用する `dynamic` 型の実行時バインド | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [OASIS OpenDocument Relax-NG Schemas](https://www.oasis-open.org/committees/office/) | tools/OdfSchemaGenerator/schemas/ に配置された ODF 1.1 / 1.2 / 1.3 / 1.4 XML 構造の検証およびコード生成 | [OASIS Copyright](https://www.oasis-open.org/committees/office/ipr.php) |

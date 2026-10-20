@@ -420,7 +420,6 @@
   "Err_OdfPackage_InvalidNotFound": "Ugyldig ODF-pakke: 'META-INF/manifest.xml' mangler.",
   "Err_OdfParagraphExtensions_FontCannotBeEmpty": "Skrifttypenavnet må ikke være tomt.",
   "Err_OdfPdfRenderer_PdfExportOnlySupportedForTextDocument": "PDF-eksport understøttes kun for TextDocument.",
-  "Err_OdfPdfRenderer_PdfSigningNotSupported": "PDF-signering understøttes ikke af PDFsharp-rendereren.",
   "Err_OdfPdfExporter_UnableResolveFont": "Skrifttypen '{0}' kunne ikke løses.",
   "Err_OdfPercent_PercentageValueBetween100": "Procentværdien skal være mellem -100 % og 100 %.",
   "Err_OdfPoint3D_3dPointCoordinatesOnly": "3D-punktkoordinater kan kun bruge cm-, mm-, in-, pt- eller pc-enheder.",

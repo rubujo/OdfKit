@@ -112,6 +112,8 @@
     href: provenance/semantic-api-clean-room.md
   - name: WebFont Clean-room
     href: provenance/webfont-managed-clean-room.md
+  - name: PDF Clean-room
+    href: provenance/pdf-managed-clean-room.md
 - name: 品質與效能
   items:
   - name: 證據索引

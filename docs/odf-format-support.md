@@ -139,8 +139,7 @@ Unicode 平面（plane）為單位路由而非以區塊（block）為單位，�
 - `OdfFontContext` 是字型子系統的唯一入口：單租戶場景直接使用 `OdfFontContext.Default`；
   多租戶或測試隔離場景可建立獨立執行個體，經由 `OdfDocument.FontContext`（文件層級，含存檔
   時的字型內嵌）或 `OdfTextFontFallbackOptions.FontContext`（單次呼叫層級）注入，優先序為
-  「選項 → 文件 → Default」。已知限制：PDF 匯出因 PDFsharp 全域字型解析器
-  （`GlobalFontSettings.FontResolver`）為處理程序層級，一律使用 `Default` 情境；嵌入子文件與
+  「選項 → 文件 → Default」。PDF 匯出使用文件自己的字型情境；嵌入子文件與
   最外層文件共用封裝時，存檔內嵌以最外層文件的情境為準。
 
 OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何第三方罕字字型檔；字型選擇、實體檔案

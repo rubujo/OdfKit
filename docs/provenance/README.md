@@ -10,7 +10,6 @@
 | 範圍 | 授權 |
 |------|------|
 | OdfKit 原創程式碼 | CC0 1.0 Universal |
-| PDFsharp | MIT |
 | CommunityToolkit.HighPerformance | MIT |
 | System.Security.Cryptography.Xml | MIT |
 | OASIS ODF RNG Schema | OASIS 標準文件 |
@@ -64,6 +63,7 @@ golden / regression 測試契約集中記錄於 [Clean-room 來源索引](clean-
 | 公式評估 | `DefaultFormulaEvaluator.*.cs` | 財務與統計函式語意 |
 | 結構驗證 | `OdfSchemaPatternValidator.cs` | 複雜 pattern 比對邏輯 |
 | OpenPGP 加密 | `OdfBouncyCastleOpenPgpProvider*.cs` | PKESK 封包解析、ECDH／RFC 6637 KDF |
+| PDF 引擎 | `OdfKit.Extensions.Pdf/Internal/*.cs` | PDF 讀寫、加密、字型子集、影像解碼；見 [PDF managed 來源紀錄](pdf-managed-clean-room.md) |
 
 ## 已確認無直接抄襲
 

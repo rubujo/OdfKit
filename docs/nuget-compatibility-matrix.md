@@ -11,7 +11,7 @@
 | `OdfKit.Extensions.Html` | `net10.0;netstandard2.0` | HTML / Markdown / RTF managed 匯出 | 內容轉出與 Web 預覽 |
 | `OdfKit.Extensions.Imaging` | `net10.0;netstandard2.0` | 影像渲染與圖表 fallback 視覺化 | 依賴 SkiaSharp / HarfBuzzSharp |
 | `OdfKit.Extensions.Ooxml` | `net10.0;netstandard2.0` | OOXML 轉換（DOCX / XLSX） | 依賴 ClosedXML 與 Open XML SDK |
-| `OdfKit.Extensions.Pdf` | `net10.0;netstandard2.0` | PDF 匯出 | 依賴 PDFsharp-MigraDoc |
+| `OdfKit.Extensions.Pdf` | `net10.0;netstandard2.0` | PDF 匯出 | 完全託管，無第三方 PDF 相依 |
 | `OdfKit.Extensions.Rendering` | `net10.0;netstandard2.0` | LibreOffice 後端渲染 | 需本機 LibreOffice 或相容程序 |
 | `OdfKit.Extensions.Rdf` | `net10.0;netstandard2.0` | `manifest.rdf` 與 RDF / SPARQL 橋接 | 依賴 dotNetRdf |
 | `OdfKit.Extensions.Collaboration` | `net10.0;netstandard2.0` | ODF Toolkit 相容 JSON operations 匯出 | 適合協作編輯流程 |

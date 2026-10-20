@@ -420,7 +420,6 @@
   "Err_OdfPackage_InvalidNotFound": "Neplatný balík ODF: Chýba 'META-INF/manifest.xml'.",
   "Err_OdfParagraphExtensions_FontCannotBeEmpty": "Názov písma nemôže byť prázdny.",
   "Err_OdfPdfRenderer_PdfExportOnlySupportedForTextDocument": "Export do PDF je podporovaný iba pre TextDocument.",
-  "Err_OdfPdfRenderer_PdfSigningNotSupported": "Podpisovanie PDF nie je podporované rendererom PDFsharp.",
   "Err_OdfPdfExporter_UnableResolveFont": "Nepodarilo sa vyriešiť písmo '{0}'.",
   "Err_OdfPercent_PercentageValueBetween100": "Percentuálna hodnota musí byť medzi -100 % a 100 %.",
   "Err_OdfPoint3D_3dPointCoordinatesOnly": "Súradnice 3D bodu môžu používať iba jednotky cm, mm, in, pt alebo pc.",

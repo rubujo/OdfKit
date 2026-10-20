@@ -2,7 +2,7 @@
 title: Tredjepartsmeddelelser
 _lang: da
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4
+translation_source_sha256: 64c45bc0b0973108485e251b9faa3a1c30090ea4bbd03812d6a55f68015db84f
 ---
 
 # Tredjepartsmeddelelser
@@ -29,7 +29,6 @@ OdfKit bruger CC0 1.0 Universal. Disse avhengighetene bevarer licensene sine:
 | SkiaSharp / HarfBuzzSharp | Tegning og tekstformning | MIT |
 | ScottPlot | Diagrammer og fallback-visualisering | MIT |
 | ClosedXML / DocumentFormat.OpenXml | OOXML-integration, import og eksport | MIT / MIT |
-| PDFsharp-MigraDoc | PDF-behandling, layout og tegning | MIT |
 | dotNetRdf.Core | RDF-graf- og SPARQL-bro | MIT |
 | Microsoft.CSharp | Runtime-binding for `dynamic` | MIT |
 | OASIS OpenDocument Relax-NG Schemas | ODF 1.1–1.4-validering og kodegenerering | OASIS Copyright |

@@ -2,7 +2,7 @@
 title: Kennisgevingen van derden
 _lang: nl
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4
+translation_source_sha256: 64c45bc0b0973108485e251b9faa3a1c30090ea4bbd03812d6a55f68015db84f
 ---
 
 # Kennisgevingen van derden
@@ -29,7 +29,6 @@ OdfKit gebruikt CC0 1.0 Universal. Deze afhankelijkheden behouden hun licentie:
 | SkiaSharp / HarfBuzzSharp | Tekenen en tekstvorming | MIT |
 | ScottPlot | Grafieken en fallback-visualisatie | MIT |
 | ClosedXML / DocumentFormat.OpenXml | OOXML-integratie, import en export | MIT / MIT |
-| PDFsharp-MigraDoc | PDF-verwerking, indeling en tekenen | MIT |
 | dotNetRdf.Core | RDF-graaf- en SPARQL-brug | MIT |
 | Microsoft.CSharp | Runtimebinding voor `dynamic` | MIT |
 | OASIS OpenDocument Relax-NG Schemas | ODF 1.1–1.4-validatie en codegeneratie | OASIS Copyright |

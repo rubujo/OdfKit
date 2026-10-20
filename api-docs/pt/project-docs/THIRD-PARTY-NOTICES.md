@@ -2,7 +2,7 @@
 title: Avisos de terceiros
 _lang: pt
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4
+translation_source_sha256: 64c45bc0b0973108485e251b9faa3a1c30090ea4bbd03812d6a55f68015db84f
 ---
 
 # Avisos de terceiros
@@ -29,7 +29,6 @@ OdfKit usa CC0 1.0 Universal. Estas dependências mantêm as suas licenças:
 | SkiaSharp / HarfBuzzSharp | Desenho e composição de texto | MIT |
 | ScottPlot | Gráficos e visualização alternativa | MIT |
 | ClosedXML / DocumentFormat.OpenXml | Integração, importação e exportação OOXML | MIT / MIT |
-| PDFsharp-MigraDoc | Processamento, layout e desenho PDF | MIT |
 | dotNetRdf.Core | Ponte RDF e SPARQL | MIT |
 | Microsoft.CSharp | Ligação em execução para `dynamic` | MIT |
 | OASIS OpenDocument Relax-NG Schemas | Validação ODF 1.1–1.4 e geração de código | OASIS Copyright |

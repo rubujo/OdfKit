@@ -2,7 +2,7 @@
 title: Avisos de terceros
 _lang: es
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4
+translation_source_sha256: 64c45bc0b0973108485e251b9faa3a1c30090ea4bbd03812d6a55f68015db84f
 ---
 
 # Avisos de terceros
@@ -29,7 +29,6 @@ El proyecto OdfKit se publica bajo [CC0 1.0 Universal](https://creativecommons.o
 | [SkiaSharp](https://github.com/mono/SkiaSharp) / [HarfBuzzSharp](https://github.com/mono/SkiaSharp) | Dibujo de imágenes y composición tipográfica multiplataforma usados por OdfKit.Extensions.Imaging | [MIT](https://github.com/mono/SkiaSharp/blob/main/LICENSE.md) |
 | [ScottPlot](https://github.com/ScottPlot/ScottPlot) | Dibujo de gráficos en memoria y visualización de imágenes de reserva usados por OdfKit.Extensions.Imaging | [MIT](https://github.com/ScottPlot/ScottPlot/blob/main/LICENSE) |
 | [ClosedXML](https://github.com/ClosedXML/ClosedXML) / [DocumentFormat.OpenXml](https://github.com/dotnet/Open-XML-SDK) | Integración, importación y exportación de formatos OOXML como Excel, usadas por OdfKit.Extensions.Ooxml | [MIT](https://github.com/ClosedXML/ClosedXML/blob/master/LICENSE) / [MIT](https://github.com/dotnet/Open-XML-SDK/blob/main/LICENSE) |
-| [PDFsharp-MigraDoc](https://github.com/empira/PDFsharp) | Extensiones de procesamiento, maquetación y dibujo de PDF usadas por OdfKit.Extensions.Pdf | [MIT](https://github.com/empira/PDFsharp/blob/master/LICENSE) |
 | [dotNetRdf.Core](https://github.com/dotnetrdf/dotnetrdf) | Puente de gráficos RDF y consultas SPARQL usado por OdfKit.Extensions.Rdf | [MIT](https://github.com/dotnetrdf/dotnetrdf/blob/master/License.txt) |
 | [Microsoft.CSharp](https://github.com/dotnet/runtime) | Enlace en tiempo de ejecución del tipo `dynamic` usado por el destino netstandard2.0 de OdfKit.Extensions.Ooxml | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [OASIS OpenDocument Relax-NG Schemas](https://www.oasis-open.org/committees/office/) | Validación de estructuras XML ODF 1.1 / 1.2 / 1.3 / 1.4 y generación de código; se encuentra en tools/OdfSchemaGenerator/schemas/ | [OASIS Copyright](https://www.oasis-open.org/committees/office/ipr.php) |

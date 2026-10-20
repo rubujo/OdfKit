@@ -44,7 +44,6 @@ public class ExtensionDiagnosticsLocalizationTests
             "Diag_XlsxToOdfConverter_ChartImportSkipped",
             "Diag_XlsxToOdfConverter_PivotTableImportSkipped",
             "Diag_OdfToXlsxConverter_ChartExportSkipped",
-            "Diag_OdfPdfExporter_TrueTypeCollectionFontFallback",
             "Diag_OdfHybridPdfHelper_PdfCatalogNamesMissing",
             "Diag_OdfHybridPdfHelper_PdfEmbeddedFilesMissing",
             "Diag_OdfHybridPdfHelper_EmbeddedOdfExtracted",

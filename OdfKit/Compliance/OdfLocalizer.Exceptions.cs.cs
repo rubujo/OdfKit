@@ -438,7 +438,6 @@ public static partial class OdfLocalizer
             ["Err_OdfPackage_InvalidNotFound"] = "Neplatný balíček ODF: chybí 'META-INF/manifest.xml'.",
             ["Err_OdfParagraphExtensions_FontCannotBeEmpty"] = "Název písma nesmí být prázdný.",
             ["Err_OdfPdfRenderer_PdfExportOnlySupportedForTextDocument"] = "Export do PDF je podporován pouze pro TextDocument.",
-            ["Err_OdfPdfRenderer_PdfSigningNotSupported"] = "Vykreslovač PDFsharp nepodporuje podepisování PDF.",
             ["Err_OdfPdfExporter_UnableResolveFont"] = "Písmo '{0}' nelze vyhledat.",
             ["Err_OdfPercent_PercentageValueBetween100"] = "Procentní hodnota musí být mezi -100 % a 100 %.",
             ["Err_OdfPoint3D_3dPointCoordinatesOnly"] = "Souřadnice 3D bodu mohou používat pouze jednotky cm, mm, in, pt nebo pc.",

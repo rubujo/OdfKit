@@ -420,7 +420,6 @@
   "Err_OdfPackage_InvalidNotFound": "ODF パッケージが無効です。'META-INF/manifest.xml' がありません。",
   "Err_OdfParagraphExtensions_FontCannotBeEmpty": "フォント名を空にすることはできません。",
   "Err_OdfPdfRenderer_PdfExportOnlySupportedForTextDocument": "PDF へのエクスポートは TextDocument でのみサポートされます。",
-  "Err_OdfPdfRenderer_PdfSigningNotSupported": "PDFsharp レンダラーは PDF 署名をサポートしていません。",
   "Err_OdfPdfExporter_UnableResolveFont": "フォント '{0}' を解決できません。",
   "Err_OdfPercent_PercentageValueBetween100": "パーセント値は -100%～100% の範囲である必要があります。",
   "Err_OdfPoint3D_3dPointCoordinatesOnly": "3D 点の座標には cm、mm、in、pt、または pc 単位のみを使用できます。",

@@ -438,7 +438,6 @@ public static partial class OdfLocalizer
             ["Err_OdfPackage_InvalidNotFound"] = "Package ODF non valide : 'META-INF/manifest.xml' est manquant.",
             ["Err_OdfParagraphExtensions_FontCannotBeEmpty"] = "Le nom de la police ne peut pas être vide.",
             ["Err_OdfPdfRenderer_PdfExportOnlySupportedForTextDocument"] = "L'export PDF est uniquement pris en charge pour TextDocument.",
-            ["Err_OdfPdfRenderer_PdfSigningNotSupported"] = "La signature PDF n'est pas prise en charge par le moteur PDFsharp.",
             ["Err_OdfPdfExporter_UnableResolveFont"] = "Impossible de résoudre la police '{0}'.",
             ["Err_OdfPercent_PercentageValueBetween100"] = "La valeur du pourcentage doit être comprise entre -100 % et 100 %.",
             ["Err_OdfPoint3D_3dPointCoordinatesOnly"] = "Les coordonnées de points 3D ne peuvent utiliser que des unités cm, mm, in, pt ou pc.",

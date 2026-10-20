@@ -2,7 +2,7 @@
 title: Avisos de terceiros
 _lang: pt-BR
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4
+translation_source_sha256: 64c45bc0b0973108485e251b9faa3a1c30090ea4bbd03812d6a55f68015db84f
 ---
 
 # Avisos de terceiros
@@ -29,7 +29,6 @@ O projeto OdfKit é disponibilizado sob a licença [CC0 1.0 Universal](https://c
 | [SkiaSharp](https://github.com/mono/SkiaSharp) / [HarfBuzzSharp](https://github.com/mono/SkiaSharp) | Desenho de imagens e composição de texto multiplataforma usados em OdfKit.Extensions.Imaging | [MIT](https://github.com/mono/SkiaSharp/blob/main/LICENSE.md) |
 | [ScottPlot](https://github.com/ScottPlot/ScottPlot) | Desenho de gráficos em memória e visualização alternativa de imagens usados em OdfKit.Extensions.Imaging | [MIT](https://github.com/ScottPlot/ScottPlot/blob/main/LICENSE) |
 | [ClosedXML](https://github.com/ClosedXML/ClosedXML) / [DocumentFormat.OpenXml](https://github.com/dotnet/Open-XML-SDK) | Integração, importação e exportação de formatos OOXML, como Excel, usadas em OdfKit.Extensions.Ooxml | [MIT](https://github.com/ClosedXML/ClosedXML/blob/master/LICENSE) / [MIT](https://github.com/dotnet/Open-XML-SDK/blob/main/LICENSE) |
-| [PDFsharp-MigraDoc](https://github.com/empira/PDFsharp) | Extensões de processamento, layout e desenho de PDF usadas em OdfKit.Extensions.Pdf | [MIT](https://github.com/empira/PDFsharp/blob/master/LICENSE) |
 | [dotNetRdf.Core](https://github.com/dotnetrdf/dotnetrdf) | Ponte entre grafos RDF e consultas SPARQL usada em OdfKit.Extensions.Rdf | [MIT](https://github.com/dotnetrdf/dotnetrdf/blob/master/License.txt) |
 | [Microsoft.CSharp](https://github.com/dotnet/runtime) | Vinculação em tempo de execução do tipo `dynamic` usada pelo destino netstandard2.0 de OdfKit.Extensions.Ooxml | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [OASIS OpenDocument Relax-NG Schemas](https://www.oasis-open.org/committees/office/) | Validação de estruturas XML ODF 1.1 / 1.2 / 1.3 / 1.4 e geração de código; localizado em tools/OdfSchemaGenerator/schemas/ | [OASIS Copyright](https://www.oasis-open.org/committees/office/ipr.php) |

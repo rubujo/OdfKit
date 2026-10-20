@@ -2,7 +2,7 @@
 title: 제3자 고지
 _lang: ko
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4
+translation_source_sha256: 64c45bc0b0973108485e251b9faa3a1c30090ea4bbd03812d6a55f68015db84f
 ---
 
 # 제3자 고지
@@ -29,7 +29,6 @@ OdfKit은 CC0 1.0 Universal을 사용합니다. 다음 종속성에는 각각의
 | SkiaSharp / HarfBuzzSharp | 그래픽 그리기 및 텍스트 조판 | MIT |
 | ScottPlot | 차트 및 대체 시각화 | MIT |
 | ClosedXML / DocumentFormat.OpenXml | OOXML 통합, 가져오기 및 내보내기 | MIT / MIT |
-| PDFsharp-MigraDoc | PDF 처리, 레이아웃 및 그리기 | MIT |
 | dotNetRdf.Core | RDF 그래프 및 SPARQL 브리지 | MIT |
 | Microsoft.CSharp | `dynamic` 런타임 바인딩 | MIT |
 | OASIS OpenDocument Relax-NG Schemas | ODF 1.1–1.4 검증 및 코드 생성 | OASIS Copyright |

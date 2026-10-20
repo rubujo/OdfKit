@@ -2,7 +2,7 @@
 title: Avis relatifs aux tiers
 _lang: fr
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4
+translation_source_sha256: 64c45bc0b0973108485e251b9faa3a1c30090ea4bbd03812d6a55f68015db84f
 ---
 
 # Avis relatifs aux tiers
@@ -29,7 +29,6 @@ OdfKit utilise CC0 1.0 Universal. Les dépendances suivantes conservent leur lic
 | SkiaSharp / HarfBuzzSharp | Dessin et façonnage du texte | MIT |
 | ScottPlot | Graphiques et visualisation de secours | MIT |
 | ClosedXML / DocumentFormat.OpenXml | Intégration, importation et exportation OOXML | MIT / MIT |
-| PDFsharp-MigraDoc | Traitement, mise en page et dessin PDF | MIT |
 | dotNetRdf.Core | Pont de graphes RDF et SPARQL | MIT |
 | Microsoft.CSharp | Liaison d’exécution pour `dynamic` | MIT |
 | OASIS OpenDocument Relax-NG Schemas | Validation ODF 1.1–1.4 et génération de code | OASIS Copyright |

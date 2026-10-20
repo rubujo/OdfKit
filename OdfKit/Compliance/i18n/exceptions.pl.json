@@ -420,7 +420,6 @@
   "Err_OdfPackage_InvalidNotFound": "Nieprawidłowy pakiet ODF: brakuje pliku 'META-INF/manifest.xml'.",
   "Err_OdfParagraphExtensions_FontCannotBeEmpty": "Nazwa czcionki nie może być pusta.",
   "Err_OdfPdfRenderer_PdfExportOnlySupportedForTextDocument": "Eksport do pliku PDF jest obsługiwany tylko dla obiektu TextDocument.",
-  "Err_OdfPdfRenderer_PdfSigningNotSupported": "Moduł renderujący PDFsharp nie obsługuje podpisywania plików PDF.",
   "Err_OdfPdfExporter_UnableResolveFont": "Nie można rozpoznać czcionki '{0}'.",
   "Err_OdfPercent_PercentageValueBetween100": "Wartość procentowa musi mieścić się w zakresie od -100% do 100%.",
   "Err_OdfPoint3D_3dPointCoordinatesOnly": "Współrzędne punktu 3D mogą używać tylko jednostek cm, mm, in, pt lub pc.",

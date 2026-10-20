@@ -35,12 +35,6 @@ updates:
         exclude-patterns:
           - "System.*"
           - "Microsoft.*"
-    ignore:
-      # PDFsharp-MigraDoc 6.5.0 起改為 AGPL-3.0-only 並要求有效授權，與 CC0-1.0 專案不相容，
-      # 且會使 OdfKit.Extensions.Pdf 的匯出失敗；維持最後一個 MIT 版本 6.2.4。
-      - dependency-name: "PDFsharp-MigraDoc"
-        versions:
-          - ">6.2.4"
     commit-message:
       # 對齊 docs/agent-guides/commits.md 的 Conventional Commits 慣例
       # （type(scope): subject）；Dependabot 產生的提交不會經人工 GPG 簽署流程，

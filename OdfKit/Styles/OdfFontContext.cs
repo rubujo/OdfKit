@@ -77,7 +77,7 @@ public sealed class OdfFontContext
 
     /// <summary>
     /// Returns whether the file is a TrueType Collection.
-    /// 檢查指定字型檔案是否為 TrueType Collection（.ttc）格式。PDFsharp 等部分渲染後端不支援直接讀取。
+    /// 檢查指定字型檔案是否為 TrueType Collection（.ttc）格式。部分渲染後端不支援直接讀取。
     /// </summary>
     /// <param name="filePath">The font file path. / 字型檔案路徑。</param>
     /// <returns>Whether the file starts with the TTC signature. / 若檔案以 TTC 簽章（'ttcf'）開頭則為 <see langword="true"/>。</returns>

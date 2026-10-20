@@ -2,6 +2,30 @@
 
 本檔案依 [Keep a Changelog](https://keepachangelog.com/) 慣例，記錄 OdfKit 對外可見的重大里程碑。
 
+## 未發布
+
+- **PDF 匯出改為完全託管，移除 PDFsharp-MigraDoc 相依**：PDFsharp-MigraDoc 6.5.0 起改為 AGPL-3.0-only 並在執行時要求有效授權
+  （沒有授權時 `PdfSharpLicenseException`），與本專案 CC0-1.0 不相容；6.2.4 是最後一個 MIT 版本且不再有新修正。
+  `OdfKit.Extensions.Pdf` 現在自行排版與產生 PDF，套件不再依賴任何第三方 PDF 函式庫（只剩 `System.Security.Cryptography.Pkcs`）。
+  公開 API（`OdfPdfExporter`、`OdfPdfRenderer`、`OdfHybridPdfHelper`）不變。
+  - 版面：貪婪斷行（含中日韓行首行尾禁則）、左／中／右／左右對齊、標題、清單縮排與標號、表格（合併儲存格、標題列跨頁重複、
+    比整頁還高的儲存格以行為單位切頁、不遺失文字）、行內粗體／斜體／底線／顏色／大小、tab、換行與保留空白。
+  - 字型：內嵌 TrueType 字型子集（只保留用到的字形，檔案大小與字型檔無關）並寫入 ToUnicode 對照，可複製與搜尋文字；
+    使用文件自己的字型情境（舊實作因 PDFsharp 全域解析器一律使用預設情境）；缺字時依序嘗試後備字型。
+    CFF 輪廓（含 CID 鍵控的思源黑體等）也會子集化：依 charset 取得 CID、只保留用到的字形與被呼叫的子程式（思源黑體 6.9 MB → 約 0.3 MB）；含 `seac` 的字型整份內嵌。
+  - 超連結：只輸出 http、https、mailto、tel、ftp，其他協定（例如 `javascript:`）只保留連結文字。
+  - 圖片：支援 PNG（含透明度）、JPEG、GIF（第一張畫面，含交錯與透明色）與 BMP；TIFF 等其他格式會略過而不中斷匯出。
+  - 腳註接在引用的區塊後以小字輸出，章節附註放在文件結尾；仍未輸出註解、圖表與繪圖物件（與舊實作相同）。
+  - 來源紀錄見 `docs/provenance/pdf-managed-clean-room.md`（淨室開發，只依公開規格）。
+  - `OdfHybridPdfHelper` 以增量更新附加內嵌檔案，原檔位元組與既有簽章的涵蓋範圍不變；現在支援交叉參照串流與物件串流的 PDF，
+    也支援標準安全處理常式加密的 PDF（RC4 40／128 位元、AES-128、AES-256，使用者或擁有者密碼皆可），注入後維持加密。
+  - 以真實 LibreOffice、pdfium 與 poppler 開啟並比對文字，並以獨立的 qpdf（pikepdf）產生的夾具驗證讀取、解密與增量更新。
+- **`ODF3131` 改為警告**：規範要求 `style:layout-grid-ruby-height` 只在同一 `style:page-layout-properties` 明示
+  `style:layout-grid-standard-mode="false"` 時出現，但 LibreOffice 預設頁面配置與 OASIS 自己的測試文件都不遵守，
+  TDF ODF Validator 也接受；改以警告回報，不再使這些文件被判定無效。
+- 更新 AngleSharp 1.8.5、Markdig 1.4.2、FsCheck.Xunit.v3 3.5.0；互通 CI 改用 LibreOffice 26.8.1 與 Apache OpenOffice 4.1.17；
+  WebFont 規範基準更新為 Unicode 18.0.0 與 IFT 2026-10-13 Candidate Recommendation Draft。
+
 ## 0.0.1 - 2026-10-02
 
 再以 LibreOffice 26.2.4.2 當裁判，對 OdfKit 的匯出、轉換與匯入做一輪驗證（真實 LibreOffice 產生的 ODT、ODS、ODP 與 RTF 交給 OdfKit，輸出再交回 LibreOffice 開啟，OOXML 輸出另以 Open XML SDK 驗證，字型以真實系統字型加 Chrome 渲染比對）：

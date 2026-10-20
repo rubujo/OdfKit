@@ -438,7 +438,6 @@ public static partial class OdfLocalizer
             ["Err_OdfPackage_InvalidNotFound"] = "잘못된 ODF 패키지: 'META-INF/manifest.xml'이 누락되었습니다.",
             ["Err_OdfParagraphExtensions_FontCannotBeEmpty"] = "글꼴 이름은 비워둘 수 없습니다.",
             ["Err_OdfPdfRenderer_PdfExportOnlySupportedForTextDocument"] = "PDF 내보내기는 TextDocument에서만 지원됩니다.",
-            ["Err_OdfPdfRenderer_PdfSigningNotSupported"] = "PDFsharp 렌더러는 PDF 서명을 지원하지 않습니다.",
             ["Err_OdfPdfExporter_UnableResolveFont"] = "글꼴 '{0}'을(를) 확인할 수 없습니다.",
             ["Err_OdfPercent_PercentageValueBetween100"] = "백분율 값은 -100%에서 100% 사이여야 합니다.",
             ["Err_OdfPoint3D_3dPointCoordinatesOnly"] = "3D 점 좌표에는 cm, mm, in, pt 또는 pc 단위만 사용할 수 있습니다.",

@@ -438,7 +438,6 @@ public static partial class OdfLocalizer
             ["Err_OdfPackage_InvalidNotFound"] = "Ongeldig ODF-pakket: 'META-INF/manifest.xml' ontbreekt.",
             ["Err_OdfParagraphExtensions_FontCannotBeEmpty"] = "Lettertypenaam mag niet leeg zijn.",
             ["Err_OdfPdfRenderer_PdfExportOnlySupportedForTextDocument"] = "PDF-export wordt alleen ondersteund voor TextDocument.",
-            ["Err_OdfPdfRenderer_PdfSigningNotSupported"] = "PDF-ondertekening wordt niet ondersteund door de PDFsharp-renderer.",
             ["Err_OdfPdfExporter_UnableResolveFont"] = "Kan lettertype '{0}' niet omzetten.",
             ["Err_OdfPercent_PercentageValueBetween100"] = "De procentuele waarde moet tussen -100% en 100% liggen.",
             ["Err_OdfPoint3D_3dPointCoordinatesOnly"] = "Voor 3D-puntcoördinaten kunnen alleen cm-, mm-, in-, pt- of pc-eenheden worden gebruikt.",

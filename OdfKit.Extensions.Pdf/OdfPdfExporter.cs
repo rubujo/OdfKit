@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using MigraDoc.DocumentObjectModel;
-using MigraDoc.DocumentObjectModel.Tables;
-using MigraDoc.Rendering;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Export.PdfInternal;
 using OdfKit.Styles;
 using OdfKit.Text;
-using PdfSharp.Fonts;
 
 #if NETSTANDARD2_0
 using ArgumentNullException = OdfKit.Export.Shim.ArgumentNullException;
@@ -25,6 +25,10 @@ namespace OdfKit.Export;
 /// Exports ODF documents to PDF.
 /// 將 TextDocument 匯出為 PDF 的工具類別。
 /// </summary>
+/// <remarks>
+/// 完全以託管程式碼排版並產生 PDF（不依賴第三方 PDF 函式庫）：內嵌 TrueType 字型子集，
+/// 支援段落、標題、清單、表格（含合併儲存格與標題列重複）、超連結、腳註與章節附註，以及 PNG／JPEG／GIF／BMP 圖片。
+/// </remarks>
 public static class OdfPdfExporter
 {
     /// <summary>
@@ -33,8 +37,6 @@ public static class OdfPdfExporter
     /// </summary>
     public static OdfExportReport ExportToStream(TextDocument document, Stream destination)
     {
-        // 以 Length（而非 Position）計算寫入位元組數：PDFsharp 的 PdfDocument.Save 在寫完後
-        // 可能將資料流游標移回起點（方便呼叫端立即讀回），若改用 Position 相減會誤算為 0。
         long start = destination.CanSeek ? destination.Length : 0;
         Export(document, destination);
         long written = destination.CanSeek ? destination.Length - start : 0;
@@ -79,10 +81,6 @@ public static class OdfPdfExporter
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        // 直接對目的地資料流序列化（與同步版 ExportToStream 相同路徑），省去先寫入中繼
-        // MemoryStream 再整體 CopyToAsync 的雙重緩衝。PDFsharp 的 PdfDocument.Save 本身
-        // 仍需先解析完整物件圖／xref 表才能序列化（第三方庫的整體序列化限制，無法避免），
-        // 此處僅消除 OdfKit 自行外加的第二層緩衝。
         long start = destination.CanSeek ? destination.Length : 0;
         await Task.Run(() => Export(document, destination), cancellationToken).ConfigureAwait(false);
         long written = destination.CanSeek ? destination.Length - start : 0;
@@ -120,21 +118,6 @@ public static class OdfPdfExporter
         }
     }
 
-    static OdfPdfExporter()
-    {
-        try
-        {
-            if (GlobalFontSettings.FontResolver is null)
-            {
-                GlobalFontSettings.FontResolver = new OdfPdfFontResolver();
-            }
-        }
-        catch
-        {
-            // 若已註冊則忽略。
-        }
-    }
-
     /// <summary>
     /// Exports the specified ODF document to PDF.
     /// 將 ODT 文字文件轉換並寫入 PDF 資料流。
@@ -147,56 +130,172 @@ public static class OdfPdfExporter
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(pdfStream);
 
-        var migraDoc = BuildMigraDoc(document);
-        var renderer = new PdfDocumentRenderer { Document = migraDoc };
-        renderer.RenderDocument();
-        using (renderer.PdfDocument)
-        {
-            renderer.PdfDocument.Save(pdfStream);
-        }
+        byte[] pdf = Render(document);
+        pdfStream.Write(pdf, 0, pdf.Length);
     }
 
     private const int MaxRepeatedRowsAndColumns = 100;
     private const int MaxListDepth = 8;
+    private const double BodySize = 10;
+    private const double NoteSize = 8;
+    private const double A4Width = 595.28;
+    private const double A4Height = 841.89;
 
-    private static Document BuildMigraDoc(TextDocument odfDoc)
+    private static byte[] Render(TextDocument odfDoc)
     {
-        var doc = new Document();
-
         // 文字分段沿用文件的字型情境（而非固定 Default），與 ODF 文字入口一致；
         // 未設定時 TextDocument.FontContext 即為 OdfFontContext.Default。
         OdfFontContext fontContext = odfDoc.FontContext;
 
-        // 依作業系統決定預設的中文字型名稱，以防止中文在導出 PDF 時因為 Arial 字型不支援而顯示為方塊字
-        // 在 Windows 平台上使用標楷體（DFKai-SB），因為它是標準 .ttf 檔，能避開 PDFsharp 無法直接解析 .ttc（如微軟正黑體）的 NullReferenceException 限制
-        string defaultChineseFont = "DFKai-SB";
+        // 依作業系統決定預設的中文字型名稱，避免中文在匯出 PDF 時因為預設字型不支援而顯示為方塊字。
+        string defaultFont = "DFKai-SB";
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            defaultChineseFont = "PingFang TC";
+            defaultFont = "PingFang TC";
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            defaultChineseFont = "Noto Sans CJK TC";
+            defaultFont = "Noto Sans CJK TC";
         }
 
-        // 套用中文字型至預設樣式
-        foreach (string name in new[] { "Normal", "Heading1", "Heading2", "Heading3", "Heading4", "Heading5", "Heading6" })
+        (double pageWidth, double pageHeight) = ReadPageSize(odfDoc);
+        double margin = 2.5 * PdfLayoutEngine.PointsPerCentimeter;
+        var fonts = new PdfFontProvider(fontContext);
+        var images = new PdfImageTable();
+        var engine = new PdfLayoutEngine(fonts, defaultFont, images, pageWidth, pageHeight, margin);
+        var context = new ExportContext(odfDoc, defaultFont, fontContext, images, engine.ContentWidth, pageHeight - (2 * margin));
+
+        var content = new PdfContent();
+        var rootSink = new ContentSink(content);
+        ConvertBlocks(odfDoc.BodyTextRoot, rootSink, context, 0);
+        EmitNotes(context.Endnotes, rootSink, context, 12);
+        engine.Layout(content);
+        return WriteDocument(odfDoc, engine, fonts, images);
+    }
+
+    private static byte[] WriteDocument(TextDocument odfDoc, PdfLayoutEngine engine, PdfFontProvider fonts, PdfImageTable images)
+    {
+        var builder = new PdfBuilder();
+        int pagesObject = builder.Reserve();
+        var fontObjects = new Dictionary<PdfFontResource, int>();
+        foreach (PdfFontResource font in fonts.All)
         {
-            if (doc.Styles[name] is Style style)
+            if (engine.Pages.Any(page => page.Fonts.Contains(font)))
             {
-                style.Font.Name = defaultChineseFont;
+                fontObjects[font] = font.Write(builder);
             }
         }
 
-        var section = doc.AddSection();
-        ApplyPageSize(odfDoc, section);
+        var imageObjects = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach ((PdfImage image, string name) in images.All)
+        {
+            if (engine.Pages.Any(page => page.ImageNames.Contains(name)))
+            {
+                imageObjects[name] = image.Write(builder);
+            }
+        }
 
-        var context = new ExportContext(odfDoc, defaultChineseFont, fontContext);
-        ConvertBlocks(odfDoc.BodyTextRoot, new SectionSink(section), context, 0);
-        return doc;
+        var pageObjects = new List<int>();
+        foreach (PdfPageBuilder page in engine.Pages)
+        {
+            int contentObject = builder.AddStream(string.Empty, Encoding.ASCII.GetBytes(page.Content), compress: true);
+            var annotations = new StringBuilder();
+            foreach ((double x1, double y1, double x2, double y2, string uri) in page.Links)
+            {
+                int annotation = builder.Add(
+                    "<< /Type /Annot /Subtype /Link /Rect [" + PdfCore.Number(x1) + " " + PdfCore.Number(y1) + " "
+                    + PdfCore.Number(x2) + " " + PdfCore.Number(y2) + "] /Border [0 0 0] /A << /S /URI /URI ("
+                    + EscapeUri(PdfLayoutEngine.BuildUri(uri)) + ") >> >>");
+                annotations.Append(PdfBuilder.Ref(annotation)).Append(' ');
+            }
+
+            var resources = new StringBuilder("<< ");
+            if (page.Fonts.Count > 0)
+            {
+                resources.Append("/Font << ");
+                foreach (PdfFontResource font in page.Fonts)
+                {
+                    resources.Append('/').Append(font.ResourceName).Append(' ').Append(PdfBuilder.Ref(fontObjects[font])).Append(' ');
+                }
+
+                resources.Append(">> ");
+            }
+
+            if (page.ImageNames.Count > 0)
+            {
+                resources.Append("/XObject << ");
+                foreach (string name in page.ImageNames)
+                {
+                    resources.Append('/').Append(name).Append(' ').Append(PdfBuilder.Ref(imageObjects[name])).Append(' ');
+                }
+
+                resources.Append(">> ");
+            }
+
+            resources.Append(">>");
+            pageObjects.Add(builder.Add(
+                "<< /Type /Page /Parent " + PdfBuilder.Ref(pagesObject) + " /MediaBox [0 0 " + PdfCore.Number(page.Width) + " "
+                + PdfCore.Number(page.Height) + "] /Resources " + resources + " /Contents " + PdfBuilder.Ref(contentObject)
+                + (annotations.Length > 0 ? " /Annots [" + annotations + "]" : string.Empty) + " >>"));
+        }
+
+        var kids = new StringBuilder();
+        foreach (int pageObject in pageObjects)
+        {
+            kids.Append(PdfBuilder.Ref(pageObject)).Append(' ');
+        }
+
+        builder.Set(pagesObject, "<< /Type /Pages /Kids [" + kids + "] /Count " + pageObjects.Count.ToString(CultureInfo.InvariantCulture) + " >>");
+        int catalog = builder.Add("<< /Type /Catalog /Pages " + PdfBuilder.Ref(pagesObject) + " >>");
+
+        var info = new StringBuilder("<< /Producer (OdfKit) /Creator (OdfKit) /CreationDate (" + PdfCore.Date(DateTime.UtcNow) + ")");
+        string? title = odfDoc.Title;
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            info.Append(" /Title ").Append(PdfCore.TextString(title!));
+        }
+
+        info.Append(" >>");
+        int infoObject = builder.Add(info.ToString());
+
+        byte[] id;
+#if NETSTANDARD2_0
+        using (var random = RandomNumberGenerator.Create())
+        {
+            id = new byte[16];
+            random.GetBytes(id);
+        }
+#else
+        id = RandomNumberGenerator.GetBytes(16);
+#endif
+        using var output = new MemoryStream();
+        builder.Write(output, catalog, infoObject, id);
+        return output.ToArray();
     }
 
-    private sealed class ExportContext(TextDocument document, string defaultFont, OdfFontContext fontContext)
+    private static string EscapeUri(string uri)
+    {
+        var sb = new StringBuilder(uri.Length);
+        foreach (char c in uri)
+        {
+            if (c == '\\' || c == '(' || c == ')')
+            {
+                sb.Append('\\');
+            }
+
+            sb.Append(c);
+        }
+
+        return sb.ToString();
+    }
+
+    private sealed class ExportContext(
+        TextDocument document,
+        string defaultFont,
+        OdfFontContext fontContext,
+        PdfImageTable images,
+        double contentWidth,
+        double contentHeight)
     {
         internal TextDocument Document { get; } = document;
 
@@ -204,12 +303,25 @@ public static class OdfPdfExporter
 
         internal OdfFontContext FontContext { get; } = fontContext;
 
-        // 頁面可用寬度（公分），表格以此平分欄寬。
-        internal double TextWidthCm { get; set; } = 16;
+        internal PdfImageTable Images { get; } = images;
+
+        internal double ContentWidth { get; } = contentWidth;
+
+        internal double ContentHeight { get; } = contentHeight;
+
+        internal List<PendingNote> PendingFootnotes { get; } = [];
+
+        internal List<PendingNote> Endnotes { get; } = [];
+
+        internal bool InNote { get; set; }
+
+        internal int NextNoteNumber { get; set; } = 1;
     }
 
-    // 頁面大小沿用 ODT 的預設頁面設定（邊界維持 MigraDoc 預設的 2.5 公分）。
-    private static void ApplyPageSize(TextDocument document, Section section)
+    private sealed record PendingNote(string Label, OdfNode Body);
+
+    // 頁面大小沿用 ODT 的預設頁面設定。
+    private static (double Width, double Height) ReadPageSize(TextDocument document)
     {
         try
         {
@@ -218,41 +330,57 @@ public static class OdfPdfExporter
             double height = setup.PageHeight;
             if (width > 5 && height > 5)
             {
-                section.PageSetup.PageWidth = Unit.FromCentimeter(width);
-                section.PageSetup.PageHeight = Unit.FromCentimeter(height);
+                return (width * PdfLayoutEngine.PointsPerCentimeter, height * PdfLayoutEngine.PointsPerCentimeter);
             }
         }
         catch (Exception ex) when (ex is InvalidOperationException or FormatException or ArgumentException)
         {
             // 讀不到頁面設定時維持預設的 A4。
         }
+
+        return (A4Width, A4Height);
     }
 
     // ---------- 區塊容器 ----------
 
-    // 區段（Section）與表格儲存格（Cell）都能新增段落；只有區段能新增表格（MigraDoc 不支援表格內再放表格）。
+    // 內容區與表格儲存格都能新增段落；只有內容區能新增表格（儲存格內的巢狀表格改以段落輸出）。
     private abstract class BlockSink
     {
-        internal abstract Paragraph AddParagraph(string? style);
+        internal abstract ParagraphBlock AddParagraph(RunStyle style);
 
-        internal abstract Table? AddTable();
+        internal abstract TableBlock? AddTable();
     }
 
-    private sealed class SectionSink(Section section) : BlockSink
+    private sealed class ContentSink(PdfContent content) : BlockSink
     {
-        internal override Paragraph AddParagraph(string? style) =>
-            style is null ? section.AddParagraph() : section.AddParagraph(string.Empty, style);
+        internal override ParagraphBlock AddParagraph(RunStyle style)
+        {
+            var paragraph = new ParagraphBlock(style);
+            content.Blocks.Add(paragraph);
+            return paragraph;
+        }
 
-        internal override Table? AddTable() => section.AddTable();
+        internal override TableBlock? AddTable()
+        {
+            var table = new TableBlock();
+            content.Blocks.Add(table);
+            return table;
+        }
     }
 
-    private sealed class CellSink(Cell cell) : BlockSink
+    private sealed class CellSink(TableCellModel cell) : BlockSink
     {
-        internal override Paragraph AddParagraph(string? style) =>
-            style is null ? cell.AddParagraph() : cell.AddParagraph(string.Empty);
+        internal override ParagraphBlock AddParagraph(RunStyle style)
+        {
+            var paragraph = new ParagraphBlock(style);
+            cell.Blocks.Add(paragraph);
+            return paragraph;
+        }
 
-        internal override Table? AddTable() => null;
+        internal override TableBlock? AddTable() => null;
     }
+
+    private static RunStyle NormalStyle() => new(null, BodySize, false, false, false, null, null);
 
     private static void ConvertBlocks(OdfNode parent, BlockSink sink, ExportContext context, int listDepth)
     {
@@ -290,17 +418,32 @@ public static class OdfPdfExporter
                 {
                     int level = int.TryParse(node.GetAttribute("outline-level", OdfNamespaces.Text), out int l) ? l : 1;
                     level = level < 1 ? 1 : (level > 6 ? 6 : level);
-                    Paragraph para = sink.AddParagraph("Heading" + level.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                    ConvertParagraphContent(node, new ParagraphInline(para), context);
+                    (double size, bool italic, double before, double after) = level switch
+                    {
+                        1 => (16.0, false, 12.0, 6.0),
+                        2 => (14.0, false, 6.0, 6.0),
+                        3 => (13.0, false, 6.0, 3.0),
+                        4 => (12.0, false, 6.0, 3.0),
+                        5 => (11.0, false, 6.0, 3.0),
+                        _ => (10.0, true, 6.0, 3.0),
+                    };
+                    ParagraphBlock para = sink.AddParagraph(new RunStyle(null, size, true, italic, false, null, null));
+                    para.SpaceBefore = before;
+                    para.SpaceAfter = after;
+                    para.KeepWithNext = true;
+                    ConvertParagraphContent(node, para, para.BaseStyle, context);
                     break;
                 }
+
             case "p":
                 {
-                    Paragraph para = sink.AddParagraph(null);
-                    ApplyParagraphAlignment(context.Document, node, para);
-                    ConvertParagraphContent(node, new ParagraphInline(para), context);
+                    RunStyle style = ApplyParagraphTextStyle(context.Document, node, NormalStyle());
+                    ParagraphBlock para = sink.AddParagraph(style);
+                    para.Align = ReadAlignment(context.Document, node);
+                    ConvertParagraphContent(node, para, style, context);
                     break;
                 }
+
             case "list":
                 ConvertList(node, sink, context, listDepth, null);
                 break;
@@ -316,30 +459,140 @@ public static class OdfPdfExporter
                 ConvertBlocks(node, sink, context, listDepth);
                 break;
         }
+
+        EmitNotes(context.PendingFootnotes, sink, context, 2);
     }
 
-    private static void ApplyParagraphAlignment(TextDocument document, OdfNode node, Paragraph paragraph)
+    // 腳註接在引用它的區塊後面，以小字輸出；章節附註累積到文件結尾。
+    private static void EmitNotes(List<PendingNote> notes, BlockSink sink, ExportContext context, double spaceBefore)
     {
-        string? styleName = node.GetAttribute("style-name", OdfNamespaces.Text);
-        if (string.IsNullOrWhiteSpace(styleName))
+        if (notes.Count == 0)
         {
             return;
         }
 
-        string? align = document.StyleEngine.GetStyleProperty(styleName!, "text-align", OdfNamespaces.Fo, "paragraph");
-        switch (align)
+        context.InNote = true;
+        try
         {
-            case "center":
-                paragraph.Format.Alignment = ParagraphAlignment.Center;
-                break;
-            case "end":
-            case "right":
-                paragraph.Format.Alignment = ParagraphAlignment.Right;
-                break;
-            case "justify":
-                paragraph.Format.Alignment = ParagraphAlignment.Justify;
-                break;
+            bool first = true;
+            foreach (PendingNote note in notes)
+            {
+                var style = new RunStyle(null, NoteSize, false, false, false, null, null);
+                ParagraphBlock para = sink.AddParagraph(style);
+                para.SpaceBefore = first ? spaceBefore : 0;
+                para.SpaceAfter = 2;
+                para.LeftIndent = 0;
+                AddSegmentedText(para, note.Label + " ", style, context);
+                foreach (OdfNode child in note.Body.Children)
+                {
+                    if (child.NodeType == OdfNodeType.Element && child.NamespaceUri == OdfNamespaces.Text
+                        && (child.LocalName == "p" || child.LocalName == "h"))
+                    {
+                        if (!ReferenceEquals(child, FirstParagraph(note.Body)))
+                        {
+                            AddSegmentedText(para, " ", style, context);
+                        }
+
+                        ConvertParagraphContent(child, para, style, context);
+                    }
+                }
+
+                first = false;
+            }
         }
+        finally
+        {
+            context.InNote = false;
+            notes.Clear();
+        }
+    }
+
+    private static OdfNode? FirstParagraph(OdfNode body)
+    {
+        foreach (OdfNode child in body.Children)
+        {
+            if (child.NodeType == OdfNodeType.Element && child.NamespaceUri == OdfNamespaces.Text
+                && (child.LocalName == "p" || child.LocalName == "h"))
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
+    private static void AddNote(OdfNode note, ParagraphBlock paragraph, RunStyle style, ExportContext context)
+    {
+        if (context.InNote)
+        {
+            return;
+        }
+
+        OdfNode? citation = null;
+        OdfNode? body = null;
+        foreach (OdfNode child in note.Children)
+        {
+            if (child.NodeType != OdfNodeType.Element || child.NamespaceUri != OdfNamespaces.Text)
+            {
+                continue;
+            }
+
+            if (child.LocalName == "note-citation")
+            {
+                citation = child;
+            }
+            else if (child.LocalName == "note-body")
+            {
+                body = child;
+            }
+        }
+
+        if (body is null)
+        {
+            return;
+        }
+
+        string label = (citation?.TextContent ?? string.Empty).Trim();
+        if (label.Length == 0)
+        {
+            label = context.NextNoteNumber.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        context.NextNoteNumber++;
+        RunStyle small = style.With(false, false, false, null, Math.Max(6, style.Size * 0.7));
+        AddSegmentedText(paragraph, label, small, context);
+        bool endnote = string.Equals(note.GetAttribute("note-class", OdfNamespaces.Text), "endnote", StringComparison.Ordinal);
+        (endnote ? context.Endnotes : context.PendingFootnotes).Add(new PendingNote(label, body));
+    }
+
+    private static PdfAlign ReadAlignment(TextDocument document, OdfNode node)
+    {
+        string? styleName = node.GetAttribute("style-name", OdfNamespaces.Text);
+        if (string.IsNullOrWhiteSpace(styleName))
+        {
+            return PdfAlign.Left;
+        }
+
+        string? align = document.StyleEngine.GetStyleProperty(styleName!, "text-align", OdfNamespaces.Fo, "paragraph");
+        return align switch
+        {
+            "center" => PdfAlign.Center,
+            "end" or "right" => PdfAlign.Right,
+            "justify" => PdfAlign.Justify,
+            _ => PdfAlign.Left,
+        };
+    }
+
+    // 段落樣式上的字元屬性（大小、粗體、斜體、顏色）作為段落預設。
+    private static RunStyle ApplyParagraphTextStyle(TextDocument document, OdfNode node, RunStyle style)
+    {
+        string? styleName = node.GetAttribute("style-name", OdfNamespaces.Text);
+        if (string.IsNullOrWhiteSpace(styleName))
+        {
+            return style;
+        }
+
+        return ApplyTextProperties(document, styleName!, style);
     }
 
     // ---------- 清單 ----------
@@ -387,16 +640,17 @@ public static class OdfPdfExporter
                 }
                 else if (content.NamespaceUri == OdfNamespaces.Text && (content.LocalName == "p" || content.LocalName == "h"))
                 {
-                    Paragraph para = sink.AddParagraph(null);
-                    double indent = 0.9 * (level + 1);
-                    para.Format.LeftIndent = Unit.FromCentimeter(indent);
-                    para.Format.FirstLineIndent = Unit.FromCentimeter(-0.6);
+                    RunStyle style = ApplyParagraphTextStyle(context.Document, content, NormalStyle());
+                    ParagraphBlock para = sink.AddParagraph(style);
+                    para.Align = ReadAlignment(context.Document, content);
+                    para.LeftIndent = 0.9 * (level + 1) * PdfLayoutEngine.PointsPerCentimeter;
+                    para.FirstLineIndent = -0.6 * PdfLayoutEngine.PointsPerCentimeter;
                     if (firstParagraph && !isHeader)
                     {
-                        para.AddText(BuildListLabel(levelStyle, ordered, counter) + " ");
+                        para.Inlines.Add(new TextInline(BuildListLabel(levelStyle, ordered, counter) + " ", style, true));
                     }
 
-                    ConvertParagraphContent(content, new ParagraphInline(para), context);
+                    ConvertParagraphContent(content, para, style, context);
                     firstParagraph = false;
                 }
                 else
@@ -429,7 +683,7 @@ public static class OdfPdfExporter
             "A" => ToLetters(number, upper: true),
             "i" => ToRoman(number).ToLowerInvariant(),
             "I" => ToRoman(number),
-            _ => number.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            _ => number.ToString(CultureInfo.InvariantCulture),
         };
         return prefix + text + suffix;
     }
@@ -441,7 +695,7 @@ public static class OdfPdfExporter
             return string.Empty;
         }
 
-        var builder = new System.Text.StringBuilder();
+        var builder = new StringBuilder();
         for (int value = number; value > 0; value = (value - 1) / 26)
         {
             builder.Insert(0, (char)((upper ? 'A' : 'a') + ((value - 1) % 26)));
@@ -454,7 +708,7 @@ public static class OdfPdfExporter
     {
         if (number < 1 || number > 3999)
         {
-            return number.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            return number.ToString(CultureInfo.InvariantCulture);
         }
 
         (int Value, string Symbol)[] map =
@@ -462,7 +716,7 @@ public static class OdfPdfExporter
             (1000, "M"), (900, "CM"), (500, "D"), (400, "CD"), (100, "C"), (90, "XC"),
             (50, "L"), (40, "XL"), (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I"),
         ];
-        var builder = new System.Text.StringBuilder();
+        var builder = new StringBuilder();
         int remaining = number;
         foreach ((int value, string symbol) in map)
         {
@@ -483,7 +737,7 @@ public static class OdfPdfExporter
             return null;
         }
 
-        string wanted = level.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        string wanted = level.ToString(CultureInfo.InvariantCulture);
         foreach (OdfNode root in new[] { document.ContentDom, document.StylesDom })
         {
             foreach (OdfNode section in root.Children)
@@ -521,15 +775,15 @@ public static class OdfPdfExporter
     // ---------- 表格 ----------
 
     /// <summary>
-    /// 轉換 <c>table:table</c>：欄寬平分頁面可用寬度，合併儲存格轉成 MigraDoc 的 <c>MergeRight</c>／<c>MergeDown</c>，
+    /// 轉換 <c>table:table</c>：欄寬平分頁面可用寬度，合併儲存格記錄欄／列跨度，
     /// 標題列重複於每頁，重複列有上限（試算表風格的尾端空列不展開）。
     /// </summary>
     private static void ConvertTable(OdfNode tableNode, BlockSink sink, ExportContext context)
     {
-        Table? table = sink.AddTable();
+        TableBlock? table = sink.AddTable();
         if (table is null)
         {
-            // 儲存格內的巢狀表格：MigraDoc 不支援，以段落輸出其儲存格內容，文字不遺失。
+            // 儲存格內的巢狀表格：以段落輸出其儲存格內容，文字不遺失。
             foreach (OdfNode row in EnumerateRows(tableNode, out _))
             {
                 foreach (OdfNode cell in row.Children)
@@ -551,14 +805,7 @@ public static class OdfPdfExporter
             return;
         }
 
-        table.Borders.Width = 0.5;
-        table.Borders.Color = Colors.Gray;
-        Unit columnWidth = Unit.FromCentimeter(Math.Max(1.0, context.TextWidthCm / columns));
-        for (int index = 0; index < columns; index++)
-        {
-            table.AddColumn(columnWidth);
-        }
-
+        table.Columns = columns;
         foreach (OdfNode rowNode in rows)
         {
             int rowRepeat = ReadRepeat(rowNode, "number-rows-repeated");
@@ -572,8 +819,8 @@ public static class OdfPdfExporter
 
             for (int copy = 0; copy < rowRepeat; copy++)
             {
-                Row row = table.AddRow();
-                row.HeadingFormat = headerRows.Contains(rowNode);
+                var row = new TableRowModel { IsHeader = headerRows.Contains(rowNode) };
+                table.Rows.Add(row);
                 int column = 0;
                 foreach (OdfNode cellNode in rowNode.Children)
                 {
@@ -592,17 +839,18 @@ public static class OdfPdfExporter
                             continue;
                         }
 
-                        Cell cell = row.Cells[column];
+                        var cell = new TableCellModel { Column = column };
                         if (int.TryParse(cellNode.GetAttribute("number-columns-spanned", OdfNamespaces.Table), out int colSpan) && colSpan > 1)
                         {
-                            cell.MergeRight = Math.Min(colSpan, columns - column) - 1;
+                            cell.ColumnSpan = Math.Min(colSpan, columns - column);
                         }
 
                         if (int.TryParse(cellNode.GetAttribute("number-rows-spanned", OdfNamespaces.Table), out int rowSpan) && rowSpan > 1)
                         {
-                            cell.MergeDown = Math.Min(rowSpan, MaxRepeatedRowsAndColumns) - 1;
+                            cell.RowSpan = Math.Min(rowSpan, MaxRepeatedRowsAndColumns);
                         }
 
+                        row.Cells.Add(cell);
                         ConvertBlocks(cellNode, new CellSink(cell), context, 0);
                     }
                 }
@@ -685,145 +933,26 @@ public static class OdfPdfExporter
 
     // ---------- 行內內容 ----------
 
-    // 段落、格式化文字與超連結在 MigraDoc 裡各自有相同的新增方法但沒有共同介面；以包裝類別統一，行內轉換只寫一份。
-    private abstract class InlineSink
-    {
-        internal abstract void AddText(string text);
-
-        internal abstract InlineSink AddFormatted();
-
-        internal abstract InlineSink AddHyperlink(string target);
-
-        internal abstract void AddTab();
-
-        internal abstract void AddLineBreak();
-
-        internal abstract void AddImage(string source, double? widthCm);
-
-        internal virtual void SetFont(string fontName)
-        {
-        }
-
-        internal virtual void ApplyStyle(bool bold, bool italic, bool underline, Color? color, double? sizePoints)
-        {
-        }
-    }
-
-    private sealed class ParagraphInline(Paragraph paragraph) : InlineSink
-    {
-        internal override void AddText(string text) => paragraph.AddText(text);
-
-        internal override InlineSink AddFormatted() => new FormattedInline(paragraph.AddFormattedText());
-
-        internal override InlineSink AddHyperlink(string target) =>
-            new HyperlinkInline(paragraph.AddHyperlink(target, HyperlinkType.Url));
-
-        internal override void AddTab() => paragraph.AddTab();
-
-        internal override void AddLineBreak() => paragraph.AddLineBreak();
-
-        internal override void AddImage(string source, double? widthCm)
-        {
-            MigraDoc.DocumentObjectModel.Shapes.Image image = paragraph.AddImage(source);
-            image.LockAspectRatio = true;
-            if (widthCm is double width)
-            {
-                image.Width = Unit.FromCentimeter(width);
-            }
-        }
-    }
-
-    private sealed class FormattedInline(FormattedText text) : InlineSink
-    {
-        internal override void AddText(string value) => text.AddText(value);
-
-        internal override InlineSink AddFormatted() => new FormattedInline(text.AddFormattedText());
-
-        internal override InlineSink AddHyperlink(string target) =>
-            new HyperlinkInline(text.AddHyperlink(target, HyperlinkType.Url));
-
-        internal override void AddTab() => text.AddTab();
-
-        internal override void AddLineBreak() => text.AddLineBreak();
-
-        internal override void AddImage(string source, double? widthCm)
-        {
-            MigraDoc.DocumentObjectModel.Shapes.Image image = text.AddImage(source);
-            image.LockAspectRatio = true;
-            if (widthCm is double width)
-            {
-                image.Width = Unit.FromCentimeter(width);
-            }
-        }
-
-        internal override void SetFont(string fontName) => text.Font.Name = fontName;
-
-        internal override void ApplyStyle(bool bold, bool italic, bool underline, Color? color, double? sizePoints)
-        {
-            if (bold)
-            {
-                text.Bold = true;
-            }
-
-            if (italic)
-            {
-                text.Italic = true;
-            }
-
-            if (underline)
-            {
-                text.Underline = Underline.Single;
-            }
-
-            if (color is Color value)
-            {
-                text.Color = value;
-            }
-
-            if (sizePoints is double size)
-            {
-                text.Size = Unit.FromPoint(size);
-            }
-        }
-    }
-
-    private sealed class HyperlinkInline(Hyperlink hyperlink) : InlineSink
-    {
-        internal override void AddText(string text) => hyperlink.AddText(text);
-
-        internal override InlineSink AddFormatted() => new FormattedInline(hyperlink.AddFormattedText());
-
-        internal override InlineSink AddHyperlink(string target) => this;
-
-        internal override void AddTab() => hyperlink.AddTab();
-
-        internal override void AddLineBreak() => hyperlink.AddText(" ");
-
-        internal override void AddImage(string source, double? widthCm)
-        {
-        }
-    }
-
-    private static void ConvertParagraphContent(OdfNode odfPara, InlineSink sink, ExportContext context)
+    private static void ConvertParagraphContent(OdfNode odfPara, ParagraphBlock paragraph, RunStyle style, ExportContext context)
     {
         bool hasChildren = false;
         foreach (OdfNode child in odfPara.Children)
         {
             hasChildren = true;
-            ProcessInline(child, sink, context);
+            ProcessInline(child, paragraph, style, context);
         }
 
         if (!hasChildren)
         {
-            AddSegmentedText(sink, odfPara.TextContent ?? string.Empty, context);
+            AddSegmentedText(paragraph, odfPara.TextContent ?? string.Empty, style, context);
         }
     }
 
-    private static void ProcessInline(OdfNode child, InlineSink parent, ExportContext context)
+    private static void ProcessInline(OdfNode child, ParagraphBlock paragraph, RunStyle style, ExportContext context)
     {
         if (child.NodeType == OdfNodeType.Text)
         {
-            AddSegmentedText(parent, child.TextContent ?? string.Empty, context);
+            AddSegmentedText(paragraph, child.TextContent ?? string.Empty, style, context);
             return;
         }
 
@@ -834,7 +963,7 @@ public static class OdfPdfExporter
 
         if (child.NamespaceUri == OdfNamespaces.Draw && child.LocalName == "frame")
         {
-            AddFrameImage(child, parent, context);
+            AddFrameImage(child, paragraph, style, context);
             return;
         }
 
@@ -847,11 +976,10 @@ public static class OdfPdfExporter
         {
             case "span":
                 {
-                    InlineSink formatted = parent.AddFormatted();
-                    ApplySpanStyle(context.Document, child, formatted);
+                    RunStyle spanStyle = ApplySpanStyle(context.Document, child, style);
                     foreach (OdfNode grandChild in child.Children)
                     {
-                        ProcessInline(grandChild, formatted, context);
+                        ProcessInline(grandChild, paragraph, spanStyle, context);
                     }
 
                     break;
@@ -860,10 +988,10 @@ public static class OdfPdfExporter
             case "a":
                 {
                     string? href = child.GetAttribute("href", OdfNamespaces.XLink);
-                    InlineSink target = IsSafeHref(href) ? parent.AddHyperlink(href!) : parent;
+                    RunStyle target = IsSafeHref(href) ? style.WithLink(href!.Trim()) : style;
                     foreach (OdfNode grandChild in child.Children)
                     {
-                        ProcessInline(grandChild, target, context);
+                        ProcessInline(grandChild, paragraph, target, context);
                     }
 
                     break;
@@ -878,16 +1006,20 @@ public static class OdfPdfExporter
                         count = Math.Min(c, 4096); // 防禦性上限：PDF 中不需超過 4096 個連續空白
                     }
 
-                    parent.AddText(new string(' ', count));
+                    paragraph.Inlines.Add(new TextInline(new string(' ', count), style, true));
                     break;
                 }
 
             case "tab":
-                parent.AddTab();
+                paragraph.Inlines.Add(new TabInline(style));
                 break;
 
             case "line-break":
-                parent.AddLineBreak();
+                paragraph.Inlines.Add(new BreakInline(style));
+                break;
+
+            case "note":
+                AddNote(child, paragraph, style, context);
                 break;
 
             case "bookmark-ref":
@@ -902,12 +1034,12 @@ public static class OdfPdfExporter
             case "word-count":
             case "character-count":
                 // 欄位以儲存的顯示文字輸出。
-                AddSegmentedText(parent, child.TextContent ?? string.Empty, context);
+                AddSegmentedText(paragraph, child.TextContent ?? string.Empty, style, context);
                 break;
         }
     }
 
-    // 只允許網頁連結、郵件、電話與頁內錨點；其他協定（例如 javascript:）只保留連結文字。
+    // 只允許網頁連結、郵件、電話與 FTP；其他協定（例如 javascript:）只保留連結文字。
     private static bool IsSafeHref(string? href)
     {
         if (string.IsNullOrWhiteSpace(href))
@@ -932,29 +1064,29 @@ public static class OdfPdfExporter
     }
 
     // 字元樣式：粗體、斜體、底線、顏色與大小；亞洲字型的粗體與斜體屬性當作後備。
-    private static void ApplySpanStyle(TextDocument document, OdfNode span, InlineSink formatted)
+    private static RunStyle ApplySpanStyle(TextDocument document, OdfNode span, RunStyle style)
     {
         string? styleName = span.GetAttribute("style-name", OdfNamespaces.Text);
-        if (string.IsNullOrWhiteSpace(styleName))
-        {
-            return;
-        }
+        return string.IsNullOrWhiteSpace(styleName) ? style : ApplyTextProperties(document, styleName!, style);
+    }
 
-        string? weight = document.StyleEngine.GetStyleProperty(styleName!, "font-weight", OdfNamespaces.Fo, "text")
-            ?? document.StyleEngine.GetStyleProperty(styleName!, "font-weight-asian", OdfNamespaces.Style, "text");
-        string? fontStyle = document.StyleEngine.GetStyleProperty(styleName!, "font-style", OdfNamespaces.Fo, "text")
-            ?? document.StyleEngine.GetStyleProperty(styleName!, "font-style-asian", OdfNamespaces.Style, "text");
-        string? underline = document.StyleEngine.GetStyleProperty(styleName!, "text-underline-style", OdfNamespaces.Style, "text");
-        string? colorText = document.StyleEngine.GetStyleProperty(styleName!, "color", OdfNamespaces.Fo, "text");
-        string? sizeText = document.StyleEngine.GetStyleProperty(styleName!, "font-size", OdfNamespaces.Fo, "text");
+    private static RunStyle ApplyTextProperties(TextDocument document, string styleName, RunStyle style)
+    {
+        string? weight = document.StyleEngine.GetStyleProperty(styleName, "font-weight", OdfNamespaces.Fo, "text")
+            ?? document.StyleEngine.GetStyleProperty(styleName, "font-weight-asian", OdfNamespaces.Style, "text");
+        string? fontStyle = document.StyleEngine.GetStyleProperty(styleName, "font-style", OdfNamespaces.Fo, "text")
+            ?? document.StyleEngine.GetStyleProperty(styleName, "font-style-asian", OdfNamespaces.Style, "text");
+        string? underline = document.StyleEngine.GetStyleProperty(styleName, "text-underline-style", OdfNamespaces.Style, "text");
+        string? colorText = document.StyleEngine.GetStyleProperty(styleName, "color", OdfNamespaces.Fo, "text");
+        string? sizeText = document.StyleEngine.GetStyleProperty(styleName, "font-size", OdfNamespaces.Fo, "text");
 
         bool bold = string.Equals(weight, "bold", StringComparison.OrdinalIgnoreCase);
         bool italic = string.Equals(fontStyle, "italic", StringComparison.OrdinalIgnoreCase);
         bool hasUnderline = !string.IsNullOrWhiteSpace(underline) && !string.Equals(underline, "none", StringComparison.OrdinalIgnoreCase);
-        formatted.ApplyStyle(bold, italic, hasUnderline, ParseHexColor(colorText), ParsePoints(sizeText));
+        return style.With(bold, italic, hasUnderline, ParseHexColor(colorText), ParsePoints(sizeText));
     }
 
-    private static Color? ParseHexColor(string? text)
+    private static PdfColor? ParseHexColor(string? text)
     {
         if (string.IsNullOrEmpty(text) || text![0] != '#' || text.Length != 7)
         {
@@ -962,7 +1094,7 @@ public static class OdfPdfExporter
         }
 
         return TryParseHex(text, out int rgb)
-            ? new Color((byte)((rgb >> 16) & 0xFF), (byte)((rgb >> 8) & 0xFF), (byte)(rgb & 0xFF))
+            ? new PdfColor(((rgb >> 16) & 0xFF) / 255.0, ((rgb >> 8) & 0xFF) / 255.0, (rgb & 0xFF) / 255.0)
             : null;
     }
 
@@ -970,18 +1102,18 @@ public static class OdfPdfExporter
     private static bool TryParseLengthNumber(string text, out double value)
     {
 #if NETSTANDARD2_0
-        return double.TryParse(text.Substring(0, text.Length - 2), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out value);
+        return double.TryParse(text.Substring(0, text.Length - 2), NumberStyles.Float, CultureInfo.InvariantCulture, out value);
 #else
-        return double.TryParse(text.AsSpan(0, text.Length - 2), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out value);
+        return double.TryParse(text.AsSpan(0, text.Length - 2), NumberStyles.Float, CultureInfo.InvariantCulture, out value);
 #endif
     }
 
     private static bool TryParseHex(string text, out int value)
     {
 #if NETSTANDARD2_0
-        return int.TryParse(text.Substring(1), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out value);
+        return int.TryParse(text.Substring(1), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out value);
 #else
-        return int.TryParse(text.AsSpan(1), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out value);
+        return int.TryParse(text.AsSpan(1), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out value);
 #endif
     }
 
@@ -997,8 +1129,8 @@ public static class OdfPdfExporter
             : null;
     }
 
-    // 圖片以 base64 內嵌給 PDFsharp；讀不到或過大時略過，不中斷整份匯出。
-    private static void AddFrameImage(OdfNode frame, InlineSink parent, ExportContext context)
+    // 圖片內嵌；讀不到、格式不支援或過大時略過，不中斷整份匯出。
+    private static void AddFrameImage(OdfNode frame, ParagraphBlock paragraph, RunStyle style, ExportContext context)
     {
         OdfNode? image = frame.Children.FirstOrDefault(
             child => child.NamespaceUri == OdfNamespaces.Draw && child.LocalName == "image");
@@ -1018,16 +1150,22 @@ public static class OdfPdfExporter
                 return;
             }
 
-            double? width = null;
-            string? widthText = frame.GetAttribute("width", OdfNamespaces.Svg);
-            if (!string.IsNullOrEmpty(widthText) && widthText!.EndsWith("cm", StringComparison.Ordinal)
-                && TryParseLengthNumber(widthText, out double parsed)
-                && parsed > 0)
+            byte[] bytes = buffer.ToArray();
+            PdfImage? decoded = PdfImage.TryLoad(bytes);
+            if (decoded is null)
             {
-                width = Math.Min(parsed, context.TextWidthCm);
+                return;
             }
 
-            parent.AddImage("base64:" + Convert.ToBase64String(buffer.ToArray()), width);
+            (PdfImage _, string name) = context.Images.Add(bytes, decoded);
+            double? width = ReadCentimeters(frame.GetAttribute("width", OdfNamespaces.Svg));
+            double? height = ReadCentimeters(frame.GetAttribute("height", OdfNamespaces.Svg));
+            double widthPoints = width is double w ? w * PdfLayoutEngine.PointsPerCentimeter : decoded.Width * 0.75;
+            double heightPoints = height is double h && width is not null
+                ? h * PdfLayoutEngine.PointsPerCentimeter
+                : widthPoints * decoded.Height / decoded.Width;
+            double scale = Math.Min(1.0, Math.Min(context.ContentWidth / widthPoints, context.ContentHeight / heightPoints));
+            paragraph.Inlines.Add(new ImageInline(name, widthPoints * scale, heightPoints * scale, style.Link));
         }
         catch (Exception ex) when (ex is IOException or KeyNotFoundException or ArgumentException or InvalidOperationException or NotSupportedException)
         {
@@ -1035,165 +1173,30 @@ public static class OdfPdfExporter
         }
     }
 
-    private static void AddSegmentedText(InlineSink sink, string text, ExportContext context)
+    private static double? ReadCentimeters(string? text)
+    {
+        if (string.IsNullOrEmpty(text) || !text!.EndsWith("cm", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        return TryParseLengthNumber(text, out double value) && value > 0 ? value : null;
+    }
+
+    private static void AddSegmentedText(ParagraphBlock paragraph, string text, RunStyle style, ExportContext context)
     {
         var segments = context.FontContext.SegmentText(text, context.DefaultFont);
         foreach (var (segText, fontName) in segments)
         {
             if (fontName == context.DefaultFont)
             {
-                sink.AddText(segText);
+                paragraph.Inlines.Add(new TextInline(segText, style, false));
             }
             else
             {
                 context.FontContext.WarnIfUnresolvable(fontName, "CNS 11643 高位字面文字 PDF 匯出");
-                InlineSink run = sink.AddFormatted();
-                run.SetFont(fontName);
-                run.AddText(segText);
+                paragraph.Inlines.Add(new TextInline(segText, style.WithFont(fontName), false));
             }
-        }
-    }
-}
-
-internal sealed class OdfPdfFontResolver : IFontResolver
-{
-    public FontResolverInfo ResolveTypeface(string familyName, bool isBold, bool isItalic)
-    {
-        string? resolved = Styles.OdfFontContext.Default.ResolveFontFallback(familyName, IsUsablePdfFont);
-        if (resolved is not null)
-        {
-            return new FontResolverInfo(resolved, isBold, isItalic);
-        }
-
-        if (OdfKit.Internal.OdfStringHelper.Contains(familyName, "Courier", StringComparison.OrdinalIgnoreCase))
-        {
-            return new FontResolverInfo("Courier New", isBold, isItalic);
-        }
-        return new FontResolverInfo("Arial", isBold, isItalic);
-    }
-
-    public byte[] GetFont(string faceName)
-    {
-        foreach (string candidate in Styles.OdfFontContext.Default.GetFontFallbackCandidates(faceName))
-        {
-            string? fontPath = Styles.OdfFontContext.Default.ResolveFontPath(candidate);
-            if (fontPath is not null && File.Exists(fontPath))
-            {
-                byte[] data = File.ReadAllBytes(fontPath);
-                if (!Styles.OdfFontContext.IsTrueTypeCollection(fontPath))
-                {
-                    return data;
-                }
-
-                byte[]? firstFace = TryExtractFirstFace(data);
-                if (firstFace is not null)
-                {
-                    return firstFace;
-                }
-
-                OdfKitDiagnostics.Warn(
-                    OdfLocalizer.GetMessage("Diag_OdfPdfExporter_TrueTypeCollectionFontFallback", candidate));
-            }
-        }
-
-        string[] fallbacks = { "Arial", "Courier New", "Liberation Sans", "DejaVu Sans" };
-        foreach (var fb in fallbacks)
-        {
-            string? fontPath = Styles.OdfFontContext.Default.ResolveFontPath(fb);
-            if (fontPath is not null && File.Exists(fontPath))
-            {
-                return File.ReadAllBytes(fontPath);
-            }
-        }
-
-        string[] standardDirs = {
-            @"C:\Windows\Fonts",
-            "/usr/share/fonts",
-            "/usr/local/share/fonts",
-            "/Library/Fonts"
-        };
-        foreach (var dir in standardDirs)
-        {
-            if (Directory.Exists(dir))
-            {
-                var files = Directory.GetFiles(dir, "*.ttf", SearchOption.AllDirectories);
-                if (files.Length > 0)
-                {
-                    return File.ReadAllBytes(files[0]);
-                }
-            }
-        }
-
-        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPdfExporter_UnableResolveFont", faceName));
-    }
-
-    private static bool IsUsablePdfFont(string familyName)
-    {
-        string? fontPath = Styles.OdfFontContext.Default.ResolveFontPath(familyName);
-        return fontPath is not null && File.Exists(fontPath);
-    }
-
-    // 將 TrueType Collection 的第一個字型面重組為獨立 TTF，供不支援 .ttc 的 PDFsharp 使用。
-    private static byte[]? TryExtractFirstFace(byte[] ttc)
-    {
-        try
-        {
-            if (ttc.Length < 16)
-            {
-                return null;
-            }
-
-            static uint U32(byte[] b, int o) => (uint)((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]);
-            static int U16(byte[] b, int o) => (b[o] << 8) | b[o + 1];
-
-            if (U32(ttc, 0) != 0x74746366u || U32(ttc, 8) == 0)
-            {
-                return null;
-            }
-
-            int faceOffset = checked((int)U32(ttc, 12));
-            int tableCount = U16(ttc, faceOffset + 4);
-            int headerSize = 12 + (16 * tableCount);
-            var records = new (uint Tag, uint Checksum, int Offset, int Length)[tableCount];
-            long total = headerSize;
-            for (int i = 0; i < tableCount; i++)
-            {
-                int r = faceOffset + 12 + (16 * i);
-                records[i] = (U32(ttc, r), U32(ttc, r + 4), checked((int)U32(ttc, r + 8)), checked((int)U32(ttc, r + 12)));
-                if ((long)records[i].Offset + records[i].Length > ttc.Length)
-                {
-                    return null;
-                }
-
-                total += (records[i].Length + 3L) & ~3L;
-            }
-
-            if (total > int.MaxValue)
-            {
-                return null;
-            }
-
-            var output = new byte[total];
-            Array.Copy(ttc, faceOffset, output, 0, 12);
-            int position = headerSize;
-            for (int i = 0; i < tableCount; i++)
-            {
-                int r = 12 + (16 * i);
-                Array.Copy(ttc, faceOffset + r, output, r, 8);
-                output[r + 8] = (byte)(position >> 24);
-                output[r + 9] = (byte)(position >> 16);
-                output[r + 10] = (byte)(position >> 8);
-                output[r + 11] = (byte)position;
-                Array.Copy(ttc, faceOffset + r + 12, output, r + 12, 4);
-                Array.Copy(ttc, records[i].Offset, output, position, records[i].Length);
-                position += (records[i].Length + 3) & ~3;
-            }
-
-            return output;
-        }
-        catch (Exception ex) when (ex is ArgumentException or OverflowException or IndexOutOfRangeException)
-        {
-            return null;
         }
     }
 }

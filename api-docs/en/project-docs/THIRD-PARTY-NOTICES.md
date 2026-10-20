@@ -2,7 +2,7 @@
 title: Third-Party Notices
 _lang: en
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4
+translation_source_sha256: 64c45bc0b0973108485e251b9faa3a1c30090ea4bbd03812d6a55f68015db84f
 ---
 
 # Third-Party Notices
@@ -32,7 +32,6 @@ and runtime dependencies retain their respective licenses.
 | SkiaSharp / HarfBuzzSharp | Cross-platform drawing and text shaping in OdfKit.Extensions.Imaging | MIT |
 | ScottPlot | In-memory charts and fallback visualization | MIT |
 | ClosedXML / DocumentFormat.OpenXml | OOXML integration, import, and export | MIT / MIT |
-| PDFsharp-MigraDoc | PDF processing, layout, and drawing | MIT |
 | dotNetRdf.Core | RDF graph and SPARQL bridge | MIT |
 | Microsoft.CSharp | Runtime binding for `dynamic` in the netstandard2.0 OOXML target | MIT |
 | OASIS OpenDocument Relax-NG Schemas | ODF 1.1 / 1.2 / 1.3 / 1.4 validation and code generation | OASIS Copyright |

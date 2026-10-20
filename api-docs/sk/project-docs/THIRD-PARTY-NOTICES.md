@@ -2,7 +2,7 @@
 title: Oznámenia tretích strán
 _lang: sk
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4
+translation_source_sha256: 64c45bc0b0973108485e251b9faa3a1c30090ea4bbd03812d6a55f68015db84f
 ---
 
 # Oznámenia tretích strán
@@ -29,7 +29,6 @@ OdfKit používa CC0 1.0 Universal. Nasledujúce závislosti si zachovávajú sv
 | SkiaSharp / HarfBuzzSharp | Kreslenie a tvarovanie textu | MIT |
 | ScottPlot | Grafy a náhradná vizualizácia | MIT |
 | ClosedXML / DocumentFormat.OpenXml | Integrácia, import a export OOXML | MIT / MIT |
-| PDFsharp-MigraDoc | Spracovanie, rozloženie a kreslenie PDF | MIT |
 | dotNetRdf.Core | Most grafov RDF a SPARQL | MIT |
 | Microsoft.CSharp | Runtime väzba pre `dynamic` | MIT |
 | OASIS OpenDocument Relax-NG Schemas | Validácia ODF 1.1–1.4 a generovanie kódu | OASIS Copyright |

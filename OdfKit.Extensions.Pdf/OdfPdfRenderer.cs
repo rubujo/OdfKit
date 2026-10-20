@@ -39,7 +39,7 @@ public sealed class OdfPdfRenderer : IOdfRenderer
     /// </summary>
     /// <param name="document">The source or target object. / 要進行轉換的 ODF 文件</param>
     /// <param name="pdfStream">The source or target object. / 要寫入 PDF 的目標資料流</param>
-    /// <param name="certificate">The value to use. / 用於簽章 PDF 的憑證；此 PDFsharp 實作目前不支援 PDF 簽章</param>
+    /// <param name="certificate">The value to use. / 用於簽章 PDF 的憑證；提供時以增量更新附加 CMS detached 簽章</param>
     public void ExportToPdf(OdfDocument document, Stream pdfStream, X509Certificate2? certificate = null)
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));

@@ -100,5 +100,6 @@
 | [來源與授權索引](provenance/README.md) | 模組來源、授權與依據 |
 | [Clean-room 來源索引](provenance/clean-room-source-index.md) | 公式評估、schema pattern、JSON Collaboration 與受控轉換保真度的規格來源、不可複製來源與 golden 測試契約 |
 | [WebFont managed Clean-room 來源](provenance/webfont-managed-clean-room.md) | 字型 parser／writer 的允許規格、禁止實作來源與黑箱 oracle 隔離 |
+| [PDF managed Clean-room 來源](provenance/pdf-managed-clean-room.md) | PDF 讀寫、加密、字型子集與影像解碼的允許規格、禁止實作來源與驗證方式 |
 | [智慧財產與合規說明](ip-compliance.md) | 複合授權、AI 產製、clean-room、DCO、採用者盡職調查清單（非正式法律意見） |
 | [可維護性與複雜度債](maintainability.md) | Partial 準則、在地化拆分、產生碼、歷史腳本與後續債 |
