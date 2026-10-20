@@ -2,7 +2,7 @@
 
 本檔案依 [Keep a Changelog](https://keepachangelog.com/) 慣例，記錄 OdfKit 對外可見的重大里程碑。
 
-## 未發布
+## 0.0.1 - 2026-10-20
 
 - **PDF 匯出改為完全託管，移除 PDFsharp-MigraDoc 相依**：PDFsharp-MigraDoc 6.5.0 起改為 AGPL-3.0-only 並在執行時要求有效授權
   （沒有授權時 `PdfSharpLicenseException`），與本專案 CC0-1.0 不相容；6.2.4 是最後一個 MIT 版本且不再有新修正。
@@ -25,8 +25,6 @@
   TDF ODF Validator 也接受；改以警告回報，不再使這些文件被判定無效。
 - 更新 AngleSharp 1.8.5、Markdig 1.4.2、FsCheck.Xunit.v3 3.5.0；互通 CI 改用 LibreOffice 26.8.1 與 Apache OpenOffice 4.1.17；
   WebFont 規範基準更新為 Unicode 18.0.0 與 IFT 2026-10-13 Candidate Recommendation Draft。
-
-## 0.0.1 - 2026-10-02
 
 再以 LibreOffice 26.2.4.2 當裁判，對 OdfKit 的匯出、轉換與匯入做一輪驗證（真實 LibreOffice 產生的 ODT、ODS、ODP 與 RTF 交給 OdfKit，輸出再交回 LibreOffice 開啟，OOXML 輸出另以 Open XML SDK 驗證，字型以真實系統字型加 Chrome 渲染比對）：
 
