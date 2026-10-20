@@ -60,6 +60,16 @@ public sealed class PdfCffFontTests
     }
 
     [Fact]
+    public void GlyphUsingSeacMakesSubsetFallBackToWholeFont()
+    {
+        CffFont font = CffFont.TryParse(BuildFont(cidKeyed: false, seac: true))!;
+
+        // seac 以標準編碼組合其他字形，元件不在保留集合內，所以不能子集化；呼叫端須整份內嵌。
+        Assert.Null(font.BuildSubset([1]));
+        Assert.NotNull(font.BuildSubset([2]));
+    }
+
+    [Fact]
     public void SubsetOfGarbageOrCff2InputIsRejectedWithoutThrowing()
     {
         Assert.Null(CffFont.TryParse([]));
@@ -68,12 +78,12 @@ public sealed class PdfCffFontTests
     }
 
     // 三個字形：0 為 .notdef；1 呼叫區域子程式 0；2 呼叫全域子程式 1。偏移運算元一律用 5 位元組。
-    private static byte[] BuildFont(bool cidKeyed)
+    private static byte[] BuildFont(bool cidKeyed, bool seac = false)
     {
         byte[] charStrings = Index(
             [
                 [14],
-                [139, 139, 21, 32, 10, 14],
+                seac ? [139, 139, 139, 139, 14] : [139, 139, 21, 32, 10, 14],
                 [139, 139, 21, 33, 29, 14],
             ]);
         byte[] localSubrs = Index([Subr, Subr]);
