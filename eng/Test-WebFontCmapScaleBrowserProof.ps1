@@ -90,7 +90,28 @@ if (Test-Path -LiteralPath $playwright) {
     if ($LASTEXITCODE -ne 0) { throw "無法安裝 Playwright 瀏覽器。" }
 }
 
-dotnet run --project $project -c Release --no-build -- $destinationPath $fontPath
-if ($LASTEXITCODE -ne 0) { throw "cmap 規模瀏覽器證明失敗。" }
+try {
+    if ($IsWindows) {
+        $browserRoot = if ([string]::IsNullOrWhiteSpace($env:PLAYWRIGHT_BROWSERS_PATH)) {
+            Join-Path $env:LOCALAPPDATA 'ms-playwright'
+        }
+        else {
+            [IO.Path]::GetFullPath((Join-Path $repoRoot $env:PLAYWRIGHT_BROWSERS_PATH))
+        }
+        & (Join-Path $PSScriptRoot 'Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1') `
+            -BrowserRoot $browserRoot `
+            -RemoveProxyAssets | Out-Null
+    }
+
+    dotnet run --project $project -c Release --no-build -- $destinationPath $fontPath
+    if ($LASTEXITCODE -ne 0) { throw "cmap 規模瀏覽器證明失敗。" }
+}
+finally {
+    if ($IsWindows -and $null -ne (Get-Variable browserRoot -ErrorAction SilentlyContinue)) {
+        & (Join-Path $PSScriptRoot 'Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1') `
+            -BrowserRoot $browserRoot `
+            -RemoveProxyAssets | Out-Null
+    }
+}
 
 Write-Host "PASS：cmap format 4 規模路徑已於 Chromium／Firefox／WebKit 取得實機證據。"

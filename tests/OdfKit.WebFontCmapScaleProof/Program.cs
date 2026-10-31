@@ -1,4 +1,4 @@
-﻿// 驗證 cmap format 4 規模路徑的實機證據：
+// 驗證 cmap format 4 規模路徑的實機證據：
 //   dense — 單片子集超過 8,188 個 BMP 字元（修正前必定以 cmap4-size 失敗）。
 //   sparse — 合併後 segment 數超過 16-bit length 上限，format 4 依規格省略，
 //            僅保留 (3,10)/format 12。
@@ -166,8 +166,12 @@ Console.WriteLine($"本機資產服務啟動：{origin}");
 
 var browserEvidence = new List<object>();
 int exitCode = 0;
+string[] browsersToTest = Environment.GetEnvironmentVariable("ODFKIT_PLAYWRIGHT_BROWSERS")?
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    ?? ["chromium", "firefox", "webkit"];
+
 using IPlaywright playwright = await Playwright.CreateAsync().ConfigureAwait(false);
-foreach (string browserName in new[] { "chromium", "firefox", "webkit" })
+foreach (string browserName in browsersToTest)
 {
     IBrowserType browserType = browserName switch
     {
@@ -176,8 +180,29 @@ foreach (string browserName in new[] { "chromium", "firefox", "webkit" })
         _ => playwright.Webkit
     };
 
+    var launchOptions = new BrowserTypeLaunchOptions { Headless = true };
+    if (browserName == "chromium")
+    {
+        string? customChromium = Environment.GetEnvironmentVariable("ODFKIT_PLAYWRIGHT_CHROMIUM_EXECUTABLE");
+        if (!string.IsNullOrWhiteSpace(customChromium) && File.Exists(customChromium))
+        {
+            launchOptions.ExecutablePath = customChromium;
+        }
+        else if (File.Exists(@"C:\Program Files\Google\Chrome\Application\chrome.exe"))
+        {
+            launchOptions.ExecutablePath = @"C:\Program Files\Google\Chrome\Application\chrome.exe";
+        }
+    }
+    else if (browserName == "firefox")
+    {
+        launchOptions.FirefoxUserPrefs = new Dictionary<string, object>
+        {
+            ["browser.privateWindowSeparation.enabled"] = false
+        };
+    }
+
     await using IBrowser browser = await browserType
-        .LaunchAsync(new BrowserTypeLaunchOptions { Headless = true })
+        .LaunchAsync(launchOptions)
         .ConfigureAwait(false);
     IBrowserContext context = await browser
         .NewContextAsync(new BrowserNewContextOptions
@@ -192,10 +217,15 @@ foreach (string browserName in new[] { "chromium", "firefox", "webkit" })
     {
         if (message.Type == "error")
         {
+            Console.WriteLine($"[{browserName} console error] {message.Text}");
             consoleErrors.Add(message.Text);
         }
     };
-    page.PageError += (_, error) => consoleErrors.Add(error);
+    page.PageError += (_, error) =>
+    {
+        Console.WriteLine($"[{browserName} page error] {error}");
+        consoleErrors.Add(error);
+    };
 
     foreach (CaseResult result in results)
     {
@@ -265,7 +295,7 @@ foreach (string browserName in new[] { "chromium", "firefox", "webkit" })
             report.FaceAccepted,
             report.SampledGlyphs,
             report.RenderedGlyphs,
-            consoleErrors,
+            consoleErrors = consoleErrors.ToArray(),
             screenshot = Path.GetFileName(screenshotPath)
         });
         consoleErrors.Clear();
@@ -326,14 +356,32 @@ static async Task ServeAsync(
     while (!cancellationToken.IsCancellationRequested)
     {
         HttpListenerContext context = await listener.GetContextAsync().ConfigureAwait(false);
+        _ = ProcessRequestAsync(context, results, cancellationToken);
+    }
+}
+
+static async Task ProcessRequestAsync(
+    HttpListenerContext context,
+    IReadOnlyList<CaseResult> results,
+    CancellationToken cancellationToken)
+{
+    try
+    {
         string path = context.Request.Url!.AbsolutePath.Trim('/');
+        if (path == "favicon.ico")
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.NoContent;
+            context.Response.Close();
+            return;
+        }
+
         CaseResult? match = results.FirstOrDefault(
             result => path == $"{result.Name}.html" || path == $"{result.Name}.woff2");
         if (match is null)
         {
             context.Response.StatusCode = 404;
             context.Response.Close();
-            continue;
+            return;
         }
 
         byte[] payload;
@@ -357,6 +405,11 @@ static async Task ServeAsync(
         await context.Response.OutputStream.WriteAsync(payload, cancellationToken).ConfigureAwait(false);
         context.Response.Close();
     }
+    catch (Exception ex)
+    {
+        System.Diagnostics.Debug.WriteLine(ex);
+        try { context.Response.Close(); } catch { }
+    }
 }
 
 // 取樣的字元同時用於 canvas 逐字描繪檢查；取頭、中、尾以涵蓋 cmap 各段。
@@ -377,6 +430,7 @@ static string CreateHtml(CaseResult result)
 <html lang="zh-TW">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="data:,">
 <title>OdfKit cmap scale proof — {{result.Name}}</title>
 <style>
 @font-face {
