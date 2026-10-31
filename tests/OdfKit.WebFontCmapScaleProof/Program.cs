@@ -188,10 +188,6 @@ foreach (string browserName in browsersToTest)
         {
             launchOptions.ExecutablePath = customChromium;
         }
-        else if (File.Exists(@"C:\Program Files\Google\Chrome\Application\chrome.exe"))
-        {
-            launchOptions.ExecutablePath = @"C:\Program Files\Google\Chrome\Application\chrome.exe";
-        }
     }
     else if (browserName == "firefox")
     {

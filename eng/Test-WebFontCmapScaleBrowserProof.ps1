@@ -99,8 +99,7 @@ try {
             [IO.Path]::GetFullPath((Join-Path $repoRoot $env:PLAYWRIGHT_BROWSERS_PATH))
         }
         & (Join-Path $PSScriptRoot 'Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1') `
-            -BrowserRoot $browserRoot `
-            -RemoveProxyAssets | Out-Null
+            -BrowserRoot $browserRoot | Out-Null
     }
 
     dotnet run --project $project -c Release --no-build -- $destinationPath $fontPath
@@ -109,8 +108,7 @@ try {
 finally {
     if ($IsWindows -and $null -ne (Get-Variable browserRoot -ErrorAction SilentlyContinue)) {
         & (Join-Path $PSScriptRoot 'Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1') `
-            -BrowserRoot $browserRoot `
-            -RemoveProxyAssets | Out-Null
+            -BrowserRoot $browserRoot | Out-Null
     }
 }
 
