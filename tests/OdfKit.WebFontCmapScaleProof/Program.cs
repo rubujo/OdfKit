@@ -408,7 +408,14 @@ static async Task ProcessRequestAsync(
     catch (Exception ex)
     {
         System.Diagnostics.Debug.WriteLine(ex);
-        try { context.Response.Close(); } catch { }
+        try
+        {
+            context.Response.Close();
+        }
+        catch (Exception closeEx)
+        {
+            System.Diagnostics.Debug.WriteLine(closeEx);
+        }
     }
 }
 
