@@ -52,7 +52,7 @@ internal static class FormulaDocumentEvaluationEngine
         {
             Preflight(originalContext, evaluator, options, budget, diagnostics, null);
             var stagedRoot = contentRoot.CloneNode(deep: true);
-            EvaluationStatistics statistics = EvaluateCore(
+            var (statistics, stagedContext) = EvaluateCore(
                 stagedRoot,
                 evaluator,
                 externalLinks,
@@ -63,13 +63,7 @@ internal static class FormulaDocumentEvaluationEngine
             cancellationToken.ThrowIfCancellationRequested();
             budget.Checkpoint();
 
-            var stagedContext = new OdfDomEvaluationContext(
-                stagedRoot,
-                evaluator,
-                externalLinks,
-                volatileSession,
-                budget,
-                options.ExternalReferencePolicy);
+
             int written = CommitFormulaResults(originalContext, stagedContext, null);
             return CreateReport(
                 originalContext.CellFormulas.Count,
@@ -394,7 +388,7 @@ internal static class FormulaDocumentEvaluationEngine
         }
     }
 
-    private static EvaluationStatistics EvaluateCore(
+    private static (EvaluationStatistics Statistics, OdfDomEvaluationContext StagedContext) EvaluateCore(
         OdfNode contentRoot,
         DefaultFormulaEvaluator evaluator,
         OdfExternalLinkManager? externalLinks,
@@ -422,13 +416,14 @@ internal static class FormulaDocumentEvaluationEngine
                 evaluator);
         }
 
-        return EvaluateDirtyCore(
+        EvaluationStatistics statistics = EvaluateDirtyCore(
             context,
             evaluator,
             options,
             budget,
             graph,
             writeDom: true);
+        return (statistics, context);
     }
 
     private static EvaluationStatistics EvaluateDirtyCore(

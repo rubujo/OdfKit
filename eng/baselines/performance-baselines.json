@@ -48,12 +48,12 @@
       "note": "Updated by Benchmark-Regression.ps1 on 2026-08-01"
     },
     "FormulaEvaluationBenchmarks.FullRecalculation10000": {
-      "meanNanoseconds": 223900000,
+      "meanNanoseconds": 332510000,
       "toleranceRatio": 0.4,
-      "allocatedBytes": 103630766,
+      "allocatedBytes": 130484797,
       "allocationToleranceRatio": 0.15,
       "unit": "ms",
-      "note": "10000 independent formulas, median of three Medium in-process runs, Release, 2026-07-28"
+      "note": "Updated by Benchmark-Regression.ps1 on 2026-10-31"
     },
     "FormulaEvaluationBenchmarks.IncrementalOnePercentRecalculation10000": {
       "meanNanoseconds": 2058000,
