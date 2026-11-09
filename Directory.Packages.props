@@ -58,6 +58,6 @@
     <PackageVersion Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
     <PackageVersion Include="System.Threading.Channels" Version="10.0.15" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.1" />
-    <PackageVersion Include="xunit.v3.mtp-off" Version="4.0.2" />
+    <PackageVersion Include="xunit.v3.mtp-off" Version="4.0.3" />
   </ItemGroup>
 </Project>
