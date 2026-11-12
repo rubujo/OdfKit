@@ -18,6 +18,15 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 10
+    # Microsoft 與 System 套件不自動追蹤 semver-major 大版本更新；
+    # patch 與 minor 維持每週自動更新，重大執行時期升級需由架構複查後手動評估。
+    ignore:
+      - dependency-name: "Microsoft.*"
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: "System.*"
+        update-types:
+          - "version-update:semver-major"
     # 使用 Dependabot 預設的 dependencies 與 nuget labels；預設 labels 缺少時
     # GitHub 會自動建立，避免自訂 labels 不存在時被忽略並產生 PR 警告。
     groups:
