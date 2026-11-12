@@ -1,9 +1,9 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
 驗證 WebFont 規範基準、相依政策與全專案 GitHub Actions 供應鏈政策。
 .PARAMETER Online
-向 NuGet 與 GitHub 官方 API 查詢最新穩定版本；連線失敗時採 fail closed。
+向 NuGet 與 GitHub 官方 API 查詢核准主版內最新穩定版本；連線失敗時採 fail closed。
 #>
 [CmdletBinding()]
 param(
@@ -17,7 +17,7 @@ $dependencyPolicyPath = Join-Path $PSScriptRoot "webfont-dependency-policy.json"
 $policy = Get-Content -LiteralPath $policyPath -Raw | ConvertFrom-Json -Depth 20
 $dependencyPolicy = Get-Content -LiteralPath $dependencyPolicyPath -Raw | ConvertFrom-Json -Depth 20
 
-if ($policy.schemaVersion -ne 1) {
+if ($policy.schemaVersion -ne 1 -and $policy.schemaVersion -ne 2) {
     throw "不支援的 WebFont 規範與相依政策版本。"
 }
 $reviewedAt = [DateTime]::ParseExact(
@@ -57,14 +57,19 @@ if ([string]$standardsById.OpenType.version -ne "1.9.1" `
 }
 
 $trackedPackages = @{}
-foreach ($package in $policy.latestStablePackages) {
+$approvedMajors = @{}
+$packagesList = if ($policy.approvedMajorPackages) { $policy.approvedMajorPackages } else { $policy.latestStablePackages }
+foreach ($package in $packagesList) {
     $id = [string]$package.id
     $version = [string]$package.version
+    $approvedMajor = if ($null -ne $package.approvedMajor) { [int]$package.approvedMajor } else { ([version]$version).Major }
     if ([string]::IsNullOrWhiteSpace($id) -or $trackedPackages.ContainsKey($id) `
-        -or $version -notmatch '^\d+(?:\.\d+){2,3}$') {
-        throw "WebFont 最新穩定套件政策含無效項目。"
+        -or $version -notmatch '^\d+(?:\.\d+){2,3}$' `
+        -or $approvedMajor -lt 0 -or ([version]$version).Major -ne $approvedMajor) {
+        throw "WebFont 核准主版套件政策含無效項目。"
     }
     $trackedPackages[$id] = $version
+    $approvedMajors[$id] = $approvedMajor
 }
 
 $projectFiles = @(
@@ -165,18 +170,20 @@ if ($Online) {
         $id = $package.Key.ToLowerInvariant()
         $indexUri = "https://api.nuget.org/v3-flatcontainer/$id/index.json"
         $response = Invoke-RestMethod -Uri $indexUri -MaximumRetryCount 3 -RetryIntervalSec 2 -TimeoutSec 60
+        $approvedMajor = $approvedMajors[$package.Key]
         $stableVersions = @(
             $response.versions |
                 Where-Object { [string]$_ -match '^\d+(?:\.\d+){2,3}$' } |
                 ForEach-Object { [version]$_ } |
+                Where-Object { $_.Major -eq $approvedMajor } |
                 Sort-Object -Descending
         )
         if ($stableVersions.Count -eq 0) {
-            throw "NuGet 官方資料找不到穩定版本：$($package.Key)"
+            throw "NuGet 官方資料找不到核准主版 $approvedMajor 的穩定版本：$($package.Key)"
         }
         $latestStable = $stableVersions[0].ToString()
         if ($latestStable -ne $package.Value) {
-            throw "WebFont NuGet 相依不是最新穩定版：$($package.Key) $($package.Value) → $latestStable"
+            throw "WebFont NuGet 相依不是核准主版 $approvedMajor 的最新穩定版：$($package.Key) $($package.Value) → $latestStable"
         }
     }
 
