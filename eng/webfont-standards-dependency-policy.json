@@ -49,7 +49,7 @@
     },
     {
       "id": "Microsoft.Extensions.Hosting.WindowsServices",
-      "version": "10.0.14",
+      "version": "10.0.15",
       "approvedMajor": 10
     },
     {
@@ -64,12 +64,12 @@
     },
     {
       "id": "System.Text.Encoding.CodePages",
-      "version": "10.0.14",
+      "version": "10.0.15",
       "approvedMajor": 10
     },
     {
       "id": "System.Text.Json",
-      "version": "10.0.14",
+      "version": "10.0.15",
       "approvedMajor": 10
     }
   ],
