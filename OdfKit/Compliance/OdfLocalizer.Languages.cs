@@ -35,7 +35,7 @@ public static partial class OdfLocalizer
     {
         ["RequireIso26300Odf10Compatibility"] = "Correct the document structure to remain compatible with ISO/IEC 26300:2006 (ODF 1.0) baseline.",
         ["RequireIso26300Odf12Compatibility"] = "Correct the document structure to remain compatible with ISO/IEC 26300:2015 (ODF 1.2) baseline.",
-        ["RequireIso26300Odf13Compatibility"] = "Correct the document structure to remain compatible with ISO/IEC 26300:2025 (ODF 1.3) baseline.",
+        ["RequireIso26300Odf13Compatibility"] = "Correct the document structure to remain compatible with ISO/IEC 26300-3 (ODF 1.3) baseline.",
         ["RequireDeutschlandStackCompatibility"] = "Correct document content and extensions to comply with Germany's Deutschland-Stack compatibility standard.",
         ["RequireGovernmentToolCompatibility"] = "Correct document content to ensure compatibility with Republic of China (Taiwan) government ODF application tools.",
         ["RequireTraditionalChineseMetadataSupport"] = "Correct Traditional Chinese metadata, language tags, and font configurations.",
@@ -77,7 +77,7 @@ public static partial class OdfLocalizer
     {
         ["RequireIso26300Odf10Compatibility"] = "修正文件結構，使其與 ISO/IEC 26300:2006 (ODF 1.0) 基準相容。",
         ["RequireIso26300Odf12Compatibility"] = "修正文件結構，使其與 ISO/IEC 26300:2015 (ODF 1.2) 基準相容。",
-        ["RequireIso26300Odf13Compatibility"] = "修正文件結構，使其與 ISO/IEC 26300:2025 (ODF 1.3) 基準相容。",
+        ["RequireIso26300Odf13Compatibility"] = "修正文件結構，使其與 ISO/IEC 26300-3 (ODF 1.3) 基準相容。",
         ["RequireDeutschlandStackCompatibility"] = "修正文件內容與擴充，以符合德國 Deutschland-Stack 辦公軟體相容性規範。",
         ["RequireGovernmentToolCompatibility"] = "修正文件內容，以符合中華民國政府 ODF 文件應用工具相容性規範。",
         ["RequireTraditionalChineseMetadataSupport"] = "修正 Traditional Chinese 相關之中介資料、語系標記與字型名稱設定。",

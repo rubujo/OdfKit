@@ -24,7 +24,7 @@
 | `OASIS_ODF_1_4_Extended` | `https://docs.oasis-open.org/office/OpenDocument/v1.4/os/` | `2025-10-06` | `Normative` | `VerifiedOfficial` | `1.4` | 官方 OASIS ODF 1.4 擴充標準；OASIS Standard 文件日期為 2025-10-06，見 [odf14-gap-audit.md](odf14-gap-audit.md)。 |
 | `ISO_IEC_26300_2006` | `https://www.iso.org/standard/43485.html` | `2006-11-30` | `Normative` | `VerifiedOfficial` | `1.0` | ISO/IEC 26300:2006 標準（對應 ODF 1.0）。 |
 | `ISO_IEC_26300_2015` | `https://www.iso.org/standard/66363.html` | `2015` | `Normative` | `VerifiedOfficial` | `1.2` | ISO/IEC 26300:2015 標準（對應 ODF 1.2 基準）。 |
-| `ISO_IEC_26300_2025` | `https://www.iso.org/standard/81404.html` | `2025` | `Normative` | `VerifiedOfficial` | `1.3` | ISO/IEC 26300:2025 標準（對應 ODF 1.3 基準）。 |
+| `ISO_IEC_26300_2025` | `https://www.iso.org/standard/88137.html` | `null` | `Draft` | `NeedsActiveSource` | `1.3` | ISO/IEC 26300-3（ODF 1.3）第 2 版，ISO 頁面顯示狀態為 International Standard under publication [60.00]，預計 2026-12 發布，尚未正式發布；原引用的 `standard/81404` 實為塗料標準 ISO 17463:2022，連結錯誤。profile 識別碼為公開 API，暫維持不變。 |
 | `EU_InteroperableEurope` | `https://eur-lex.europa.eu/eli/reg/2024/903/oj` | `2024-03-13` | `Compatibility` | `OfficialButIndirect` | `all-known` | 歐盟公共部門互通性規範映射；來源為一般互通性法規，不是 ODF 專屬 profile。 |
 | `EU_OfficeDocumentExchange` | `https://eur-lex.europa.eu/eli/reg/2024/903/oj` | `2024-03-13` | `Compatibility` | `OfficialButIndirect` | `all-known` | 歐盟可編輯辦公室文件交換相容性規範。 |
 | `ROC_Taiwan_ODF_CNS15251` | `https://www.cnsonline.com.tw/?node=detail&generalno=15251-1&classno=X5018` | `2019-09-05` | `Normative` | `VerifiedOfficial` | `1.2` | 中華民國（臺灣）CNS 15251 ODF 1.2 國家標準；主來源為第 1 部綱要，並包含 [第 2 部 OpenFormula](https://www.cnsonline.com.tw/?node=detail&generalno=15251-2&classno=X5018) 與[第 3 部套件](https://www.cnsonline.com.tw/?node=detail&generalno=15251-3&classno=X5018)。三部分皆於 2019-09-05 修訂、2025-03-10 確認；原 CNS 15251 已廢止。 |
@@ -78,7 +78,7 @@
   `BrGovernmentOdfEPing`、`ItGovernmentOdfCad`、`DkGovernmentOdf`、`MyGovernmentOdf`、
   `KrGovernmentOdf`、`ZaGovernmentOdf` 逐一重新查證官方入口頁，均未找到可直接驗證、
   現行有效的 ODF 版本條文，維持既有 `Draft`／`NeedsActiveSource` 狀態。
-- **重新確認為現行有效**：`OASIS_ODF_1_4_*`、`ISO_IEC_26300_2025`、`EU_*`、
+- **重新確認為現行有效**：`OASIS_ODF_1_4_*`、`EU_*`、
   `ROC_Taiwan_ODF_CNS15251`（2025-03-10 五年重新確認）、`ROC_Taiwan_GovernmentODFTools`、
   `DE_Government_ODF`（直接讀取官方 PDF 原文確認列出 ODF）、`US_NARA_ODF`（頁面審查日期
   2026-03-11）、`PT_Government_ODF_RNID`（直接讀取官方公報原文確認 TABELA II 列
@@ -100,3 +100,7 @@
   發現：官方頁面摘要無法確認是否列出 ODF，需下載完整 PDF 逐條核對——這代表每個候選
   國家都需要類似本文件其他項目的一手來源查證工作量，維基百科條目本身不足以構成
   `VerifiedOfficial` 或甚至 `Draft` 來源。在個別完成官方來源查證前，不新增這些國家。
+
+## 2026-11-14 ISO 來源更正
+
+- `ISO_IEC_26300_2025`：以瀏覽器逐頁核對，`https://www.iso.org/standard/81404.html` 是 ISO 17463:2022（塗料），並非 ODF。ISO 的 ODF 1.3 版本為 ISO/IEC 26300-3 第 2 版（`standard/88137`），仍在出版程序，故降為 `Draft`／`NeedsActiveSource`，來源日期改為空值；正式發布後再確認並升級。

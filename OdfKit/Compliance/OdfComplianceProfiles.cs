@@ -277,8 +277,8 @@ public static class OdfComplianceProfiles
         null);
 
     /// <summary>
-    /// Gets the ISO/IEC 26300:2025 compliance profile (corresponding to the ODF 1.3 baseline).
-    /// 取得 ISO/IEC 26300:2025 一致性規範（對應於 ODF 1.3 基準）。
+    /// Gets the ISO/IEC 26300-3 compliance profile (ODF 1.3 baseline). The edition is still under publication, so the source is unverified.
+    /// 取得 ISO/IEC 26300-3 一致性規範（對應於 ODF 1.3 基準）。該版本尚在出版程序中，來源尚待確認。
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage(
         "Naming",
@@ -288,14 +288,14 @@ public static class OdfComplianceProfiles
         "ISO_IEC_26300_2025",
         "International",
         "ISO/IEC JTC 1",
-        new Uri("https://www.iso.org/standard/81404.html"),
-        "2025",
-        OdfPolicyAuthorityLevel.Normative,
-        OdfProfileVerificationStatus.VerifiedOfficial,
+        new Uri("https://www.iso.org/standard/88137.html"),
+        null,
+        OdfPolicyAuthorityLevel.Draft,
+        OdfProfileVerificationStatus.NeedsActiveSource,
         OdfVersionRange.Exact(OdfVersion.Odf13),
         [.. PackagedExtensions, .. FlatExtensions],
         OpenDocumentMimeTypes,
-        [.. StandardRules, Rule("RequireIso26300Odf13Compatibility", "Documents must remain compatible with the published ISO/IEC 26300:2025 baseline.", OdfIssueSeverity.Error)],
+        [.. StandardRules, Rule("RequireIso26300Odf13Compatibility", "Documents must remain compatible with the ISO/IEC 26300-3 (ODF 1.3) edition, which is still under publication.", OdfIssueSeverity.Error)],
         null);
 
     /// <summary>
