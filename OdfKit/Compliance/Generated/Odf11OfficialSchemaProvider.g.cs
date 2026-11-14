@@ -42291,7 +42291,7 @@ namespace OdfKit.Compliance
                 }),
             };
 
-            var generated = new OdfSchemaSet(OdfVersion.Odf11, new Uri("https://docs.oasis-open.org/office/v1.1/OS/OpenDocument-schema-v1.1.rng"), "2026-06-16", elements, attributes, nameClasses, patterns);
+            var generated = new OdfSchemaSet(OdfVersion.Odf11, new Uri("https://docs.oasis-open.org/office/v1.1/OS/OpenDocument-schema-v1.1.rng"), "2007-02-01", elements, attributes, nameClasses, patterns);
             return baseSchema == null ? generated : baseSchema.MergeWith(generated);
         }
 

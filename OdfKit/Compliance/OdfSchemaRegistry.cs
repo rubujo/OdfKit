@@ -22,11 +22,11 @@ public static class OdfSchemaRegistry
 
     // ODF 1.0/1.1/1.2/1.3：以官方獨立 RNG 衍生的真實版本專屬 schema（非從 1.4 過濾的近似值）。
     private static readonly OdfSchemaSet Odf13Default = OdfGeneratedSchemaProvider.CreateOdf13(
-        CreateSeed(OdfVersion.Odf13, Odf13SchemaSource, "2026-06-16"));
+        CreateSeed(OdfVersion.Odf13, Odf13SchemaSource, "2021-04-27"));
     private static readonly OdfSchemaSet Odf12Default = OdfGeneratedSchemaProvider.CreateOdf12(
-        CreateSeed(OdfVersion.Odf12, Odf12SchemaSource, "2026-06-16"));
+        CreateSeed(OdfVersion.Odf12, Odf12SchemaSource, "2011-09-29"));
     private static readonly OdfSchemaSet Odf11Default = OdfGeneratedSchemaProvider.CreateOdf11(
-        CreateSeed(OdfVersion.Odf11, Odf11SchemaSource, "2026-06-16"));
+        CreateSeed(OdfVersion.Odf11, Odf11SchemaSource, "2007-02-01"));
     private static readonly OdfSchemaSet Odf10Default = OdfGeneratedSchemaProvider.CreateOdf10(
         CreateSeed(OdfVersion.Odf10, Odf10SchemaSource, "2005-05-01"));
 
