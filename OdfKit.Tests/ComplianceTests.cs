@@ -102,9 +102,19 @@ namespace OdfKit.Tests
             Assert.True(OdfComplianceProfiles.SkGovernmentOdf.SupportedVersions.Contains(OdfVersion.Odf12));
             Assert.False(OdfComplianceProfiles.SkGovernmentOdf.SupportedVersions.Contains(OdfVersion.Odf13));
 
+            Assert.Equal(OdfProfileVerificationStatus.VerifiedOfficial, OdfComplianceProfiles.FrGovernmentOdf.VerificationStatus);
+            Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.FrGovernmentOdf.AuthorityLevel);
+            Assert.Equal(OdfProfileVerificationStatus.VerifiedOfficial, OdfComplianceProfiles.ItGovernmentOdf.VerificationStatus);
+            Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.ItGovernmentOdf.AuthorityLevel);
+            Assert.Equal(OdfProfileVerificationStatus.VerifiedOfficial, OdfComplianceProfiles.BrGovernmentOdf.VerificationStatus);
+            Assert.True(OdfComplianceProfiles.BrGovernmentOdf.SupportedVersions.Contains(OdfVersion.Odf12));
+            Assert.False(OdfComplianceProfiles.BrGovernmentOdf.SupportedVersions.Contains(OdfVersion.Odf13));
+            Assert.Equal(OdfProfileVerificationStatus.VerifiedOfficial, OdfComplianceProfiles.NoGovernmentOdf.VerificationStatus);
+            Assert.Contains("2013-04-05-959", OdfComplianceProfiles.NoGovernmentOdf.SourceUrl!.AbsoluteUri);
+            Assert.True(OdfComplianceProfiles.NoGovernmentOdf.SupportedVersions.Contains(OdfVersion.Odf13));
+
             OdfComplianceProfile[] profilesNeedingActiveSources =
             [
-                OdfComplianceProfiles.ItGovernmentOdf,
                 OdfComplianceProfiles.DkGovernmentOdf,
                 OdfComplianceProfiles.KrGovernmentOdf,
                 OdfComplianceProfiles.ZaGovernmentOdf

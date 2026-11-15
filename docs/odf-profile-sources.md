@@ -30,14 +30,14 @@
 | `ROC_Taiwan_ODF_CNS15251` | `https://www.cnsonline.com.tw/?node=detail&generalno=15251-1&classno=X5018` | `2019-09-05` | `Normative` | `VerifiedOfficial` | `1.2` | 中華民國（臺灣）CNS 15251 ODF 1.2 國家標準；主來源為第 1 部綱要，並包含 [第 2 部 OpenFormula](https://www.cnsonline.com.tw/?node=detail&generalno=15251-2&classno=X5018) 與[第 3 部套件](https://www.cnsonline.com.tw/?node=detail&generalno=15251-3&classno=X5018)。三部分皆於 2019-09-05 修訂、2025-03-10 確認；原 CNS 15251 已廢止。 |
 | `ROC_Taiwan_GovernmentODFTools` | `https://moda.gov.tw/digital-affairs/digital-service/app-services/248` | `null` | `Compatibility` | `CompatibilityOnly` | `all-known` | 中華民國 (臺灣) 政府 ODF 文件應用工具相容性規範。 |
 | `DE_Government_ODF` | `https://www.it-planungsrat.de/fileadmin/beschluesse/2026/Beschluss_2026_03_Deutschland-Stack_Standards.pdf` | `2026` | `Normative` | `VerifiedOfficial` | `all-known` | Deutschland-Stack 標準附件直接列出 ODF，但未限定 ODF 版本；本 Profile 因此不宣稱特定版本。 |
-| `FR_Government_ODF_RGI` | `https://www.numerique.gouv.fr/offre-accompagnement/reference-interoperabilite-rgi/` | `null` | `Draft` | `NeedsActiveSource` | `1.2` | 法國 RGI 來源入口；仍需確認目前有效且直接列出 ODF 的官方條目。 |
-| `NO_Government_ODF` | `https://lovdata.no/forskrift/2009-09-25-1222` | `2009-09-25` | `Draft` | `NeedsActiveSource` | `1.1` | 原引用法規已於 2013 年廢止（Lovdata 標註 Opphevet），且該法規原文規定的版本為 ODF 1.1（OASIS, 2007-02-12），並非先前誤植的 1.2；降級並等待確認現行有效來源（可能為 Digitaliseringsdirektoratet 的 IT 標準參考目錄）。 |
-| `BR_Government_ODF_ePING` | `https://www.gov.br/governodigital/pt-br/infraestrutura-nacional-de-dados/interoperabilidade/padroes-de-interoperabilidade` | `2025` | `Draft` | `NeedsActiveSource` | `all-known` | 巴西 e-PING 來源入口；仍需確認目前有效且直接列出 ODF 的官方條目。 |
+| `FR_Government_ODF_RGI` | `https://www.numerique.gouv.fr/offre-accompagnement/reference-interoperabilite-rgi/` | `2016-04-22` | `Compatibility` | `VerifiedOfficial` | `1.2` | RGI v2.0（2016-04-20 arrêté，JORF 2016-04-22 公告，DINUM 頁面標示 en vigueur）將 ODF 標為「Recommandé」，對應 ODF 1.2／ISO/IEC 26300:2015 三部；僅為建議，非強制，故權威層級為 `Compatibility`。 |
+| `NO_Government_ODF` | `https://lovdata.no/dokument/SF/forskrift/2013-04-05-959` | `2013-04-05` | `Normative` | `VerifiedOfficial` | `all-known` | FOR-2013-04-05-959（最後修訂 2021-10-08）§5 規定機關必須能接收 ODF 與 OOXML 等常見格式；條文未限定版本，也不強制產出 ODF。取代已廢止的 2009-09-25-1222。 |
+| `BR_Government_ODF_ePING` | `https://www.gov.br/governodigital/pt-br/infraestrutura-nacional-de-dados/ePING_v2018_20171205.pdf` | `2018` | `Normative` | `VerifiedOfficial` | `1.2` | ePING 2018 版將 ODF 1.2（.odt／.ods／.odp）列為「Adotado」，對 SISP 聯邦機關具拘束力（Portaria 92/2014，經 Portaria 41/2019 更新）。狀態說明取自 PDF 圖例，未另核對葡文法條原文。 |
 | `US_NARA_ODF` | `https://www.archives.gov/records-mgmt/policy/transfer-guidance-tables.html` | `null` | `Compatibility` | `OfficialButIndirect` | `all-known` | 美國 NARA 電子檔案移轉格式接受規則映射，不是完整 ODF 規格 profile。 |
 | `NATO_ODF` | `https://nhqc3s.hq.nato.int/apps/nisp/NISP_Catalogue_02_APR_2026.pdf` | `2026-04-02` | `Normative` | `VerifiedOfficial` | `1.2-1.3` | NISP Version 17（2026-04-02）：ISO/IEC 26300-1～26300-3:2015（對應 ODF 1.2）於 [PFL-00269]／[PFL-00355]／[PFL-00592]／[PFL-00765] 列為 Mandatory；[PFL-00765] "Document File Formats (DM)" 同時將 OASIS OpenDocument V1.3 (2021) 列為 Mandatory，屬本次複查新發現的版本擴展，非單純來源更新。原引用的 `NISP-Vol3-v15-release.pdf` 路徑已失效（改為整合式目錄 PDF）。 |
 | `PT_Government_ODF_RNID` | `https://files.dre.pt/1s/2018/01/00400/0012100127.pdf` | `2018-01-05` | `Normative` | `VerifiedOfficial` | `1.2` | 葡萄牙 RNID 表 II 將 ODF 1.2 列為可編輯文件的強制規格。 |
 | `BE_Government_ODF` | `https://bosa.belgium.be/` | `null` | `Draft` | `NeedsActiveSource` | `all-known` | 比利時 BOSA 來源入口；ODF 義務源自 2006-06-23 部長會議決議與 2007 年聯邦備忘錄，但 BOSA 站內查無直接列出 ODF 的現行條目（`dt.bosa.be` 的開放標準頁目前不可達），仍需確認有效官方條目。 |
-| `IT_Government_ODF_CAD` | `https://www.agid.gov.it/` | `null` | `Draft` | `NeedsActiveSource` | `1.2` | AgID 舊版附件可證明 ODF 使用，但本次找不到直接且現行的 ODF 1.2 規範來源，故不得宣稱已驗證。 |
+| `IT_Government_ODF_CAD` | `https://www.agid.gov.it/sites/agid/files/2024-06/allegato_2_formati_di_file_e_riversamento.pdf` | `2024-06` | `Compatibility` | `VerifiedOfficial` | `1.2` | AgID 文件管理指引 Allegato 2（2024-06）列出 OpenDocument（ISO/IEC 26300-1/3:2015、OASIS ODF 1.2），並建議可編輯文件使用 .odt；屬建議而非強制。 |
 | `UK_Government_ODF_1_2` | `https://www.gov.uk/government/publications/open-standards-for-government/sharing-or-collaborating-with-government-documents` | `2026-01-29` | `Normative` | `VerifiedOfficial` | `1.2` | 英國政府 ODF 1.2 相容性規範；官方頁面於 2026-01-29 更新後仍明定使用 ODF 1.2。 |
 | `NL_Government_ODF` | `https://www.forumstandaardisatie.nl/open-standaarden/odf` | `null` | `Normative` | `VerifiedOfficial` | `1.2` | 荷蘭政府 ODF 1.2 相容性規範。 |
 | `SK_Government_ODF` | `https://www.slov-lex.sk/pravne-predpisy/SK/ZZ/2020/78/` | `2020-04-16` | `Normative` | `VerifiedOfficial` | `1.2` | Vyhláška č. 78/2020 Z. z. §19 ods. 1 písm. b) bod 1：直接讀取官方法規原文，確認條文寫「Open Document Format (.odt) najviac vo verzii 1.2 podľa... (OASIS)」（.odt 檔案最高至 1.2 版）。來源網址已由入口頁改指法規原文本身。 |
@@ -100,6 +100,11 @@
   發現：官方頁面摘要無法確認是否列出 ODF，需下載完整 PDF 逐條核對——這代表每個候選
   國家都需要類似本文件其他項目的一手來源查證工作量，維基百科條目本身不足以構成
   `VerifiedOfficial` 或甚至 `Draft` 來源。在個別完成官方來源查證前，不新增這些國家。
+
+## 2026-11-15 剩餘缺來源 Profile 複查
+
+- **升級**：`FR_Government_ODF_RGI`、`IT_Government_ODF_CAD`、`BR_Government_ODF_ePING`、`NO_Government_ODF` 已找到現行一手來源並改為 `VerifiedOfficial`。法、義僅為建議（`Compatibility`）；巴西對聯邦機關具拘束力；挪威只要求「能接收」，版本範圍因此為 `all-known`。
+- **維持 `Draft`／`NeedsActiveSource`**：`BE`（僅有 2006 年部長會議決議的二手報導）、`DK`（2011 年專家委員會建議不列入強制清單）、`MY`（2007/08 年採用，現行狀態不明）、`KR`（KS X ISO/IEC 26300 存在，但無公務強制規定）、`ZA`（PSR 2016 第 97 條要求遵守 MIOS，但 MIOS 5.0 本文無法取得一手確認）。
 
 ## 2026-11-14 ISO 來源更正
 
