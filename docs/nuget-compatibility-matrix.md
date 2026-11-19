@@ -80,10 +80,10 @@ managed 擴充套件不綁定特定 CPU 架構；Imaging 套件則明確宣告 L
 |------|------|
 | **GitHub 原始碼** | 主要使用方式（clone、`ProjectReference`） |
 | **CI 候選資產** | 每次工作流程產生 commit-bound 候選套件，供驗證與人工決策 |
-| **GitHub Release** | 發佈自動化已備妥，但目前尚未建立公開 Release |
+| **GitHub Release** | 隨 `v0.0.1` tag 更新自動建置、簽署並發佈交付快照 |
 | **nuget.org** | **非目前目標** |
 
-首個經人工核准的 GitHub Release 建立後，可下載資產並執行：
+自 GitHub Release 下載資產後，可建立本機或內部套件來源並執行：
 
 ```powershell
 dotnet nuget add source C:\path\to\release-assets --name odfkit-github-release
@@ -93,8 +93,7 @@ dotnet add package OdfKit --version 0.0.1 --source odfkit-github-release
 若需固定套件選型與導入順序，請先讀
 [套件目錄與選型指南](package-catalog.md)。
 
-在公開 Release 建立前，請使用原始碼／`ProjectReference`，或使用相同提交的 CI 候選資產；
-不得把工作流程演練產物描述為已公開發佈的套件。
+日常開發建議優先使用原始碼／`ProjectReference`，或下載 `v0.0.1` GitHub Release 交付快照（此 Release 隨 tag 更新覆蓋，代表該 tag 指向提交的快照，而非 nuget.org 上的不可變版本歷史）。
 
 ## 5. 驗證與封裝
 

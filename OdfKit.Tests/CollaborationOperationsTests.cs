@@ -824,7 +824,9 @@ public sealed class CollaborationOperationsTests
     public void CompatibilityProfileAndExporterBudgetsAreAuditable()
     {
         Assert.True(OdtOperationCompatibilityProfile.SupportsImport("addTable"));
-        Assert.False(OdtOperationCompatibilityProfile.SupportsExport("addTable"));
+        Assert.True(OdtOperationCompatibilityProfile.SupportsExport("addTable"));
+        Assert.True(OdtOperationCompatibilityProfile.SupportsExport("addCells"));
+        Assert.False(OdtOperationCompatibilityProfile.SupportsExport("delete"));
         Assert.True(OdtOperationCompatibilityProfile.SupportsExport("addText"));
 
         using TextDocument document = TextDocument.Create();

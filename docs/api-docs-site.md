@@ -92,7 +92,7 @@ docs/toc.yml          # project-docs 的分層文件導覽
 | `--warningsAsErrors` | DocFX metadata 與 build 警告均視為錯誤。 |
 | 站內連結健檢 | 掃描全站 HTML 相對 `href`／`src`，任何指向不存在檔案者即失敗。 |
 | 原始資源與 xref | 禁止內部 `.md`、同儲存庫 GitHub Markdown、無來源的 `project-docs/` 輸出及 modern 輸出殘留的 `xref:*`。 |
-| DocFX 版本 | 必須與 repo-local tool manifest 固定的 2.78.5 一致。 |
+| DocFX 版本 | 必須與 repo-local tool manifest 固定的 2.81.0 一致。 |
 | modern 輸出 | 驗證自訂 CSS、OdfKit 標誌、footer、sitemap、搜尋索引、頁數及 17 語系 HTML `lang`。 |
 | 權威文件 | 驗證快速開始、套件選型、完整 `docs/`、機器可讀證據與第三方聲明均建置為站內資源。 |
 | 404 頁面 | 驗證 `404.html` 存在、已注入站台根 `<base>`（GitHub Pages 於任意深度缺失路徑回傳其內容，相對資源需以站台根解析）且不進入 sitemap。 |

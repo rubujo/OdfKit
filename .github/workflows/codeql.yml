@@ -36,8 +36,8 @@ jobs:
         include:
           - language: csharp
             # 建置模式取捨：OdfKit.csproj 明確關閉 EnableTrimAnalyzer，因為對本專案
-            # 約 28.7 萬行產生碼（DOM/Generated 606 檔、Compliance/Generated 13 檔，
-            # 佔 .cs 檔案 62%）做資料流分析會讓 VBCSCompiler 記憶體衝上 7GB 以上。
+            # 約 28.0 萬行產生碼（DOM/Generated 607 檔、Compliance/Generated 13 檔，
+            # 共 620 個產生碼檔案）做資料流分析會讓建置耗時達數小時以上。
             # 若在此改用手動建置（`dotnet build` 43 個專案並開啟分析器），會複現
             # 同一種資源壓力，且逐一建置每個專案的 CI 成本也偏高。
             #

@@ -18,7 +18,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 
-# OdfKit 主函式庫（621 檔）跑完整 dotnet format 會觸發大量 analyzer 修正，本機可達數十分鐘；僅 whitespace。
+# OdfKit 主函式庫（含 620 個產生碼檔案，共 1,564 檔）跑完整 dotnet format 會觸發大量 analyzer 修正，本機可達數十分鐘；僅 whitespace。
 $whitespaceOnlyProjects = @(
     'OdfKit/OdfKit.csproj'
 )

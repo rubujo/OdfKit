@@ -27,8 +27,8 @@
   <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
     <IsTrimmable>true</IsTrimmable>
     <!-- 裁剪相容性已由 eng/Test-TrimSmoke.ps1 的實機發佈+執行驗證把關；此分析器須對本專案
-         619 個檔案、約 28.7 萬行生成碼（DOM/Generated 606 檔 69,841 行；
-         Compliance/Generated 13 檔 217,523 行；合計佔本專案 .cs 的 62%）做資料流分析，
+         620 個檔案、約 28.0 萬行生成碼（DOM/Generated 607 檔 62,152 行；
+         Compliance/Generated 13 檔 217,583 行）做資料流分析，
          耗時完全不可用，故關閉。
 
          2026-07-26 實測（Release／net10.0／-t:Rebuild／UseSharedCompilation=false，

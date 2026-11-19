@@ -21,7 +21,7 @@ public static class OdtOperationCompatibilityProfile
 
     private static readonly string[] ExportNames =
     [
-        "addParagraph", "addText", "addTab", "addLineBreak",
+        "addParagraph", "addText", "addTab", "addLineBreak", "addTable", "addCells",
     ];
 
     /// <summary>

@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- 明確釘選已修補的 AngleSharp 版本，覆寫 dotNetRdf.Core 帶入的舊版傳遞相依以通過 NuGet Audit。 -->
     <PackageReference Include="AngleSharp" />
     <PackageReference Include="dotNetRdf.Core" />
   </ItemGroup>

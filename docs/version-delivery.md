@@ -7,7 +7,7 @@
 | 項目 | 現況 |
 |------|------|
 | 原始碼 | GitHub repository |
-| 套件資產 | CI 產生 commit-bound 候選資產；目前尚無公開 GitHub Release |
+| 套件資產 | 隨 `v0.0.1` tag 更新由 `github-release.yml` 自動建置、簽署並發布的 GitHub Release 交付快照，以及每次 CI 產生的 commit-bound 候選資產 |
 | 公開套件倉庫 | 目前 **未發佈至 nuget.org** |
 
 ## 2. 版本身分與相容性資訊
@@ -29,7 +29,7 @@
 | 模式 | 適用情境 | 參考文件 |
 |------|----------|----------|
 | 原始碼 / `ProjectReference` | 直接整合原始碼或追蹤最新主幹 | [快速開始](getting-started.md) |
-| GitHub Release `.nupkg` | 首個公開 Release 經人工核准後，以固定資產建立內部套件來源 | [GitHub Release 發佈指南](github-release-publishing.md) |
+| GitHub Release `.nupkg` | 下載 `v0.0.1` GitHub Release 交付快照資產建立內部套件來源 | [GitHub Release 發佈指南](github-release-publishing.md) |
 | 本機 / CI 驗證 | 建置、測試、封裝與 smoke 驗證 | [NuGet 相容矩陣](nuget-compatibility-matrix.md) |
 
 ## 4. 常見查閱文件

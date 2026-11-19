@@ -4,8 +4,7 @@ title: 快速開始 / Getting started
 
 # 快速開始 / Getting started
 
-從原始碼建置 OdfKit，或在應用程式中加入 `ProjectReference`。目前尚未建立公開 GitHub
-Release，亦未發布至 nuget.org；請勿把 CI 候選資產視為公開套件來源。
+從原始碼建置 OdfKit，或在應用程式中加入 `ProjectReference`。目前主要交付管道為 GitHub 原始碼與隨 `v0.0.1` tag 自動更新的 GitHub Release 交付快照，仍未發佈至 nuget.org。
 
 ```powershell
 dotnet build
